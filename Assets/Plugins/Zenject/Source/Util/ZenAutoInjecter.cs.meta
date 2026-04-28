@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 717a02054ef2699498e6bd4234fd7995
+timeCreated: 1510660712
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Util/ZenAutoInjecter.cs
+  uploadId: 273967

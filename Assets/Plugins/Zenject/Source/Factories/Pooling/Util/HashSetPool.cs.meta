@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 89c66035001289a4199cb04e17d0bc28
+timeCreated: 1520670682
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Factories/Pooling/Util/HashSetPool.cs
+  uploadId: 273967

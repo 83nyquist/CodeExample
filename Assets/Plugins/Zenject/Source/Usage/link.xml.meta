@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 78cde942f7000eb41900aa4d3c9249d7
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Usage/link.xml
+  uploadId: 273967

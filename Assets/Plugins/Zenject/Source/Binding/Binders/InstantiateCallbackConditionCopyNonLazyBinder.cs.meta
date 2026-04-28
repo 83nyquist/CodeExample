@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 0711425cf187dd94ea21d8ed6f38d981
+timeCreated: 1535263051
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Binding/Binders/InstantiateCallbackConditionCopyNonLazyBinder.cs
+  uploadId: 273967

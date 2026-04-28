@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 1c47912ae4e51a84d92f1acf689997c8
+timeCreated: 1461708048
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: -9996
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Runtime/Kernels/DefaultGameObjectKernel.cs
+  uploadId: 273967

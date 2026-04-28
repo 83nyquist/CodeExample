@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: f96372c95411c904bb55ba67b55e0c84
+timeCreated: 1537003252
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Unity/AssemblyPathRegistry.cs
+  uploadId: 273967

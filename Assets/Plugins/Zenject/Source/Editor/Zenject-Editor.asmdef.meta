@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d0acddb179989574c8355991596bd3e6
+timeCreated: 1531030222
+licenseType: Store
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Editor/Zenject-Editor.asmdef
+  uploadId: 273967

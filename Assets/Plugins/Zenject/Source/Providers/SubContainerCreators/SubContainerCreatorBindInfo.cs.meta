@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 2d894c838f0dcc34bb38d1311af9ea56
+timeCreated: 1534923025
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Providers/SubContainerCreators/SubContainerCreatorBindInfo.cs
+  uploadId: 273967

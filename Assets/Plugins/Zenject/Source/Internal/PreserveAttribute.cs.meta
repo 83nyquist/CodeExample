@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: de17d24691e2bfd458a9d10cb1d49098
+timeCreated: 1453682156
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/Source/Internal/PreserveAttribute.cs
+  uploadId: 273967

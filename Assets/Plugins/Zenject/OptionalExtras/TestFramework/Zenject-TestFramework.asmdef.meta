@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a2f2239355369ba4fb6909aeaa41def5
+timeCreated: 1531969421
+licenseType: Store
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17758
+  packageName: Zenject Dependency Injection IOC
+  packageVersion: 7.3.1
+  assetPath: Assets/Plugins/Zenject/OptionalExtras/TestFramework/Zenject-TestFramework.asmdef
+  uploadId: 273967
