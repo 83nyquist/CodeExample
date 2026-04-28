@@ -7,7 +7,7 @@ A Unity demonstration project featuring a top-down hex grid system with Perlin n
 - **Hex Grid System** - Complete top-down hex grid implementation with cell navigation
 - **Perlin Noise Generation** - Procedural terrain height and feature mapping
 - **UI Toolkit** - Modern Unity UI system for clean, scalable interface design
-- **Coroutine & Multithreading** - Optimized generation patterns for smooth performance
+- **Coroutine Cooperative Multitasking** - Optimized generation patterns for smooth performance
 
 ## How to Run the Build
 
