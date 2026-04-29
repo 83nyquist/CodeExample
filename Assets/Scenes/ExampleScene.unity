@@ -397,7 +397,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.47185796, y: -0.00000026912213, z: 0.00000014402978, w: 0.8816746}
+  m_LocalRotation: {x: 0.47185796, y: -0.000000033897383, z: 0.00000001814133, w: 0.8816746}
   m_LocalPosition: {x: 0, y: 30, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -489,8 +489,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 583918622}
-  - component: {fileID: 583918623}
   - component: {fileID: 583918624}
+  - component: {fileID: 583918623}
+  - component: {fileID: 583918625}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -544,6 +545,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cda962aefb99ab6fb8be4aa4b776187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Input.InputHandler
+--- !u!114 &583918625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583918621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b88ee9bca3a79c53958438a5a645f62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraZoom
+  cinemachineCamera: {fileID: 1778644304}
+  zoomSpeed: 5
+  minDistance: 10
+  maxDistance: 40
+  zoomSmoothing: 0.1
+  defaultY: 30
+  defaultZ: -20
+  maintainAngle: 1
 --- !u!1 &663264069
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,8 +803,9 @@ MonoBehaviour:
   npcCount: 100
   minMoveInterval: 1
   maxMoveInterval: 3
-  npcVisualPrefab: {fileID: 4336427945477894687, guid: a4c860ce2bce89dde83e675fe00d7d2d, type: 3}
+  npcVisualPrefab: {fileID: 8794614267443648548, guid: a4c860ce2bce89dde83e675fe00d7d2d, type: 3}
   moveSpeed: 3
+  rotationSpeed: 15
 --- !u!1 &937940295
 GameObject:
   m_ObjectHideFlags: 0
@@ -1281,7 +1303,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1778644301}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4718579, y: -0.0000002691221, z: 0.00000014402978, w: 0.88167465}
+  m_LocalRotation: {x: 0.4718579, y: -0.000000033897376, z: 0.000000018141323, w: 0.88167465}
   m_LocalPosition: {x: 0, y: 30, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
