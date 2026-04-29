@@ -31,6 +31,10 @@ namespace Systems.Grid
         // public Vector3 WorldCoordinates => grid.AxialToWorld(X, Z);
         public Vector3Int CubeCoordinates => AxialToCube(x, z);
         
+        public bool IsWalkable => type != TileType.Water && 
+                                  type != TileType.Forest && 
+                                  type != TileType.Mountain;
+        
         public TileData(int q, int r)
         {
             // this.grid = grid;

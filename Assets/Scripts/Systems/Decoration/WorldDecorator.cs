@@ -144,6 +144,11 @@ namespace Systems.Decoration
                 }
             }
         }
+        
+        public HashSet<TileData> GetVisibleTiles()
+        {
+            return _decoratedTilesSet;
+        }
 
         private void OnDestroy()
         {
