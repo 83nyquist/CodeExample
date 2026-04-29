@@ -779,10 +779,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24b5192beacb9c2c1b7267677c6a5791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcManager
-  npcCount: 10
+  npcCount: 100
+  minMoveInterval: 1
+  maxMoveInterval: 3
   npcVisualPrefab: {fileID: 4336427945477894687, guid: a4c860ce2bce89dde83e675fe00d7d2d, type: 3}
-  moveSpeed: 5
-  npcDecisionInterval: 2
+  moveSpeed: 3
 --- !u!1 &937940295
 GameObject:
   m_ObjectHideFlags: 0
