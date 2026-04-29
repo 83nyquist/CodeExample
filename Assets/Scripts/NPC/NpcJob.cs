@@ -7,9 +7,9 @@ using UnityEngine;
 namespace NPC
 {
     [BurstCompile]
-    public struct NPCJob : IJobParallelFor
+    public struct NpcJob : IJobParallelFor
     {
-        public NativeArray<NPCData> NPCs;
+        public NativeArray<NpcData> NPCs;
         public float DeltaTime;
         public float MinInterval;
         public float MaxInterval;

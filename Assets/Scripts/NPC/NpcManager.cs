@@ -23,7 +23,7 @@ namespace NPC
         [SerializeField] private float moveSpeed = 5f;
         
         private NativeHexGrid _nativeGrid;
-        private NativeArray<NPCData> _npcs;
+        private NativeArray<NpcData> _npcs;
         private GameObject[] _npcVisuals;
         private Animator[] _npcAnimators;
         
@@ -122,7 +122,7 @@ namespace NPC
         
         private void SpawnNPCs()
         {
-            _npcs = new NativeArray<NPCData>(npcCount, Allocator.Persistent);
+            _npcs = new NativeArray<NpcData>(npcCount, Allocator.Persistent);
             _npcVisuals = new GameObject[npcCount];
             _npcAnimators = new Animator[npcCount]; 
             
@@ -145,7 +145,7 @@ namespace NPC
             {
                 int2 startPos = walkableTiles[Random.Range(0, walkableTiles.Count)];
                 
-                _npcs[i] = new NPCData
+                _npcs[i] = new NpcData
                 {
                     Position = startPos,
                     Timer = Random.Range(0f, maxMoveInterval),
@@ -206,7 +206,7 @@ namespace NPC
             UpdateAnimatorFlags();
     
             // Schedule new job
-            var job = new NPCJob
+            var job = new NpcJob
             {
                 NPCs = _npcs,
                 DeltaTime = Time.deltaTime,
