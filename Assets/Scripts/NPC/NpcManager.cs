@@ -232,11 +232,11 @@ namespace NPC
             
             UpdateNPCVisuals();
         }
-        
+        [SerializeField] private float rotationSpeed = 15f; 
         private void UpdateNPCVisuals()
         {
             if (_isJobRunning) return;
-    
+
             for (int i = 0; i < _npcVisuals.Length; i++)
             {
                 if (_npcVisuals[i] != null && i < _npcs.Length)
@@ -244,25 +244,32 @@ namespace NPC
                     Vector3 targetPos = HexToWorld(_npcs[i].Position);
                     Vector3 currentPos = _npcVisuals[i].transform.position;
             
-                    // Only position and rotation - no animator calls here
-                    if (Vector3.Distance(currentPos, targetPos) > 0.01f)
+                    float distanceToTarget = Vector3.Distance(currentPos, targetPos);
+            
+                    // Use MoveTowards for precise stopping
+                    if (distanceToTarget > 0.01f)
                     {
-                        // Movement
-                        _npcVisuals[i].transform.position = Vector3.Lerp(
+                        // This will move exactly and stop when reached
+                        _npcVisuals[i].transform.position = Vector3.MoveTowards(
                             currentPos, 
                             targetPos, 
                             moveSpeed * Time.deltaTime
                         );
                 
-                        // Rotation
+                        // Rotation while moving
                         Vector3 moveDirection = (targetPos - currentPos).normalized;
                         Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
                         targetRotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
                         _npcVisuals[i].transform.rotation = Quaternion.Slerp(
                             _npcVisuals[i].transform.rotation,
                             targetRotation,
-                            moveSpeed * Time.deltaTime
+                            rotationSpeed * Time.deltaTime  // Use dedicated rotation speed
                         );
+                    }
+                    else
+                    {
+                        // Snap to exact position when close enough
+                        _npcVisuals[i].transform.position = targetPos;
                     }
             
                     // Visibility
@@ -284,9 +291,9 @@ namespace NPC
                     Vector3 targetPos = HexToWorld(_npcs[i].Position);
                     Vector3 currentPos = _npcVisuals[i].transform.position;
             
+                    // Now this will properly become false when MoveTowards finishes
                     bool isMoving = Vector3.Distance(currentPos, targetPos) > 0.01f;
             
-                    // Use cached animator - no GetComponent call!
                     Animator animator = _npcAnimators[i];
                     if (animator != null && animator.GetBool("IsMoving") != isMoving)
                     {
