@@ -7,10 +7,10 @@ multithreading for performance optimization, running 2000+ agents
 ## Technical Highlights
 
 v1.2.1
-- **User Interface improvements
+- **User Interface improvements**
 
 v1.0.2
-- **Performance optimization
+- **Performance optimization**
 
 v1.0.1
 - **Multithreading in Unity Job System** - NPC system supporting a large amount of individiual agents
