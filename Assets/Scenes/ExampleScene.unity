@@ -152,119 +152,6 @@ Transform:
   - {fileID: 1778644302}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &116154293
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 116154294}
-  - component: {fileID: 116154297}
-  - component: {fileID: 116154296}
-  - component: {fileID: 116154295}
-  m_Layer: 0
-  m_Name: Background
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &116154294
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116154293}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.38453, z: 0}
-  m_LocalScale: {x: 75, y: 1.5, z: 75}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1723073966}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &116154295
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116154293}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &116154296
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116154293}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 4aa1ca1ad00a6ae47bf2a922e0b6c3ae, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &116154297
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116154293}
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &237140872
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,8 +234,8 @@ Camera:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.10092557, g: 0.105701886, b: 0.11320752, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -397,7 +284,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.47185796, y: -0.000000033897383, z: 0.00000001814133, w: 0.8816746}
+  m_LocalRotation: {x: 0.52172977, y: 0.000000012712342, z: -0.00000000777438, w: 0.8531108}
   m_LocalPosition: {x: 0, y: 30, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -560,7 +447,7 @@ MonoBehaviour:
   cinemachineCamera: {fileID: 1778644304}
   zoomSpeed: 5
   minDistance: 10
-  maxDistance: 40
+  maxDistance: 60
   zoomSmoothing: 0.1
   defaultY: 30
   defaultZ: -20
@@ -800,7 +687,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24b5192beacb9c2c1b7267677c6a5791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcManager
-  npcCount: 100
   minMoveInterval: 1
   maxMoveInterval: 3
   npcVisualPrefab: {fileID: 8794614267443648548, guid: a4c860ce2bce89dde83e675fe00d7d2d, type: 3}
@@ -1103,6 +989,7 @@ GameObject:
   - component: {fileID: 1720891973}
   - component: {fileID: 1720891972}
   - component: {fileID: 1720891974}
+  - component: {fileID: 1720891976}
   - component: {fileID: 1720891975}
   m_Layer: 5
   m_Name: UserInterface
@@ -1171,9 +1058,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1720891971}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 989b2fb8819bf644c89ddda5083e5521, type: 3}
+  m_Script: {fileID: 11500000, guid: 5639c98a72e46f512a282c540d08d232, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OutputAggregator
+  m_EditorClassIdentifier: Assembly-CSharp::UserInterface.DebugDrawer
+  showDebug: 0
+--- !u!114 &1720891976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720891971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4989b2a18908cef3a946e91d468b9559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UserInterface.UiLabels
+  uiDocument: {fileID: 1720891972}
 --- !u!1 &1723073965
 GameObject:
   m_ObjectHideFlags: 0
@@ -1206,7 +1107,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 116154294}
   - {fileID: 860187152}
   - {fileID: 1001720007}
   - {fileID: 237140873}
@@ -1225,7 +1125,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58e4b494633e500b88fc7cf68942cbd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Systems.WorldTileSystem.AxialHexGridGenerator
-  radius: 50
   hexSize: 1.05
   generateOnAwake: 1
   useRandomSeed: 1
@@ -1259,7 +1158,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fd4bc0cff2594321ac38c4132bb94cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Systems.Decoration.WorldDecorator
-  visionRadius: 10
   decorationUpdatesPerFrame: 25
 --- !u!114 &1723073970
 MonoBehaviour:
@@ -1303,7 +1201,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1778644301}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4718579, y: -0.000000033897376, z: 0.000000018141323, w: 0.88167465}
+  m_LocalRotation: {x: 0.52172977, y: 0.000000012712344, z: -0.000000007774381, w: 0.8531108}
   m_LocalPosition: {x: 0, y: 30, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1385,7 +1283,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineRotationComposer
   Composition:
-    ScreenPosition: {x: 0, y: 0}
+    ScreenPosition: {x: 0, y: -0.1}
     DeadZone:
       Enabled: 0
       Size: {x: 0.2, y: 0.2}

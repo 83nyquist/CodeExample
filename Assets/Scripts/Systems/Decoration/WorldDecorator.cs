@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Character;
+using Game;
 using Systems.Grid;
 using UnityEngine;
 using Zenject;
@@ -13,7 +14,7 @@ namespace Systems.Decoration
         [Inject] private DecoratorFactory _decoratorFactory;
         [Inject] private CharacterMover _characterMover;
 
-        [SerializeField] private int visionRadius;
+        private int _visionRadius = 10;
         
         [Header("Performance")]
         [SerializeField] private int decorationUpdatesPerFrame = 25;
@@ -40,7 +41,8 @@ namespace Systems.Decoration
         {
             if (origin == null) return;
 
-            List<TileData> newTilesInRadius = _axialHexGrid.GetTilesInRadius(origin.AxialCoordinates, visionRadius);
+            _visionRadius = GameSettings.VisionRadius;
+            List<TileData> newTilesInRadius = _axialHexGrid.GetTilesInRadius(origin.AxialCoordinates, _visionRadius);
 
             // Queue tiles to show (in new set but not in old set)
             foreach (TileData data in newTilesInRadius)

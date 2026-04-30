@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Game;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -16,7 +18,7 @@ namespace NPC
         [Inject] private WorldDecorator _worldDecorator;  // Inject WorldDecorator
         
         [Header("NPC Settings")]
-        [SerializeField] private int npcCount = 50;
+        private int npcCount = 50;
         [SerializeField] private float minMoveInterval = 1f;
         [SerializeField] private float maxMoveInterval = 3f;
         [SerializeField] private GameObject npcVisualPrefab;
@@ -24,6 +26,7 @@ namespace NPC
         
         private NativeHexGrid _nativeGrid;
         private NativeArray<NpcData> _npcs;
+        private NativeArray<NpcData>.ReadOnly _npcsReadOnly;
         private GameObject[] _npcVisuals;
         private Animator[] _npcAnimators;
         
@@ -34,6 +37,14 @@ namespace NPC
         private NativeHashSet<int2> _visibleTiles;
         private float _lastVisionUpdate;
         private readonly float _visionUpdateInterval = 0.1f; // Update vision 5 times per second
+        
+        public int NpcCount => npcCount;
+        public bool IsNpcsCreated => _npcs.IsCreated;
+        
+        private float _countUpdateTimer = 0;
+        private float _countUpdateInterval = 0.2f;
+        private int _cachedVisibleCount;
+        public event Action<int> OnVisibleAgentsCountChanged;
         
         void Awake()
         {
@@ -61,7 +72,7 @@ namespace NPC
             
             CleanupNPCs();
             BuildNativeGrid();
-            SpawnNPCs();
+            SpawnNpcs();
             
             // Initialize visible tiles set
             if (_visibleTiles.IsCreated)
@@ -120,8 +131,9 @@ namespace NPC
             Debug.Log($"Native grid built with {index} tiles");
         }
         
-        private void SpawnNPCs()
+        private void SpawnNpcs()
         {
+            npcCount = GameSettings.PopulationSize;
             _npcs = new NativeArray<NpcData>(npcCount, Allocator.Persistent);
             _npcVisuals = new GameObject[npcCount];
             _npcAnimators = new Animator[npcCount]; 
@@ -194,6 +206,8 @@ namespace NPC
                 _lastVisionUpdate = Time.time + _visionUpdateInterval;
                 UpdateVisibleTiles();
             }
+            
+            HandleVisibleAgentsCountChanged();
             
             // Complete previous job first
             if (_isJobRunning && _jobHandle.IsCompleted)
@@ -308,43 +322,34 @@ namespace NPC
             return _hexGrid.AxialToWorld(coord.x, coord.y);
         }
         
-        void OnGUI()
+        private void HandleVisibleAgentsCountChanged()
         {
-            if (!_npcs.IsCreated) 
+            _countUpdateTimer += Time.deltaTime;
+    
+            if (_countUpdateTimer >= _countUpdateInterval)
             {
-                GUILayout.Label("NPC System: Waiting for grid...");
-                return;
+                _countUpdateTimer = 0;
+        
+                // Check if job is done before reading
+                if (_jobHandle.IsCompleted)
+                {
+                    _jobHandle.Complete();
+                    int newCount = CalculateVisibleCount();
+                    if (newCount != _cachedVisibleCount)
+                    {
+                        _cachedVisibleCount = newCount;
+                        OnVisibleAgentsCountChanged?.Invoke(newCount);
+                    }
+                }
             }
-            
-            GUILayout.BeginArea(new Rect(Screen.width - 300, 15, 290, 150));
-            GUILayout.BeginVertical(GUI.skin.box);
-            
-            GUILayout.Label($"NPCs: {npcCount}");
-            GUILayout.Label($"Move Interval: {minMoveInterval}-{maxMoveInterval}s");
-            GUILayout.Label($"Walkable Tiles: {GetWalkableTileCount()}");
-            
-            int visibleCount = 0;
-            for (int i = 0; i < _npcs.Length; i++)
-            {
-                if (_npcs[i].IsVisible) visibleCount++;
-            }
-            GUILayout.Label($"Visible NPCs: {visibleCount}/{npcCount}");
-            
-            GUILayout.Label($"Multithreading: ACTIVE ✓");
-            GUILayout.Label($"FPS: {1f/Time.deltaTime:F0}");
-            
-            GUILayout.EndVertical();
-            GUILayout.EndArea();
         }
         
-        private int GetWalkableTileCount()
+        private int CalculateVisibleCount()
         {
-            if (!_nativeGrid.Tiles.IsCreated) return 0;
-            
             int count = 0;
-            for (int i = 0; i < _nativeGrid.Tiles.Length; i++)
+            for (int i = 0; i < _npcs.Length; i++)
             {
-                if (_nativeGrid.Tiles[i].IsWalkable) count++;
+                if (_npcs[i].IsVisible) count++;
             }
             return count;
         }

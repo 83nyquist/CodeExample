@@ -1,6 +1,7 @@
 using Audio;
 using Character;
 using Input;
+using NPC;
 using Systems.Decoration;
 using Systems.Grid;
 using UserInterface;
@@ -15,6 +16,7 @@ namespace Systems.DependencyInjection
             Container.Bind<AxialHexGrid>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<WorldDecorator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<DecoratorFactory>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<NpcManager>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<CharacterController>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<CharacterPathfinding>().FromComponentInHierarchy().AsCached().NonLazy();
@@ -24,9 +26,11 @@ namespace Systems.DependencyInjection
             Container.Bind<InputHandler>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<UIController>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<UiLabels>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<DebugDrawer>().FromComponentInHierarchy().AsCached().NonLazy();
+            
             Container.Bind<AudioManager>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<CharacterAnimationEvents>().FromComponentInHierarchy().AsCached().NonLazy();
-            Container.Bind<OutputAggregator>().FromComponentInHierarchy().AsCached().NonLazy();
         }
     }
 }

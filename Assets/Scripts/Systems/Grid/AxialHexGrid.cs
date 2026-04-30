@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Enumerations;
+using Game;
 using Systems.Grid.AlterationPasses;
 using UnityEngine;
 
@@ -10,7 +11,6 @@ namespace Systems.Grid
     public class AxialHexGrid : MonoBehaviour
     {
         [Header("Grid Settings")]
-        [Range(1, 200)] public int radius = 5;
         public float hexSize = 1.05f;
         public bool generateOnAwake = true;
         
@@ -19,11 +19,13 @@ namespace Systems.Grid
         [SerializeField] private int customSeed = 42;
         
         [SerializeField] private List<GridGeneratorPassWrapper> generatorPasses = new List<GridGeneratorPassWrapper>();
-        
+
         // Core grid storage
         private Dictionary<Vector2Int, TileData> _tiles = new Dictionary<Vector2Int, TileData>();
         public Dictionary<Vector2Int, TileData> Tiles => _tiles;
-        
+
+        private int _radius = 5;
+
         // Events
         public event Action<Dictionary<Vector2Int, TileData>> OnGridGenerated;
         
@@ -41,6 +43,7 @@ namespace Systems.Grid
         [ContextMenu("Generate Grid")]
         public void GenerateGrid()
         {
+            _radius = GameSettings.GridRadius;
             SetSeed();
             ClearGrid();
             
@@ -53,16 +56,16 @@ namespace Systems.Grid
             BuildAllNeighbours();
             RunGeneratorPasses();
             
-            Debug.Log($"Generated {_tiles.Count} hex tiles with radius {radius}");
+            Debug.Log($"Generated {_tiles.Count} hex tiles with radius {_radius}");
             OnGridGenerated?.Invoke(_tiles);
         }
         
         private IEnumerable<Vector2Int> GetCoordinatesInRadius()
         {
-            for (int q = -radius; q <= radius; q++)
+            for (int q = -_radius; q <= _radius; q++)
             {
-                int r1 = Mathf.Max(-radius, -q - radius);
-                int r2 = Mathf.Min(radius, -q + radius);
+                int r1 = Mathf.Max(-_radius, -q - _radius);
+                int r2 = Mathf.Min(_radius, -q + _radius);
                 
                 for (int r = r1; r <= r2; r++)
                 {
