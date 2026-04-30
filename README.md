@@ -6,14 +6,21 @@ multithreading for performance optimization, running 2000+ agents
 
 ## Technical Highlights
 
+v1.2.1
+- **User Interface improvements
+
+v1.0.2
+- **Performance optimization
+
+v1.0.1
+- **Multithreading in Unity Job System** - NPC system supporting a large amount of individiual agents
+
 v1.0.0
 - **Hex Grid System** - Complete top-down hex grid implementation with cell navigation
 - **Perlin Noise Generation** - Procedural terrain height and feature mapping
 - **UI Toolkit** - Modern Unity UI system for clean, scalable interface design
 - **Coroutine & Object Pooling** - Optimized generation of tile decoration for smooth performance
 
-v1.0.1
-- **Multithreading in Unity Job System** - NPC system supporting a large amount of individiual agents
 
 ## How to Run the Build
 
