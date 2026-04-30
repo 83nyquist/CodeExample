@@ -1,7 +1,7 @@
 using Unity.Mathematics;
 
 // This struct can be used in jobs (no references, only value types)
-namespace NPC
+namespace NPC.Structs
 {
     public struct BlittableTileData
     {
