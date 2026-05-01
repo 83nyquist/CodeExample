@@ -88,6 +88,7 @@ namespace Systems.Grid
 
             if (currentPath == null || currentPath.Count == 0)
             {
+                //TODO User feedback
                 Debug.Log("No path found.");
                 return;
             }
