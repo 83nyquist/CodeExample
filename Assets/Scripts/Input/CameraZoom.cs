@@ -49,8 +49,6 @@ namespace Input
             
                 // Clamp to min/max
                 _targetDistance = Mathf.Clamp(_targetDistance, minDistance, maxDistance);
-            
-                Debug.Log($"Camera initialized: Direction={_normalizedDirection}, Distance={_originalMagnitude}");
             }
             else
             {

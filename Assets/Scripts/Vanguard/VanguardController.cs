@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Character;
 using Systems.Decoration;
 using Systems.Grid;
 using UnityEngine;

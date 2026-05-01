@@ -2,14 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Enumerations;
-using Game;
+using Game.Data;
 using Systems.Grid.AlterationPasses;
 using UnityEngine;
+using Zenject;
 
 namespace Systems.Grid
 {
     public class AxialHexGrid : MonoBehaviour
     {
+        [Inject] private PlayerSettings _playerSettings;
+        
         [Header("Grid Settings")]
         public float hexSize = 1.05f;
         public bool generateOnAwake = true;
@@ -43,7 +46,7 @@ namespace Systems.Grid
         [ContextMenu("Generate Grid")]
         public void GenerateGrid()
         {
-            _radius = GameSettings.GridRadius;
+            _radius = _playerSettings.gridRadius;
             SetSeed();
             ClearGrid();
             
@@ -104,7 +107,6 @@ namespace Systems.Grid
         private void SetSeed()
         {
             _currentSeed = useRandomSeed ? UnityEngine.Random.Range(1, 999999) : customSeed;
-            Debug.Log($"[AxialHexGrid] Using seed: {_currentSeed}");
         }
         
         private void RunGeneratorPasses()
@@ -123,7 +125,6 @@ namespace Systems.Grid
             
             foreach (var pass in _orderedPasses)
             {
-                Debug.Log($"Running generation pass: {pass.PassName} (Priority: {pass.Priority})");
                 pass.Execute(this, _currentSeed);
             }
         }

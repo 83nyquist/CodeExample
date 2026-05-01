@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Game;
+using Game.Data;
 using NPC.Components;
 using NPC.Structs;
 using Unity.Collections;
@@ -18,6 +19,7 @@ namespace NPC
     {
         [Inject] private AxialHexGrid _hexGrid;
         [Inject] private WorldDecorator _worldDecorator;
+        [Inject] private PlayerSettings _playerSettings;
         
         [Header("NPC Settings")]
         [SerializeField] private float minMoveInterval = 1f;
@@ -102,7 +104,7 @@ namespace NPC
 
             // Build new grid and spawn
             _nativeGrid = _gridBuilder.BuildFromTileData(tiles, Allocator.Persistent);
-            _npcs = _spawner.Spawn(GameSettings.PopulationSize, _nativeGrid);
+            _npcs = _spawner.Spawn(_playerSettings.populationSize, _nativeGrid);
             _visualRegistry.CreateVisuals(_npcs, HexToWorld);
 
             // Reset event cache
