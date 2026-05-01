@@ -38,7 +38,7 @@ namespace Systems.Grid
         public void DrawPath(TileDecorator targetDecorator)
         {
             // Ensure the Vanguard has a valid tile and that tile's visual decorator has been spawned
-            if (_vanguardController.CurrentTile == null || _vanguardController.CurrentTile.Decorator == null)
+            if (targetDecorator == null || _vanguardController.CurrentTile == null || _vanguardController.CurrentTile.Decorator == null)
             {
                 return;
             }
@@ -50,6 +50,12 @@ namespace Systems.Grid
             
             ErasePath();
             CreatePath(_vanguardController.CurrentTile.Decorator, targetDecorator);
+
+            // If CreatePath failed to find a valid path, currentPath will be null
+            if (currentPath == null)
+            {
+                return;
+            }
 
             foreach (TileData tile in currentPath)
             {

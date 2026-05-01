@@ -29,7 +29,7 @@ namespace Systems.Decoration
 
         private void Awake()
         {
-            _axialHexGrid.OnGridGenerated += DecorateWorld;
+            _axialHexGrid.OnInitialNeighborsPopulated += DecorateInitialSubset; // Listen to the new event
             _vanguardMover.OnPathNodeReached += OnPathNodeReached; // New handler
         }
 
@@ -121,7 +121,7 @@ namespace Systems.Decoration
             _isProcessing = false;
         }
 
-        public void DecorateWorld(Dictionary<Vector2Int, TileData> tiles)
+        public void DecorateInitialSubset(TileData centerTile) // Renamed and modified signature
         {
             // Clean up
             ReturnAllDecoratorsToPool();
@@ -134,7 +134,7 @@ namespace Systems.Decoration
             _isProcessing = false;
 
             // Start fresh
-            UpdateDecorations(tiles.GetValueOrDefault(Vector2Int.zero));
+            UpdateDecorations(centerTile); // Use the provided centerTile
         }
 
         private void ReturnAllDecoratorsToPool()
@@ -155,7 +155,7 @@ namespace Systems.Decoration
 
         private void OnDestroy()
         {
-            _axialHexGrid.OnGridGenerated -= DecorateWorld;
+            _axialHexGrid.OnInitialNeighborsPopulated -= DecorateInitialSubset; // Unsubscribe from the new event
             _vanguardMover.OnPathNodeReached -= OnPathNodeReached;
         }
     }
