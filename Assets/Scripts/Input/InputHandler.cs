@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Character;
 using Systems.Decoration;
+using Systems.Grid;
 using UnityEngine;
+using Vanguard;
 using Zenject;
 
 namespace Input
@@ -10,8 +12,8 @@ namespace Input
     public class InputHandler : MonoBehaviour
     {
         [Inject] private MouseInput _mouseInput;
-        [Inject] private CharacterPathfinding _characterPathfinding;
-        [Inject] private CharacterMover _characterMover;
+        [Inject] private AStarPathfinding _aStarPathfinding;
+        [Inject] private VanguardMover _vanguardMover;
 
         private List<InputLock> _inputLocks = new List<InputLock>();
         
@@ -38,7 +40,7 @@ namespace Input
                 return;
             }
             
-            _characterMover.TraversePath(_characterPathfinding.currentPath);
+            _vanguardMover.TraversePath(_aStarPathfinding.currentPath);
         }
         
         private void DrawPath(TileDecorator decorator)
@@ -50,11 +52,11 @@ namespace Input
             
             if (decorator == null)
             {
-                _characterPathfinding.ErasePath();
+                _aStarPathfinding.ErasePath();
                 return;
             }
         
-            _characterPathfinding.DrawPath(decorator);
+            _aStarPathfinding.DrawPath(decorator);
         }
 
         public InputLock RegisterInputLock(MonoBehaviour obj)

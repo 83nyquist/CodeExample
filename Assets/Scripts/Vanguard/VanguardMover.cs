@@ -1,21 +1,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Character;
 using Input;
 using Systems.Grid;
 using UnityEngine;
 using Zenject;
 
-namespace Character
+namespace Vanguard
 {
-    public class CharacterMover : MonoBehaviour
+    public class VanguardMover : MonoBehaviour
     {
         [Inject] private InputHandler _inputHandler;
-        [Inject] private CharacterController _characterController;
+        [Inject] private VanguardController _vanguardController;
      
-        private const string IsMovingAnimatorParameter = "IsMoving";
+        private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
-        private Animator _animator;
+        [SerializeField] private Animator animator;
         [SerializeField] private float moveSpeed = 4f;
         [SerializeField] private float rotationSpeed = 12f;
 
@@ -29,11 +30,6 @@ namespace Character
         private void Awake()
         {
             _inputLock = _inputHandler.RegisterInputLock(this);
-
-            if (_animator == null)
-            {
-                _animator = GetComponent<Animator>();
-            }
         }
 
         public void TraversePath(List<TileData> path)
@@ -124,9 +120,9 @@ namespace Character
         private void SetIsMoving(bool isMoving)
         {
             _inputLock.IsLocked = isMoving;
-            if (_animator != null)
+            if (animator != null)
             {
-                _animator.SetBool(IsMovingAnimatorParameter, isMoving);
+                animator.SetBool(IsMoving, isMoving);
             }
         }
     }

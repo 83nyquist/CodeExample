@@ -1,15 +1,16 @@
 using System.Collections.Generic;
+using Character;
 using Systems.Decoration;
 using Systems.Grid;
 using UnityEngine;
 using Zenject;
 
-namespace Character
+namespace Vanguard
 {
-    public class CharacterController : MonoBehaviour
+    public class VanguardController : MonoBehaviour
     {
-        [Inject] private CharacterMover _characterMover;
-        [Inject] private CharacterPathfinding _characterPathfinding;
+        [Inject] private VanguardMover _vanguardMover;
+        [Inject] private AStarPathfinding _aStarPathfinding;
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldDecorator _worldDecorator;
         
@@ -19,13 +20,13 @@ namespace Character
         private void Awake()
         {
             _axialHexGrid.OnGridGenerated += OnGridGenerated;
-            _characterMover.OnDestinationReached += SetCurrentTile;
+            _vanguardMover.OnDestinationReached += SetCurrentTile;
         }
         
         private void OnDestroy()
         {
             _axialHexGrid.OnGridGenerated -= OnGridGenerated;
-            _characterMover.OnDestinationReached -= SetCurrentTile;
+            _vanguardMover.OnDestinationReached -= SetCurrentTile;
         }
 
         private void OnGridGenerated(Dictionary<Vector2Int, TileData> grid)
@@ -36,7 +37,7 @@ namespace Character
 
         public void Respawn()
         {
-            _characterPathfinding.ErasePath();
+            _aStarPathfinding.ErasePath();
             OnGridGenerated(_axialHexGrid.Tiles);
             _worldDecorator.UpdateDecorations(_currentTile);
         }

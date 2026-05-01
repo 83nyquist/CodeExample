@@ -5,6 +5,7 @@ using Systems.Decoration;
 using Systems.Grid;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Vanguard;
 using Zenject;
 
 namespace UserInterface
@@ -14,7 +15,7 @@ namespace UserInterface
         [Inject] private UIController _uIController;
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldDecorator _worldDecorator;
-        [Inject] private CharacterMover _characterMover;
+        [Inject] private VanguardMover _vanguardMover;
         [Inject] private NpcManager _npcManager;
         
         [SerializeField] private UIDocument uiDocument;
@@ -27,7 +28,7 @@ namespace UserInterface
         private void Start()
         {
             _axialHexGrid.OnGridGenerated += OnGridGenerated;
-            _characterMover.OnDestinationReached += OnDestinationReached;
+            _vanguardMover.OnDestinationReached += OnDestinationReached;
             
             _lblVisibleAgents = uiDocument.rootVisualElement.Q<Label>("VisibleAgents");
             _lblActiveAgents = uiDocument.rootVisualElement.Q<Label>("ActiveAgents");
@@ -40,7 +41,7 @@ namespace UserInterface
         private void OnDestroy()
         {
             _axialHexGrid.OnGridGenerated -= OnGridGenerated;
-            _characterMover.OnDestinationReached -= OnDestinationReached;
+            _vanguardMover.OnDestinationReached -= OnDestinationReached;
             _npcManager.OnVisibleAgentsCountChanged -= OnVisibleAgentsCountChanged;
         }
 

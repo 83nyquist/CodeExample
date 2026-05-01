@@ -359,8 +359,6 @@ GameObject:
   m_Component:
   - component: {fileID: 536636268398985388}
   - component: {fileID: 815214889570564960}
-  - component: {fileID: 1625140260728029919}
-  - component: {fileID: 2631332010846001008}
   - component: {fileID: 1056870489444788077}
   - component: {fileID: 5081153954575016020}
   m_Layer: 0
@@ -409,32 +407,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1625140260728029919
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4336427945477894687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a7c1b616e039fcb6b387243ec78e5ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Character.CharacterController
---- !u!114 &2631332010846001008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4336427945477894687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 399714fcf0f5898ed8af0c43234535fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Character.CharacterMover
-  moveSpeed: 10
-  rotationSpeed: 12
 --- !u!114 &1056870489444788077
 MonoBehaviour:
   m_ObjectHideFlags: 0

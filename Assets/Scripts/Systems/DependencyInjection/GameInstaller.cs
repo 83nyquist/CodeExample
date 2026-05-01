@@ -5,6 +5,7 @@ using NPC;
 using Systems.Decoration;
 using Systems.Grid;
 using UserInterface;
+using Vanguard;
 using Zenject;
 
 namespace Systems.DependencyInjection
@@ -18,9 +19,9 @@ namespace Systems.DependencyInjection
             Container.Bind<DecoratorFactory>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<NpcManager>().FromComponentInHierarchy().AsCached().NonLazy();
             
-            Container.Bind<CharacterController>().FromComponentInHierarchy().AsCached().NonLazy();
-            Container.Bind<CharacterPathfinding>().FromComponentInHierarchy().AsCached().NonLazy();
-            Container.Bind<CharacterMover>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<VanguardController>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<AStarPathfinding>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<VanguardMover>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<MouseInput>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<InputHandler>().FromComponentInHierarchy().AsCached().NonLazy();
