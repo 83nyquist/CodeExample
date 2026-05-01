@@ -184,6 +184,16 @@ namespace Systems.Grid
         }
         
         /// <summary>
+        /// Calculates the distance between two axial coordinates
+        /// </summary>
+        public static int DistanceTo(this Vector2Int a, Vector2Int b)
+        {
+            return (Mathf.Abs(a.x - b.x) + 
+                    Mathf.Abs(a.x + a.y - b.x - b.y) + 
+                    Mathf.Abs(a.y - b.y)) / 2;
+        }
+        
+        /// <summary>
         /// Gets tile count (for debugging)
         /// </summary>
         public static int GetTileCount(this AxialHexGrid grid)
