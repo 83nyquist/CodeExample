@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Character;
 using Input;
 using Systems.Grid;
 using UnityEngine;
@@ -27,6 +26,9 @@ namespace Vanguard
         private InputLock _inputLock;
         private Coroutine _moveCoroutine;
     
+        public TileData CurrentTile => _currentTile;
+        
+        
         private void Awake()
         {
             _inputLock = _inputHandler.RegisterInputLock(this);
@@ -99,6 +101,12 @@ namespace Vanguard
 
         private IEnumerator MoveToTile(TileData tile)
         {
+            if (tile.Decorator == null)
+            {
+                Debug.LogError($"Attempting to move to tile {tile.AxialCoordinates} but it has no Decorator!");
+                yield break;
+            }
+
             Vector3 destination = tile.Decorator.transform.position;
 
             while (Vector3.Distance(transform.position, destination) > 0.01f)

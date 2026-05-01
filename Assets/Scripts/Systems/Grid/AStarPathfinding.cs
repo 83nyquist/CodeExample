@@ -37,6 +37,12 @@ namespace Systems.Grid
         
         public void DrawPath(TileDecorator targetDecorator)
         {
+            // Ensure the Vanguard has a valid tile and that tile's visual decorator has been spawned
+            if (_vanguardController.CurrentTile == null || _vanguardController.CurrentTile.Decorator == null)
+            {
+                return;
+            }
+
             if (!CanTraverse(targetDecorator.TileData))
             {
                 return;
