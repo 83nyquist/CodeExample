@@ -4,6 +4,7 @@ using Character;
 using Game;
 using Systems.Grid;
 using UnityEngine;
+using Vanguard;
 using Zenject;
 
 namespace Systems.Decoration
@@ -12,7 +13,7 @@ namespace Systems.Decoration
     {
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private DecoratorFactory _decoratorFactory;
-        [Inject] private CharacterMover _characterMover;
+        [Inject] private VanguardMover _vanguardMover;
 
         private int _visionRadius = 10;
         
@@ -29,7 +30,7 @@ namespace Systems.Decoration
         private void Awake()
         {
             _axialHexGrid.OnGridGenerated += DecorateWorld;
-            _characterMover.OnPathNodeReached += OnPathNodeReached; // New handler
+            _vanguardMover.OnPathNodeReached += OnPathNodeReached; // New handler
         }
 
         private void OnPathNodeReached(TileData tile)
@@ -155,7 +156,7 @@ namespace Systems.Decoration
         private void OnDestroy()
         {
             _axialHexGrid.OnGridGenerated -= DecorateWorld;
-            _characterMover.OnPathNodeReached -= OnPathNodeReached;
+            _vanguardMover.OnPathNodeReached -= OnPathNodeReached;
         }
     }
 }

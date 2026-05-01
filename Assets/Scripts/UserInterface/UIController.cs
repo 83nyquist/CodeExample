@@ -4,8 +4,8 @@ using Game;
 using Systems.Grid;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Vanguard;
 using Zenject;
-using CharacterController = Character.CharacterController;
 
 namespace UserInterface
 {
@@ -14,7 +14,7 @@ namespace UserInterface
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private AudioManager _audioManager;
         [Inject] private CharacterAnimationEvents _characterAnimationEvents;
-        [Inject] private CharacterController _characterController;
+        [Inject] private VanguardController _vanguardController;
         [Inject] private DebugDrawer _debugDrawer;
         
         [SerializeField] private UIDocument uiDocument;
@@ -111,7 +111,7 @@ namespace UserInterface
 
         private void OnRespawnClicked()
         {
-            _characterController.Respawn();
+            _vanguardController.Respawn();
         }
 
         private void OnGenerateClicked()
