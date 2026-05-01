@@ -6,11 +6,10 @@ using Systems.Decoration;
 using Systems.Grid;
 using UserInterface;
 using Vanguard;
-using Zenject;
 
 namespace Systems.DependencyInjection
 {
-    public class GameInstaller : MonoInstaller
+    public class MonoInstaller : Zenject.MonoInstaller
     {
         public override void InstallBindings()
         {

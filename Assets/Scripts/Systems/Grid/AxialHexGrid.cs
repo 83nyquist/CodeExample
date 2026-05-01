@@ -2,14 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Enumerations;
-using Game;
+using Game.Data;
 using Systems.Grid.AlterationPasses;
 using UnityEngine;
+using Zenject;
 
 namespace Systems.Grid
 {
     public class AxialHexGrid : MonoBehaviour
     {
+        [Inject] private PlayerSettings _playerSettings;
+        
         [Header("Grid Settings")]
         public float hexSize = 1.05f;
         public bool generateOnAwake = true;
@@ -43,7 +46,7 @@ namespace Systems.Grid
         [ContextMenu("Generate Grid")]
         public void GenerateGrid()
         {
-            _radius = GameSettings.GridRadius;
+            _radius = _playerSettings.gridRadius;
             SetSeed();
             ClearGrid();
             

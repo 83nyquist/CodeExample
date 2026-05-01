@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Character;
-using Game;
+using Game.Data;
 using Systems.Grid;
 using UnityEngine;
 using Vanguard;
@@ -14,6 +13,7 @@ namespace Systems.Decoration
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private DecoratorFactory _decoratorFactory;
         [Inject] private VanguardMover _vanguardMover;
+        [Inject] private PlayerSettings _playerSettings;
 
         private int _visionRadius = 10;
         
@@ -42,7 +42,7 @@ namespace Systems.Decoration
         {
             if (origin == null) return;
 
-            _visionRadius = GameSettings.VisionRadius;
+            _visionRadius = _playerSettings.visionRadius;
             List<TileData> newTilesInRadius = _axialHexGrid.GetTilesInRadius(origin.AxialCoordinates, _visionRadius);
 
             // Queue tiles to show (in new set but not in old set)
