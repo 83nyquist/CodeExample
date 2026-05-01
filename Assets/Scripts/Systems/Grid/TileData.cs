@@ -87,6 +87,11 @@ namespace Systems.Grid
             if (other == null) return -1;
             return DistanceTo(other.x, other.z);
         }
+
+        public float DistanceTo(Vector2Int coord)
+        {
+            return DistanceTo(coord.x, coord.y);
+        }
         
         public float DistanceTo(int q, int r)
         {

@@ -40,6 +40,12 @@ namespace Input
 
             Vector2 mousePosition = Mouse.current.position.ReadValue();
 
+            if (mousePosition == null)
+            {
+                
+            }
+            
+            
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
                 HandlePointerDown(mousePosition);

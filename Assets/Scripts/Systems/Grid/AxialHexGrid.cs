@@ -30,7 +30,9 @@ namespace Systems.Grid
         private int _radius = 5;
 
         // Events
-        public event Action<Dictionary<Vector2Int, TileData>> OnGridGenerated;
+        public event Action<Dictionary<Vector2Int, TileData>> OnGridGenerated; // Fires when the entire grid is fully generated and passes are run
+        public event Action<TileData> OnInitialNeighborsPopulated; // Fires after initial subset of neighbors are built
+
         
         private int _currentSeed;
         private List<IGridAlterationPass> _orderedPasses;
@@ -42,6 +44,8 @@ namespace Systems.Grid
                 GenerateGrid();
             }
         }
+
+        private HashSet<Vector2Int> _neighborsBuiltFor = new HashSet<Vector2Int>();
         
         [ContextMenu("Generate Grid")]
         public void GenerateGrid()
@@ -55,8 +59,15 @@ namespace Systems.Grid
             {
                 CreateTileData(axialCoord.x, axialCoord.y);
             }
-            
-            BuildAllNeighbours();
+
+            // Calculate initial radius for neighbor population
+            int initialNeighborRadius = Mathf.Max(50, 2 * _playerSettings.visionRadius);
+
+            // Build neighbors for the initial subset of tiles and fire event
+            BuildNeighboursForSubset(initialNeighborRadius, true);
+
+            // Continue building neighbors for the rest of the grid
+            BuildNeighboursForSubset(_radius, false);
             RunGeneratorPasses();
             
             Debug.Log($"Generated {_tiles.Count} hex tiles with radius {_radius}");
@@ -65,14 +76,28 @@ namespace Systems.Grid
         
         private IEnumerable<Vector2Int> GetCoordinatesInRadius()
         {
-            for (int q = -_radius; q <= _radius; q++)
+            yield return Vector2Int.zero;
+
+            for (int k = 1; k <= _radius; k++)
             {
-                int r1 = Mathf.Max(-_radius, -q - _radius);
-                int r2 = Mathf.Min(_radius, -q + _radius);
-                
-                for (int r = r1; r <= r2; r++)
+                // Start at the top-most hex of the current ring
+                Vector2Int current = new Vector2Int(0, -k);
+                Vector2Int[] directions = {
+                    new Vector2Int(1, 0),   // Move East
+                    new Vector2Int(0, 1),   // Move SouthEast
+                    new Vector2Int(-1, 1),  // Move SouthWest
+                    new Vector2Int(-1, 0),  // Move West
+                    new Vector2Int(0, -1),  // Move NorthWest
+                    new Vector2Int(1, -1)   // Move NorthEast
+                };
+
+                foreach (var dir in directions)
                 {
-                    yield return new Vector2Int(q, r);
+                    for (int i = 0; i < k; i++)
+                    {
+                        yield return current;
+                        current += dir;
+                    }
                 }
             }
         }
@@ -83,24 +108,38 @@ namespace Systems.Grid
             _tiles[new Vector2Int(q, r)] = tileData;
         }
         
-        private void BuildAllNeighbours()
+        private void BuildNeighboursForSubset(int targetRadius, bool fireEvent)
         {
-            foreach (TileData data in _tiles.Values)
+            // Iterate through all tiles, but only build neighbors for those within targetRadius
+            // and whose neighbors haven't been built yet.
+            foreach (var kvp in _tiles)
             {
-                Dictionary<Directions.Axial, TileData> res = new Dictionary<Directions.Axial, TileData>();
-                
-                foreach (Directions.Axial direction in Enum.GetValues(typeof(Directions.Axial)))
+                Vector2Int axialCoord = kvp.Key;
+                TileData data = kvp.Value;
+
+                // Check if tile is within the target radius and its neighbors haven't been built yet
+                if (data.DistanceTo(Vector2Int.zero) <= targetRadius && !_neighborsBuiltFor.Contains(axialCoord))
                 {
-                    Vector2Int neighborCoord = data.GetNeighborCoordinate(direction);
-                    TileData neighbor = GetTile(neighborCoord.x, neighborCoord.y);
-                
-                    if (neighbor != null)
+                    Dictionary<Directions.Axial, TileData> res = new Dictionary<Directions.Axial, TileData>();
+                    foreach (Directions.Axial direction in Enum.GetValues(typeof(Directions.Axial)))
                     {
-                        res[direction] = neighbor;
+                        Vector2Int neighborCoord = data.GetNeighborCoordinate(direction);
+                        TileData neighbor = GetTile(neighborCoord.x, neighborCoord.y);
+                        if (neighbor != null)
+                        {
+                            res[direction] = neighbor;
+                        }
                     }
+                    data.SetNeighbours(res);
+                    _neighborsBuiltFor.Add(axialCoord); // Mark as processed
                 }
-                
-                data.SetNeighbours(res);
+            }
+
+            if (fireEvent)
+            {
+                // Find the center tile to pass to the event
+                TileData centerTile = GetTile(Vector2Int.zero);
+                OnInitialNeighborsPopulated?.Invoke(centerTile);
             }
         }
         
@@ -134,6 +173,7 @@ namespace Systems.Grid
         {
             _tiles?.Clear();
             _tiles ??= new Dictionary<Vector2Int, TileData>();
+            _neighborsBuiltFor?.Clear();
         }
         
         // Core query methods (kept because they're fundamental to grid operation)
@@ -147,6 +187,38 @@ namespace Systems.Grid
         {
             _tiles.TryGetValue(axialCoord, out TileData tile);
             return tile;
+        }
+
+        public List<TileData> GetTilesInRadius(Vector2Int center, int radius)
+        {
+            List<TileData> results = new List<TileData>();
+            
+            TileData centerTile = GetTile(center);
+            if (centerTile != null) results.Add(centerTile);
+
+            for (int k = 1; k <= radius; k++)
+            {
+                Vector2Int current = center + new Vector2Int(0, -k);
+                Vector2Int[] directions = {
+                    new Vector2Int(1, 0),   // East
+                    new Vector2Int(0, 1),   // SouthEast
+                    new Vector2Int(-1, 1),  // SouthWest
+                    new Vector2Int(-1, 0),  // West
+                    new Vector2Int(0, -1),  // NorthWest
+                    new Vector2Int(1, -1)   // NorthEast
+                };
+
+                foreach (var dir in directions)
+                {
+                    for (int i = 0; i < k; i++)
+                    {
+                        TileData tile = GetTile(current);
+                        if (tile != null) results.Add(tile);
+                        current += dir;
+                    }
+                }
+            }
+            return results;
         }
         
         // Pass management
