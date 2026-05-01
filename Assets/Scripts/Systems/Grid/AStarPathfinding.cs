@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using Core.Components;
 using Systems.Decoration;
-using Systems.Grid;
 using Systems.Grid.Pathfinding;
 using UnityEngine;
+using Vanguard;
 using Zenject;
 
-namespace Character
+namespace Systems.Grid
 {
-    public class CharacterPathfinding : MonoBehaviour
+    public class AStarPathfinding : MonoBehaviour
     {
-        [Inject] private CharacterController _characterController;
-        [Inject] private CharacterMover _characterMover;
+        [Inject] private VanguardController _vanguardController;
+        [Inject] private VanguardMover _vanguardMover;
         [Inject] private AxialHexGrid _axialHexGrid;
 
         [SerializeField] private GameObject pathPrefab;
@@ -25,13 +25,13 @@ namespace Character
         {
             _destroyPathChildren = pathParent.GetComponent<DestroyChildren>();
             
-            _characterMover.OnDestinationReached += ErasePath;
+            _vanguardMover.OnDestinationReached += ErasePath;
             _axialHexGrid.OnGridGenerated += OnGridGenerated;
         }
         
         private void OnDestroy()
         {
-            _characterMover.OnDestinationReached -= ErasePath;
+            _vanguardMover.OnDestinationReached -= ErasePath;
             _axialHexGrid.OnGridGenerated -= OnGridGenerated;
         }
         
@@ -43,7 +43,7 @@ namespace Character
             }
             
             ErasePath();
-            CreatePath(_characterController.CurrentTile.Decorator, targetDecorator);
+            CreatePath(_vanguardController.CurrentTile.Decorator, targetDecorator);
 
             foreach (TileData tile in currentPath)
             {
@@ -59,7 +59,7 @@ namespace Character
         
         public void ErasePath(TileData data = null)
         {
-            _characterMover.StopMoving();
+            _vanguardMover.StopMoving();
             currentPath = null;
             _destroyPathChildren.Activate();
         }
