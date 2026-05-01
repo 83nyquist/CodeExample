@@ -1,6 +1,6 @@
 using Audio;
 using Character;
-using Game;
+using Game.Data;
 using Systems.Grid;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,6 +16,8 @@ namespace UserInterface
         [Inject] private CharacterAnimationEvents _characterAnimationEvents;
         [Inject] private VanguardController _vanguardController;
         [Inject] private DebugDrawer _debugDrawer;
+        [Inject] private GameSettings _gameSettings;
+        [Inject] private PlayerSettings _playerSettings;
         
         [SerializeField] private UIDocument uiDocument;
         
@@ -32,7 +34,6 @@ namespace UserInterface
         
         void Start()
         {
-            Debug.Log($"Pre all VisionRadius: {PlayerPrefs.GetInt("VisionRadius", -999)}");
             _sliderGrid = uiDocument.rootVisualElement.Q<Slider>("slider_grid");
             _sliderVolume = uiDocument.rootVisualElement.Q<Slider>("slider_volume");
             _sliderPopulation = uiDocument.rootVisualElement.Q<Slider>("slider_population");
@@ -78,7 +79,7 @@ namespace UserInterface
             int value = (int)(evt.newValue);
 
             _sliderGrid.label = $"Grid Radius: {value}";
-            GameSettings.GridRadius = value;
+            _playerSettings.gridRadius = value;
         }
 
         private void OnVolumeValueChanged(ChangeEvent<float> evt)
@@ -90,7 +91,7 @@ namespace UserInterface
             // Display and save
             int value = (int)evt.newValue;
             _sliderVolume.label = $"Volume: {value}";
-            GameSettings.MasterVolume = value;
+            _gameSettings.MasterVolume = value;
         }
 
         private void OnPopulationValueChanged(ChangeEvent<float> evt)
@@ -98,7 +99,7 @@ namespace UserInterface
             int value = (int)(evt.newValue);
 
             _sliderPopulation.label = $"Population: {value}";
-            GameSettings.PopulationSize = value;
+            _playerSettings.populationSize = value;
         }
 
         private void OnVisionValueChanged(ChangeEvent<float> evt)
@@ -106,7 +107,7 @@ namespace UserInterface
             int value = (int)(evt.newValue);
             
             _sliderVision.label = $"Vision Radius: {value}";
-            GameSettings.VisionRadius = value;
+            _playerSettings.visionRadius = value;
         }
 
         private void OnRespawnClicked()
@@ -123,11 +124,11 @@ namespace UserInterface
         {
             Application.Quit();
         }
-
+        
         private void OnTglFpsChanged(ChangeEvent<bool> evt)
         {
             _debugDrawer.showDebug = evt.newValue;
-            GameSettings.ShowFPS = evt.newValue;
+            _playerSettings.showFPS = evt.newValue;
         }
 
         public void SetSliderRanges()
@@ -147,18 +148,18 @@ namespace UserInterface
 
         public void LoadSettings()
         {
-            _sliderGrid.label = $"Grid Radius: {GameSettings.GridRadius}";
-            _sliderVolume.label = $"Volume: {GameSettings.MasterVolume}";
-            _sliderPopulation.label = $"Population: {GameSettings.PopulationSize}";
-            _sliderVision.label = $"Vision Radius: {GameSettings.VisionRadius}";
+            _sliderGrid.label = $"Grid Radius: {_playerSettings.gridRadius}";
+            _sliderVolume.label = $"Volume: {_gameSettings.MasterVolume}";
+            _sliderPopulation.label = $"Population: {_playerSettings.populationSize}";
+            _sliderVision.label = $"Vision Radius: {_playerSettings.visionRadius}";
             
-            _sliderGrid.value = GameSettings.GridRadius;
-            _sliderVolume.value = GameSettings.MasterVolume;
-            _sliderPopulation.value = GameSettings.PopulationSize;
-            _sliderVision.value = GameSettings.VisionRadius;
+            _sliderGrid.value = _playerSettings.gridRadius;
+            _sliderVolume.value = _gameSettings.MasterVolume;
+            _sliderPopulation.value = _playerSettings.populationSize;
+            _sliderVision.value = _playerSettings.visionRadius;
             
             _tglFps.label = $"Show FPS:";
-            _tglFps.value = GameSettings.ShowFPS;
+            _tglFps.value = _playerSettings.showFPS;
         }
     }
 }
