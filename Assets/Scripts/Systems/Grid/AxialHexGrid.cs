@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Enumerations;
@@ -17,6 +18,9 @@ namespace Systems.Grid
         public float hexSize = 1.05f;
         public bool generateOnAwake = true;
         
+        [Header("Async Spawning Settings")]
+        [SerializeField] private float maxMsPerFrame = 5f; // Maximum milliseconds allowed per frame for grid logic
+
         [Header("Seed Settings")]
         [SerializeField] private bool useRandomSeed = true;
         [SerializeField] private int customSeed = 42;
@@ -41,12 +45,12 @@ namespace Systems.Grid
         {
             if (generateOnAwake)
             {
-                GenerateGrid();
+                StartCoroutine(GenerateGridRoutine());
             }
         }
 
         private HashSet<Vector2Int> _neighborsBuiltFor = new HashSet<Vector2Int>();
-        
+
         [ContextMenu("Generate Grid")]
         public void GenerateGrid()
         {
@@ -54,31 +58,64 @@ namespace Systems.Grid
             SetSeed();
             ClearGrid();
             
-            // Generate all hexes within radius
-            foreach (Vector2Int axialCoord in GetCoordinatesInRadius())
-            {
-                CreateTileData(axialCoord.x, axialCoord.y);
-            }
+            StartCoroutine(GenerateGridRoutine());
+        }
 
-            // Calculate initial radius for neighbor population
-            int initialNeighborRadius = Mathf.Max(50, 2 * _playerSettings.visionRadius);
+        private IEnumerator GenerateGridRoutine()
+        {
+            _radius = _playerSettings.gridRadius;
+            SetSeed();
+            ClearGrid();
 
-            // Build neighbors for the initial subset of tiles and fire event
-            BuildNeighboursForSubset(initialNeighborRadius, true);
+            // 1. Create ALL TileData objects first.
+            // We generate the entire grid's underlying data first so that generator passes
+            // have the full context they need to avoid "ruined" generations.
+            yield return StartCoroutine(CreateDataForRangeRoutine(0, _radius));
 
-            // Continue building neighbors for the rest of the grid
-            BuildNeighboursForSubset(_radius, false);
+            // 2. Run generator passes now on the full data set.
+            // This ensures Elevation, Moisture, and TileTypes are correctly calculated for all tiles.
             RunGeneratorPasses();
-            
+
+            // 3. Determine the initial radius needed for starting the game visuals
+            int initialRadius = Mathf.Max(50, 2 * _playerSettings.visionRadius);
+
+            // 4. Build neighbors for the initial subset and fire the event.
+            // Because Step 2 already ran, the WorldDecorator will see the correct TileTypes immediately.
+            yield return StartCoroutine(BuildNeighboursRoutine(initialRadius, true));
+
+            // 5. Build neighbors for the rest of the grid in the background.
+            yield return StartCoroutine(BuildNeighboursRoutine(_radius, false));
+
             Debug.Log($"Generated {_tiles.Count} hex tiles with radius {_radius}");
             OnGridGenerated?.Invoke(_tiles);
         }
-        
-        private IEnumerable<Vector2Int> GetCoordinatesInRadius()
-        {
-            yield return Vector2Int.zero;
 
-            for (int k = 1; k <= _radius; k++)
+        private IEnumerator CreateDataForRangeRoutine(int startRadius, int endRadius)
+        {
+            float budgetSeconds = maxMsPerFrame / 1000f;
+            float startTime = Time.realtimeSinceStartup;
+
+            foreach (Vector2Int coord in GetCoordinatesInRingRange(startRadius, endRadius))
+            {
+                CreateTileData(coord.x, coord.y);
+                
+                if (Time.realtimeSinceStartup - startTime > budgetSeconds)
+                {
+                    yield return null;
+                    startTime = Time.realtimeSinceStartup;
+                }
+            }
+        }
+
+        private IEnumerable<Vector2Int> GetCoordinatesInRingRange(int startRadius, int endRadius)
+        {
+            if (startRadius == 0)
+            {
+                yield return Vector2Int.zero;
+                startRadius = 1;
+            }
+
+            for (int k = startRadius; k <= endRadius; k++)
             {
                 // Start at the top-most hex of the current ring
                 Vector2Int current = new Vector2Int(0, -k);
@@ -108,30 +145,36 @@ namespace Systems.Grid
             _tiles[new Vector2Int(q, r)] = tileData;
         }
         
-        private void BuildNeighboursForSubset(int targetRadius, bool fireEvent)
+        private IEnumerator BuildNeighboursRoutine(int targetRadius, bool fireEvent)
         {
-            // Iterate through all tiles, but only build neighbors for those within targetRadius
-            // and whose neighbors haven't been built yet.
-            foreach (var kvp in _tiles)
-            {
-                Vector2Int axialCoord = kvp.Key;
-                TileData data = kvp.Value;
+            float budgetSeconds = maxMsPerFrame / 1000f;
+            float startTime = Time.realtimeSinceStartup;
 
-                // Check if tile is within the target radius and its neighbors haven't been built yet
-                if (data.DistanceTo(Vector2Int.zero) <= targetRadius && !_neighborsBuiltFor.Contains(axialCoord))
+            // Use the spiral generator instead of iterating the whole dictionary
+            // This makes the initial subset building much faster for large grids
+            foreach (Vector2Int axialCoord in GetCoordinatesInRingRange(0, targetRadius))
+            {
+                if (_neighborsBuiltFor.Contains(axialCoord)) continue;
+                
+                TileData data = GetTile(axialCoord);
+                if (data == null) continue;
+
+                var res = new Dictionary<Directions.Axial, TileData>();
+                foreach (Directions.Axial direction in Enum.GetValues(typeof(Directions.Axial)))
                 {
-                    Dictionary<Directions.Axial, TileData> res = new Dictionary<Directions.Axial, TileData>();
-                    foreach (Directions.Axial direction in Enum.GetValues(typeof(Directions.Axial)))
-                    {
-                        Vector2Int neighborCoord = data.GetNeighborCoordinate(direction);
-                        TileData neighbor = GetTile(neighborCoord.x, neighborCoord.y);
-                        if (neighbor != null)
-                        {
-                            res[direction] = neighbor;
-                        }
-                    }
-                    data.SetNeighbours(res);
-                    _neighborsBuiltFor.Add(axialCoord); // Mark as processed
+                    Vector2Int neighborCoord = data.GetNeighborCoordinate(direction);
+                    TileData neighbor = GetTile(neighborCoord.x, neighborCoord.y);
+                    if (neighbor != null)
+                        res[direction] = neighbor;
+                }
+
+                data.SetNeighbours(res);
+                _neighborsBuiltFor.Add(axialCoord);
+
+                if (Time.realtimeSinceStartup - startTime > budgetSeconds)
+                {
+                    yield return null;
+                    startTime = Time.realtimeSinceStartup;
                 }
             }
 

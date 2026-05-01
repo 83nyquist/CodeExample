@@ -18,7 +18,7 @@ namespace Systems.Decoration
         private int _visionRadius = 10;
         
         [Header("Performance")]
-        [SerializeField] private int decorationUpdatesPerFrame = 25;
+        [SerializeField] private float maxMsPerFrame = 3f; // Time budget for spawning visuals
 
         private readonly Queue<TileData> _tilesQueuedToShow = new Queue<TileData>();
         private readonly Queue<TileData> _tilesQueuedToHide = new Queue<TileData>();
@@ -76,15 +76,17 @@ namespace Systems.Decoration
         private IEnumerator ProcessDecorationQueue()
         {
             _isProcessing = true;
+            float budgetSeconds = maxMsPerFrame / 1000f;
 
             while (_tilesQueuedToHide.Count > 0 || _tilesQueuedToShow.Count > 0)
             {
-                int processedThisFrame = 0;
-                int maxPerFrame = decorationUpdatesPerFrame;
+                float startTime = Time.realtimeSinceStartup;
 
                 // Process hides (priority to cleanup first)
-                while (_tilesQueuedToHide.Count > 0 && processedThisFrame < maxPerFrame)
+                while (_tilesQueuedToHide.Count > 0)
                 {
+                    if (Time.realtimeSinceStartup - startTime > budgetSeconds) break;
+
                     TileData data = _tilesQueuedToHide.Dequeue();
 
                     if (_activeDecoratorsDict.TryGetValue(data, out TileDecorator decorator))
@@ -92,13 +94,13 @@ namespace Systems.Decoration
                         _activeDecoratorsDict.Remove(data);
                         _decoratorFactory.ReturnTileDecorator(decorator);
                     }
-
-                    processedThisFrame++;
                 }
 
                 // Process shows
-                while (_tilesQueuedToShow.Count > 0 && processedThisFrame < maxPerFrame)
+                while (_tilesQueuedToShow.Count > 0)
                 {
+                    if (Time.realtimeSinceStartup - startTime > budgetSeconds) break;
+
                     TileData data = _tilesQueuedToShow.Dequeue();
 
                     // Check if tile should still be decorated
@@ -111,8 +113,6 @@ namespace Systems.Decoration
                             _activeDecoratorsDict[data] = decorator;
                         }
                     }
-
-                    processedThisFrame++;
                 }
 
                 yield return null;
