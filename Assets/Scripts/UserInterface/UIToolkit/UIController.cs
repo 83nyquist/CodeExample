@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Audio;
 using Character;
 using Game.Data;
@@ -7,7 +8,7 @@ using UnityEngine.UIElements;
 using Vanguard;
 using Zenject;
 
-namespace UserInterface
+namespace UserInterface.UIToolkit
 {
     public class UIController : MonoBehaviour
     {
@@ -20,7 +21,8 @@ namespace UserInterface
         [Inject] private PlayerSettings _playerSettings;
         
         [SerializeField] private UIDocument uiDocument;
-        
+
+        private VisualElement _root;
         private Slider _sliderGrid;
         private Slider _sliderVolume;
         private Slider _sliderPopulation;
@@ -34,6 +36,10 @@ namespace UserInterface
         
         void Start()
         {
+            _axialHexGrid.OnGridGenerated += OnGridGenerated;
+            
+            _root = uiDocument.rootVisualElement;
+            
             _sliderGrid = uiDocument.rootVisualElement.Q<Slider>("slider_grid");
             _sliderVolume = uiDocument.rootVisualElement.Q<Slider>("slider_volume");
             _sliderPopulation = uiDocument.rootVisualElement.Q<Slider>("slider_population");
@@ -58,6 +64,8 @@ namespace UserInterface
             _tglFps.RegisterValueChangedCallback(OnTglFpsChanged);
             
             LoadSettings();
+            
+            SetEnabled(false);
         }
 
         private void OnDestroy()
@@ -72,6 +80,13 @@ namespace UserInterface
             _btnExit.clicked -= OnExitClicked;
             
             _tglFps.UnregisterValueChangedCallback(OnTglFpsChanged);
+            
+            _axialHexGrid.OnGridGenerated -= OnGridGenerated;
+        }
+
+        private void OnGridGenerated(Dictionary<Vector2Int, TileData> grid)
+        {
+            SetEnabled(true);
         }
 
         private void OnGridValueChanged(ChangeEvent<float> evt)
@@ -117,6 +132,8 @@ namespace UserInterface
 
         private void OnGenerateClicked()
         {
+            SetEnabled(false);
+            _vanguardController.Stop();
             _axialHexGrid.GenerateGrid();
         }
 
@@ -133,7 +150,7 @@ namespace UserInterface
 
         public void SetSliderRanges()
         {
-            _sliderGrid.lowValue = 0;
+            _sliderGrid.lowValue = 10;
             _sliderGrid.highValue = 1000;
 
             _sliderVolume.lowValue = 0;
@@ -160,6 +177,16 @@ namespace UserInterface
             
             _tglFps.label = $"Show FPS:";
             _tglFps.value = _playerSettings.showFPS;
+        }
+
+        public void SetVisible(bool isVisible)
+        {
+            uiDocument.rootVisualElement.visible = isVisible;
+        }
+
+        public void SetEnabled(bool isEnabled)
+        {
+            _root.SetEnabled(isEnabled);
         }
     }
 }

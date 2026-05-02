@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Character;
 using NPC;
 using Systems.Decoration;
 using Systems.Grid;
@@ -8,7 +7,7 @@ using UnityEngine.UIElements;
 using Vanguard;
 using Zenject;
 
-namespace UserInterface
+namespace UserInterface.UIToolkit
 {
     public class UiLabels : MonoBehaviour
     {

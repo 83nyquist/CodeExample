@@ -5,6 +5,8 @@ using NPC;
 using Systems.Decoration;
 using Systems.Grid;
 using UserInterface;
+using UserInterface.UGUI;
+using UserInterface.UIToolkit;
 using Vanguard;
 
 namespace Systems.DependencyInjection
@@ -17,6 +19,7 @@ namespace Systems.DependencyInjection
             Container.Bind<WorldDecorator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<DecoratorFactory>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<NpcManager>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<GenerationProgressTracker>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<VanguardController>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<AStarPathfinding>().FromComponentInHierarchy().AsCached().NonLazy();
@@ -25,9 +28,11 @@ namespace Systems.DependencyInjection
             Container.Bind<MouseInput>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<InputHandler>().FromComponentInHierarchy().AsCached().NonLazy();
             
+            Container.Bind<UiManager>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<UIController>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<UiLabels>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<DebugDrawer>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<LoadingPanelController>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<AudioManager>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<CharacterAnimationEvents>().FromComponentInHierarchy().AsCached().NonLazy();
