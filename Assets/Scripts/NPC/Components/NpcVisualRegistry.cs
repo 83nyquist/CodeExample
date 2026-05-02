@@ -24,19 +24,25 @@ namespace NPC.Components
             _parent = parent;
         }
         
-        public void CreateVisuals(NativeArray<NpcData> npcs, System.Func<int2, Vector3> hexToWorld)
+        public void PrepareRegistry(int totalCount)
         {
-            _visuals = new GameObject[npcs.Length];
-            _animators = new Animator[npcs.Length];
-            _lastPositions = new Vector3[npcs.Length];
-            
-            for (int i = 0; i < npcs.Length; i++)
+            _visuals = new GameObject[totalCount];
+            _animators = new Animator[totalCount];
+            _lastPositions = new Vector3[totalCount];
+        }
+
+        public void CreateVisualsInRange(NativeSlice<NpcData> npcSlice, int startIndex, System.Func<int2, Vector3> hexToWorld)
+        {
+            if (_visuals == null) return;
+
+            for (int i = 0; i < npcSlice.Length; i++)
             {
-                Vector3 worldPos = hexToWorld(npcs[i].Position);
-                _visuals[i] = Object.Instantiate(_prefab, worldPos, Quaternion.identity, _parent);
-                _visuals[i].name = $"NPC_{npcs[i].Id}";
-                _animators[i] = _visuals[i].GetComponent<Animator>();
-                _lastPositions[i] = worldPos;
+                int globalIndex = startIndex + i;
+                Vector3 worldPos = hexToWorld(npcSlice[i].Position);
+                _visuals[globalIndex] = Object.Instantiate(_prefab, worldPos, Quaternion.identity, _parent);
+                _visuals[globalIndex].name = $"NPC_{npcSlice[i].Id}";
+                _animators[globalIndex] = _visuals[globalIndex].GetComponent<Animator>();
+                _lastPositions[globalIndex] = worldPos;
             }
         }
         

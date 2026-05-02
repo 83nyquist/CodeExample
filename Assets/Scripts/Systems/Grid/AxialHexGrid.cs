@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Enumerations;
 using Game.Data;
+using Input;
 using Systems.Grid.AlterationPasses;
 using UnityEngine;
+using UserInterface;
 using Zenject;
 
 namespace Systems.Grid
@@ -13,6 +15,9 @@ namespace Systems.Grid
     public class AxialHexGrid : MonoBehaviour
     {
         [Inject] private PlayerSettings _playerSettings;
+        [Inject] private InputHandler _inputHandler;
+        [Inject] private GenerationProgressTracker _progressTracker;
+        [Inject] private UiManager _uiManager;
         
         [Header("Grid Settings")]
         public float hexSize = 1.05f;
@@ -25,7 +30,7 @@ namespace Systems.Grid
         [SerializeField] private bool useRandomSeed = true;
         [SerializeField] private int customSeed = 42;
         
-        [SerializeField] private List<GridGeneratorPassWrapper> generatorPasses = new List<GridGeneratorPassWrapper>();
+        [SerializeField] private List<GridGeneratorPassWrapper> augmentationPasses = new List<GridGeneratorPassWrapper>();
 
         // Core grid storage
         private Dictionary<Vector2Int, TileData> _tiles = new Dictionary<Vector2Int, TileData>();
@@ -34,36 +39,39 @@ namespace Systems.Grid
         private int _radius = 5;
 
         // Events
-        public event Action<Dictionary<Vector2Int, TileData>> OnGridGenerated; // Fires when the entire grid is fully generated and passes are run
-        public event Action<TileData> OnInitialNeighborsPopulated; // Fires after initial subset of neighbors are built
-
+        public event Action<Dictionary<Vector2Int, TileData>> OnGridGenerated;
+        public event Action OnAugmentationPassesComplete;
+        
+        private InputLock _inputLock;
         
         private int _currentSeed;
         private List<IGridAlterationPass> _orderedPasses;
+
+        private HashSet<Vector2Int> _neighborsBuiltFor = new HashSet<Vector2Int>();
         
         private void Start()
         {
+            _inputLock = _inputHandler.RegisterInputLock(this);
+            
             if (generateOnAwake)
             {
                 StartCoroutine(GenerateGridRoutine());
             }
         }
 
-        private HashSet<Vector2Int> _neighborsBuiltFor = new HashSet<Vector2Int>();
-
-        [ContextMenu("Generate Grid")]
         public void GenerateGrid()
         {
-            _radius = _playerSettings.gridRadius;
-            SetSeed();
-            ClearGrid();
-            
             StartCoroutine(GenerateGridRoutine());
         }
 
         private IEnumerator GenerateGridRoutine()
         {
+            _inputLock.IsLocked = true;
             _radius = _playerSettings.gridRadius;
+            
+            _uiManager.ShowLoadingScrean();
+            _progressTracker.Initialize(_radius, _playerSettings.populationSize);
+            
             SetSeed();
             ClearGrid();
 
@@ -72,22 +80,18 @@ namespace Systems.Grid
             // have the full context they need to avoid "ruined" generations.
             yield return StartCoroutine(CreateDataForRangeRoutine(0, _radius));
 
-            // 2. Run generator passes now on the full data set.
-            // This ensures Elevation, Moisture, and TileTypes are correctly calculated for all tiles.
-            RunGeneratorPasses();
+            // 2. Build neighbors for the ENTIRE grid. 
+            // This must happen before passes so passes can use neighbor-aware logic (clustering/smoothing).
+            yield return StartCoroutine(BuildNeighboursRoutine(_radius));
 
-            // 3. Determine the initial radius needed for starting the game visuals
-            int initialRadius = Mathf.Max(50, 2 * _playerSettings.visionRadius);
-
-            // 4. Build neighbors for the initial subset and fire the event.
-            // Because Step 2 already ran, the WorldDecorator will see the correct TileTypes immediately.
-            yield return StartCoroutine(BuildNeighboursRoutine(initialRadius, true));
-
-            // 5. Build neighbors for the rest of the grid in the background.
-            yield return StartCoroutine(BuildNeighboursRoutine(_radius, false));
+            // 3. Run generator passes now that the full neighbor graph is linked.
+            RunAugmentationPasses();
 
             Debug.Log($"Generated {_tiles.Count} hex tiles with radius {_radius}");
+            
             OnGridGenerated?.Invoke(_tiles);
+            
+            _inputLock.IsLocked = false;
         }
 
         private IEnumerator CreateDataForRangeRoutine(int startRadius, int endRadius)
@@ -95,16 +99,24 @@ namespace Systems.Grid
             float budgetSeconds = maxMsPerFrame / 1000f;
             float startTime = Time.realtimeSinceStartup;
 
+            int batchCount = 0;
+
             foreach (Vector2Int coord in GetCoordinatesInRingRange(startRadius, endRadius))
             {
                 CreateTileData(coord.x, coord.y);
+                batchCount++;
                 
                 if (Time.realtimeSinceStartup - startTime > budgetSeconds)
                 {
+                    _progressTracker.UpdateProgress(WorkUnitTypes.TileCreation, batchCount);
+                    batchCount = 0;
                     yield return null;
                     startTime = Time.realtimeSinceStartup;
                 }
             }
+            
+            if (batchCount > 0)
+                _progressTracker.UpdateProgress(WorkUnitTypes.TileCreation, batchCount);
         }
 
         private IEnumerable<Vector2Int> GetCoordinatesInRingRange(int startRadius, int endRadius)
@@ -145,10 +157,14 @@ namespace Systems.Grid
             _tiles[new Vector2Int(q, r)] = tileData;
         }
         
-        private IEnumerator BuildNeighboursRoutine(int targetRadius, bool fireEvent)
+        private IEnumerator BuildNeighboursRoutine(int targetRadius)
         {
             float budgetSeconds = maxMsPerFrame / 1000f;
-            float startTime = Time.realtimeSinceStartup;
+            float lastYieldTime = Time.realtimeSinceStartup;
+            int batchCount = 0;
+
+            // Cache the enum values so we don't use Reflection inside the loop
+            Directions.Axial[] directions = (Directions.Axial[])Enum.GetValues(typeof(Directions.Axial));
 
             // Use the spiral generator instead of iterating the whole dictionary
             // This makes the initial subset building much faster for large grids
@@ -160,7 +176,7 @@ namespace Systems.Grid
                 if (data == null) continue;
 
                 var res = new Dictionary<Directions.Axial, TileData>();
-                foreach (Directions.Axial direction in Enum.GetValues(typeof(Directions.Axial)))
+                foreach (Directions.Axial direction in directions)
                 {
                     Vector2Int neighborCoord = data.GetNeighborCoordinate(direction);
                     TileData neighbor = GetTile(neighborCoord.x, neighborCoord.y);
@@ -170,20 +186,21 @@ namespace Systems.Grid
 
                 data.SetNeighbours(res);
                 _neighborsBuiltFor.Add(axialCoord);
-
-                if (Time.realtimeSinceStartup - startTime > budgetSeconds)
+                batchCount++;
+                
+                // Check budget every 50 iterations (similar to your NPC batching) 
+                // to reduce calls to Time.realtimeSinceStartup
+                if (batchCount % 50 == 0 && Time.realtimeSinceStartup - lastYieldTime > budgetSeconds)
                 {
+                    _progressTracker.UpdateProgress(WorkUnitTypes.NeighborHookup, batchCount);
+                    batchCount = 0;
                     yield return null;
-                    startTime = Time.realtimeSinceStartup;
+                    lastYieldTime = Time.realtimeSinceStartup;
                 }
             }
-
-            if (fireEvent)
-            {
-                // Find the center tile to pass to the event
-                TileData centerTile = GetTile(Vector2Int.zero);
-                OnInitialNeighborsPopulated?.Invoke(centerTile);
-            }
+            
+            if (batchCount > 0)
+                _progressTracker.UpdateProgress(WorkUnitTypes.NeighborHookup, batchCount);
         }
         
         private void SetSeed()
@@ -191,15 +208,15 @@ namespace Systems.Grid
             _currentSeed = useRandomSeed ? UnityEngine.Random.Range(1, 999999) : customSeed;
         }
         
-        private void RunGeneratorPasses()
+        private void RunAugmentationPasses()
         {
-            if (generatorPasses == null || generatorPasses.Count == 0)
+            if (augmentationPasses == null || augmentationPasses.Count == 0)
             {
-                Debug.LogWarning("No generator passes configured!");
+                Debug.LogWarning("No augmentation passes configured!");
                 return;
             }
             
-            _orderedPasses = generatorPasses
+            _orderedPasses = augmentationPasses
                 .Where(w => w.pass != null)
                 .Select(w => w.pass)
                 .OrderBy(p => p.Priority)
@@ -209,6 +226,8 @@ namespace Systems.Grid
             {
                 pass.Execute(this, _currentSeed);
             }
+            
+            OnAugmentationPassesComplete?.Invoke();
         }
         
         [ContextMenu("Clear Grid")]
@@ -235,31 +254,12 @@ namespace Systems.Grid
         public List<TileData> GetTilesInRadius(Vector2Int center, int radius)
         {
             List<TileData> results = new List<TileData>();
-            
-            TileData centerTile = GetTile(center);
-            if (centerTile != null) results.Add(centerTile);
 
-            for (int k = 1; k <= radius; k++)
+            foreach (Vector2Int relCoord in GetCoordinatesInRingRange(0, radius))
             {
-                Vector2Int current = center + new Vector2Int(0, -k);
-                Vector2Int[] directions = {
-                    new Vector2Int(1, 0),   // East
-                    new Vector2Int(0, 1),   // SouthEast
-                    new Vector2Int(-1, 1),  // SouthWest
-                    new Vector2Int(-1, 0),  // West
-                    new Vector2Int(0, -1),  // NorthWest
-                    new Vector2Int(1, -1)   // NorthEast
-                };
-
-                foreach (var dir in directions)
-                {
-                    for (int i = 0; i < k; i++)
-                    {
-                        TileData tile = GetTile(current);
-                        if (tile != null) results.Add(tile);
-                        current += dir;
-                    }
-                }
+                Vector2Int absoluteCoord = center + relCoord;
+                TileData tile = GetTile(absoluteCoord);
+                if (tile != null) results.Add(tile);
             }
             return results;
         }
@@ -267,16 +267,16 @@ namespace Systems.Grid
         // Pass management
         public void AddGeneratorPass(IGridAlterationPass pass)
         {
-            generatorPasses.Add(new GridGeneratorPassWrapper { pass = pass });
+            augmentationPasses.Add(new GridGeneratorPassWrapper { pass = pass });
             _orderedPasses = null;
         }
         
         public bool RemoveGeneratorPass(IGridAlterationPass pass)
         {
-            var wrapper = generatorPasses.Find(w => w.pass == pass);
+            var wrapper = augmentationPasses.Find(w => w.pass == pass);
             if (wrapper != null)
             {
-                generatorPasses.Remove(wrapper);
+                augmentationPasses.Remove(wrapper);
                 _orderedPasses = null;
                 return true;
             }
@@ -285,7 +285,7 @@ namespace Systems.Grid
         
         public List<IGridAlterationPass> GetGeneratorPasses()
         {
-            return generatorPasses?.Where(w => w.pass != null).Select(w => w.pass).ToList() ?? new List<IGridAlterationPass>();
+            return augmentationPasses?.Where(w => w.pass != null).Select(w => w.pass).ToList() ?? new List<IGridAlterationPass>();
         }
         
         [System.Serializable]

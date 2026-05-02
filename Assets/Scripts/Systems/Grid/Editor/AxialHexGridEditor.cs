@@ -26,19 +26,6 @@ namespace Systems.Grid.Editor
             AxialHexGrid grid = (AxialHexGrid)target;
         
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("Controls", EditorStyles.boldLabel);
-        
-            if (GUILayout.Button("Regenerate Grid"))
-            {
-                grid.GenerateGrid();
-            }
-        
-            if (GUILayout.Button("Clear Grid"))
-            {
-                grid.ClearGrid();
-            }
-            
-            EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Debugging", EditorStyles.boldLabel);
             EditorGUILayout.LabelField($"Tile Count: {grid.Tiles.Count}");
             TileData origin = grid.GetTile(0, 0);

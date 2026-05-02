@@ -3,8 +3,12 @@
     --main-color: rgb(255, 187, 124);
     --text-on-main: rgb(46, 45, 39);
     --text-on-panel: rgb(255, 187, 124);
+
+    /* Hover variants */
+    --main-color-hover: rgb(255, 200, 150);
 }
 
+/* ===== LAYOUT & CONTAINERS ===== */
 .container {
     background-color: var(--panel-bg);
     align-items: stretch;
@@ -18,6 +22,19 @@
     padding: 10px;
 }
 
+.spacer {
+    flex-grow: 1;
+}
+
+.divider {
+    background-color: var(--main-color);
+    width: 90%;
+    height: 1px;
+    align-self: center;
+    min-height: 1px;
+}
+
+/* ===== BUTTONS ===== */
 .button {
     height: 22px;
     border-radius: 5px;
@@ -29,15 +46,16 @@
 }
 
 .button:hover {
-    background-color: rgb(255, 200, 150);
+    background-color: var(--main-color-hover);
 }
 
+/* ===== SLIDERS ===== */
 Slider {
     flex-direction: column;
     margin-bottom: 26px;
+    margin-top: 0;
     padding-top: 0;
     padding-bottom: 0;
-    margin-top: 0;
 }
 
 Slider Label {
@@ -60,24 +78,17 @@ Slider Label {
 }
 
 .unity-slider__dragger:hover {
-    background-color: rgb(255, 200, 150);
+    background-color: var(--main-color-hover);
     width: 14px;
     height: 14px;
 }
 
+/* ===== TOGGLES ===== */
 Toggle {
     flex-direction: row;
     align-items: center;
     margin-bottom: 8px;
     align-self: flex-start;
-}
-
-.unity-toggle__checkmark {
-    -unity-background-image-tint-color: white;
-}
-
-Toggle:checked .unity-toggle__checkmark {
-    -unity-background-image-tint-color: var(--text-on-main);
 }
 
 .unity-toggle__input {
@@ -91,8 +102,8 @@ Toggle:checked .unity-toggle__checkmark {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-Toggle:checked .unity-toggle__input {
-    background-color: var(--main-color);
+.unity-toggle__checkmark {
+    -unity-background-image-tint-color: white;
 }
 
 .unity-toggle__label {
@@ -100,20 +111,15 @@ Toggle:checked .unity-toggle__input {
     min-width: auto;
 }
 
-Toggle {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.divider {
+Toggle:checked .unity-toggle__input {
     background-color: var(--main-color);
-    width: 90%;
-    height: 1px;
-    align-self: center;
-    min-height: 1px;
 }
 
+Toggle:checked .unity-toggle__checkmark {
+    -unity-background-image-tint-color: var(--text-on-main);
+}
+
+/* ===== OUTPUT ===== */
 .output {
     height: 30%;
     font-size: 10px;
@@ -124,10 +130,7 @@ Toggle {
     flex-direction: column-reverse;
 }
 
-.spacer {
-    flex-grow: 1;
-}
-
+/* ===== GENERIC LABELS ===== */
 .Label {
-    color: rgb(255, 200, 150);
+    color: var(--main-color-hover);
 }

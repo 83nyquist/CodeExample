@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Game.Data;
+using Input;
 using Systems.Grid;
 using UnityEngine;
 using Vanguard;
@@ -14,6 +15,7 @@ namespace Systems.Decoration
         [Inject] private DecoratorFactory _decoratorFactory;
         [Inject] private VanguardMover _vanguardMover;
         [Inject] private PlayerSettings _playerSettings;
+        [Inject] private InputHandler _inputHandler;
 
         private int _visionRadius = 10;
         
@@ -27,10 +29,25 @@ namespace Systems.Decoration
         private readonly Dictionary<TileData, TileDecorator> _activeDecoratorsDict = new Dictionary<TileData, TileDecorator>();
         private HashSet<TileData> _decoratedTilesSet = new HashSet<TileData>();
 
+        private InputLock _inputLock;
+        
         private void Awake()
         {
-            _axialHexGrid.OnInitialNeighborsPopulated += DecorateInitialSubset; // Listen to the new event
+            _inputLock = _inputHandler.RegisterInputLock(this);
+            _axialHexGrid.OnGridGenerated += OnGridGenerated; // Listen to the new event
             _vanguardMover.OnPathNodeReached += OnPathNodeReached; // New handler
+        }
+
+        private void OnDestroy()
+        {
+            _axialHexGrid.OnGridGenerated -= OnGridGenerated; // Unsubscribe from the new event
+            _vanguardMover.OnPathNodeReached -= OnPathNodeReached;
+        }
+
+        private void OnGridGenerated(Dictionary<Vector2Int, TileData> grid)
+        {
+            TileData origin = grid.GetValueOrDefault(Vector2Int.zero);
+            UpdateDecorations(origin);
         }
 
         private void OnPathNodeReached(TileData tile)
@@ -42,6 +59,7 @@ namespace Systems.Decoration
         {
             if (origin == null) return;
 
+            _inputLock.IsLocked = true;
             _visionRadius = _playerSettings.visionRadius;
             List<TileData> newTilesInRadius = _axialHexGrid.GetTilesInRadius(origin.AxialCoordinates, _visionRadius);
 
@@ -119,44 +137,12 @@ namespace Systems.Decoration
             }
 
             _isProcessing = false;
-        }
-
-        public void DecorateInitialSubset(TileData centerTile) // Renamed and modified signature
-        {
-            // Clean up
-            ReturnAllDecoratorsToPool();
-            _activeDecoratorsDict.Clear();
-            _decoratedTilesSet.Clear();
-
-            _tilesQueuedToShow.Clear();
-            _tilesQueuedToHide.Clear();
-
-            _isProcessing = false;
-
-            // Start fresh
-            UpdateDecorations(centerTile); // Use the provided centerTile
-        }
-
-        private void ReturnAllDecoratorsToPool()
-        {
-            foreach (var decorator in _activeDecoratorsDict.Values)
-            {
-                if (decorator != null)
-                {
-                    _decoratorFactory.ReturnTileDecorator(decorator);
-                }
-            }
+            _inputLock.IsLocked = false;
         }
         
         public HashSet<TileData> GetVisibleTiles()
         {
             return _decoratedTilesSet;
-        }
-
-        private void OnDestroy()
-        {
-            _axialHexGrid.OnInitialNeighborsPopulated -= DecorateInitialSubset; // Unsubscribe from the new event
-            _vanguardMover.OnPathNodeReached -= OnPathNodeReached;
         }
     }
 }

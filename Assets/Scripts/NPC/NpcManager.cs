@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Game;
 using Game.Data;
@@ -20,6 +21,7 @@ namespace NPC
         [Inject] private AxialHexGrid _hexGrid;
         [Inject] private WorldDecorator _worldDecorator;
         [Inject] private PlayerSettings _playerSettings;
+        [Inject] private GenerationProgressTracker _progressTracker;
         
         [Header("NPC Settings")]
         [SerializeField] private float minMoveInterval = 1f;
@@ -41,6 +43,7 @@ namespace NPC
         // Job system
         private JobHandle _jobHandle;
         private bool _isJobScheduled;
+        private bool _isSimulationActive;
         
         // Event handling
         private float _eventUpdateTimer;
@@ -49,7 +52,8 @@ namespace NPC
         
         public int NpcCount => _npcs.IsCreated ? _npcs.Length : 0;
         public event Action<int> OnVisibleAgentsCountChanged;
-        public bool IsInitialized => _npcs.IsCreated;
+        public event Action<NativeArray<NpcData>> OnNpcsSpawned;
+        public bool IsInitialized => _isSimulationActive;
         
         void Awake()
         {
@@ -68,7 +72,7 @@ namespace NPC
         
         void Update()
         {
-            if (!_npcs.IsCreated) return;
+            if (!_isSimulationActive) return;
             
             CompleteJobIfFinished();
             ScheduleMovementJob();
@@ -96,20 +100,57 @@ namespace NPC
             // Complete any running job first
             CompleteJob();
 
-            // Clean up ALL existing resources
+            // Clean up existing resources before starting a new build
             CleanupResources();
 
-            // RECREATE vision manager (don't rebuild disposed one)
+            StartCoroutine(SpawnNpcsRoutine(tiles));
+        }
+
+        private IEnumerator SpawnNpcsRoutine(Dictionary<Vector2Int, TileData> tiles)
+        {
+            // 1. Setup Vision and Native Grid (Fast operations)
             _visionManager = new VisionManager(_worldDecorator, tiles.Count);
-
-            // Build new grid and spawn
             _nativeGrid = _gridBuilder.BuildFromTileData(tiles, Allocator.Persistent);
-            _npcs = _spawner.Spawn(_playerSettings.populationSize, _nativeGrid);
-            _visualRegistry.CreateVisuals(_npcs, HexToWorld);
 
-            // Reset event cache
+            // 2. Data Spawning (Calculations)
+            int totalCount = _playerSettings.populationSize;
+            _npcs = _spawner.Spawn(totalCount, _nativeGrid);
+
+            // Initialize visual arrays before we start the batching process
+            _visualRegistry.PrepareRegistry(totalCount);
+
+            // 3. Visual Spawning (Heavy operation - Spread over frames)
+            // We process in batches to keep the UI responsive and update the slider
+            int batchSize = 50; 
+            
+            // Note: If your NpcVisualRegistry only supports bulk creation, 
+            // you should ideally update it to support partial creation.
+            // Here we assume we can initialize them in steps.
+            for (int i = 0; i < totalCount; i += batchSize)
+            {
+                int currentBatchCount = Mathf.Min(batchSize, totalCount - i);
+                
+                // Create a slice for the current batch and pass the global start index 'i'
+                // so the registry knows where to insert the new GameObjects in its internal arrays.
+                var npcSlice = new NativeSlice<NpcData>(_npcs, i, currentBatchCount);
+                
+                _visualRegistry.CreateVisualsInRange(npcSlice, i, HexToWorld);
+                
+                _progressTracker.UpdateProgress(WorkUnitTypes.Agents, currentBatchCount);
+
+                // Give the engine one frame to update UI/Slider
+                yield return null;
+            }
+
+            _isSimulationActive = true;
+
+            // 4. Finalize
+            OnNpcsSpawned?.Invoke(_npcs);
+
             _cachedVisibleCount = -1;
             _eventUpdateTimer = 0;
+
+            Debug.Log($"NPC Spawning Complete: {totalCount} agents initialized.");
         }
         
         private void ScheduleMovementJob()
@@ -204,6 +245,7 @@ namespace NPC
     
             // Reset job state
             _isJobScheduled = false;
+            _isSimulationActive = false;
         }
         
         private Vector3 HexToWorld(int2 coord)

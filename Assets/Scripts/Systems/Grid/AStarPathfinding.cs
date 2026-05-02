@@ -26,13 +26,11 @@ namespace Systems.Grid
             _destroyPathChildren = pathParent.GetComponent<DestroyChildren>();
             
             _vanguardMover.OnDestinationReached += ErasePath;
-            _axialHexGrid.OnGridGenerated += OnGridGenerated;
         }
         
         private void OnDestroy()
         {
             _vanguardMover.OnDestinationReached -= ErasePath;
-            _axialHexGrid.OnGridGenerated -= OnGridGenerated;
         }
         
         public void DrawPath(TileDecorator targetDecorator)
@@ -64,14 +62,8 @@ namespace Systems.Grid
             }
         }
         
-        public void OnGridGenerated(Dictionary<Vector2Int, TileData> grid)
-        {
-            ErasePath();
-        }
-        
         public void ErasePath(TileData data = null)
         {
-            _vanguardMover.StopMoving();
             currentPath = null;
             _destroyPathChildren.Activate();
         }
