@@ -1,6 +1,7 @@
 using System;
 using Systems.Decoration;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
@@ -40,12 +41,6 @@ namespace Input
 
             Vector2 mousePosition = Mouse.current.position.ReadValue();
 
-            if (mousePosition == null)
-            {
-                
-            }
-            
-            
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
                 HandlePointerDown(mousePosition);
@@ -64,7 +59,7 @@ namespace Input
 
         private void HandlePointerDown(Vector2 mousePosition)
         {
-            if (IsPointerOverUiToolkit(mousePosition))
+            if (IsPointerOverUI(mousePosition))
             {
                 return;
             }
@@ -87,7 +82,7 @@ namespace Input
 
         private void HandlePointerDrag(Vector2 mousePosition)
         {
-            if (IsPointerOverUiToolkit(mousePosition))
+            if (IsPointerOverUI(mousePosition))
             {
                 OnTileDecoratorDrag?.Invoke(null);
                 _lastDraggedTileDecorator = null;
@@ -131,7 +126,7 @@ namespace Input
 
             TileDecorator tileDecorator = null;
 
-            if (!IsPointerOverUiToolkit(mousePosition))
+            if (!IsPointerOverUI(mousePosition))
             {
                 tileDecorator = RaycastTileDecorator(mousePosition);
             }
@@ -164,8 +159,15 @@ namespace Input
             return hit.collider.GetComponentInParent<TileDecorator>();
         }
 
-        private bool IsPointerOverUiToolkit(Vector2 mousePosition)
+        private bool IsPointerOverUI(Vector2 mousePosition)
         {
+            // Check UGUI (EventSystem)
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            {
+                return true;
+            }
+
+            // Check UI Toolkit
             if (blockingUIDocuments == null)
             {
                 return false;
