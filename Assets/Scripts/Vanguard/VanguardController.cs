@@ -30,6 +30,7 @@ namespace Vanguard
         
         private TileData _currentTile;
         public TileData CurrentTile => _currentTile;
+        private bool _isResetting;
         
         private void Awake()
         {
@@ -75,9 +76,12 @@ namespace Vanguard
 
         public void Respawn()
         {
+            _isResetting = true;
             Stop();
-            ReturnToOrigin(_axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero));
+            TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
+            ReturnToOrigin(origin);
             _worldDecorator.UpdateDecorations(_currentTile);
+            _isResetting = false;
         }
 
         public void Stop()
@@ -94,6 +98,8 @@ namespace Vanguard
 
         private void SetCurrentTile(TileData tileData)
         {
+            if (_isResetting) return;
+            
             _currentTile = tileData;
         }
     }
