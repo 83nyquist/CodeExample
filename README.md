@@ -10,6 +10,11 @@ Keywords:
 
 ## Technical Highlights
 
+v2.0.1
+- **Added Generation variations**
+- **Added Fog of War**
+- **Performance Optimization and refactoring**
+
 v1.2.1
 - **User Interface improvements**
 
