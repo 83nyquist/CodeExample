@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using NPC.Structs;
+using Systems.NPC.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace NPC.Components
+namespace Systems.NPC.Components
 {
     public class NpcSpawner
     {

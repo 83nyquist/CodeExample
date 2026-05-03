@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Audio;
 using Character;
-using Game.Data;
+using Data;
 using Systems.Grid;
 using UnityEngine;
 using UnityEngine.UIElements;

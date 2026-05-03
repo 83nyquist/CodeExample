@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using NPC.Structs;
 using Systems.Grid;
+using Systems.NPC.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace NPC.Components
+namespace Systems.NPC.Components
 {
     public class NativeGridBuilder
     {

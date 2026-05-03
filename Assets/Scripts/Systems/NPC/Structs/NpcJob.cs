@@ -4,7 +4,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace NPC.Structs
+namespace Systems.NPC.Structs
 {
     [BurstCompile]
     public struct NpcJob : IJobParallelFor

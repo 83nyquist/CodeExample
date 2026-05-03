@@ -1,4 +1,4 @@
-using Game.Data;
+using Data;
 using UnityEngine;
 using Zenject;
 
