@@ -16,24 +16,24 @@ MonoBehaviour:
   - type: 0
     prefabs:
     - {fileID: 4110313678187046319, guid: 6083cb1f9d7f3443193f9d09474c70ca, type: 3}
-    shroudedPrefab: {fileID: 0}
+    shroudedPrefab: {fileID: 2433382436168047601, guid: 85f4028c3d6a56508a041bfea473aab9, type: 3}
   - type: 1
     prefabs:
     - {fileID: 4110313678187046319, guid: 223acb40f42522b7f8806e5ce34cc088, type: 3}
-    shroudedPrefab: {fileID: 0}
+    shroudedPrefab: {fileID: 1676356043280456385, guid: b79353df39d0d1d3aaebbbfb4a2515bf, type: 3}
   - type: 2
     prefabs:
     - {fileID: 4110313678187046319, guid: 12887f16681f30a29bd83b00b4919de6, type: 3}
     - {fileID: 4110313678187046319, guid: 57d2131717c973829b9af955c6ad12db, type: 3}
-    shroudedPrefab: {fileID: 0}
+    shroudedPrefab: {fileID: 9113041400041376695, guid: 1735e4c67bb4fca13841143d47b4dfa2, type: 3}
   - type: 3
     prefabs:
     - {fileID: 4110313678187046319, guid: 7ec87ed89156c6363b5e5c40682359b2, type: 3}
     - {fileID: 413125148039128164, guid: a8c6d4cde002aafaba1363a5b16c1e9f, type: 3}
-    shroudedPrefab: {fileID: 0}
+    shroudedPrefab: {fileID: 6953942510647114199, guid: d414f7056ed3af5208fca98897bdc9c3, type: 3}
   - type: 4
     prefabs:
     - {fileID: 4110313678187046319, guid: a4825ea32453d10e8a502ffe33a79d17, type: 3}
     - {fileID: 4110313678187046319, guid: 8858ed5baf1bb9d86b60760657ca9487, type: 3}
     - {fileID: 4110313678187046319, guid: a51862e4b20aaa63da4901ae3289285a, type: 3}
-    shroudedPrefab: {fileID: 0}
+    shroudedPrefab: {fileID: 6735146786490975404, guid: e49ea29c71131acb1b88025fb11e6de4, type: 3}
