@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Core.Enumerations;
 using Systems.Coordinators;
 using UnityEngine;
 
@@ -29,22 +28,19 @@ namespace Systems.Grid.Components
 
         public IEnumerator BuildNeighborsRoutine(AxialHexGrid grid, int radius)
         {
-            var directions = (Directions.Axial[])Enum.GetValues(typeof(Directions.Axial));
-
             return ProcessInBatches(
                 HexGeometry.GetCoordinatesInRingRange(0, radius),
                 axialCoord => {
                 TileData data = grid.GetTile(axialCoord);
                 if (data == null) return;
 
-                var res = new Dictionary<Directions.Axial, TileData>();
-                foreach (var direction in directions)
+                TileData[] neighbours = new TileData[6];
+                for (int i = 0; i < 6; i++)
                 {
-                    TileData neighbor = grid.GetTile(data.GetNeighborCoordinate(direction));
-                    if (neighbor != null)
-                        res[direction] = neighbor;
+                    Vector2Int neighborCoord = data.GetNeighborCoordinate(i);
+                    neighbours[i] = grid.GetTile(neighborCoord);
                 }
-                data.SetNeighbours(res);
+                data.SetNeighbours(neighbours);
             }, WorkUnitTypes.Neighbors);
         }
 
