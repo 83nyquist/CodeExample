@@ -1,199 +1,37 @@
-using System.Collections.Generic;
-using Audio;
-using Character;
-using Data;
 using Systems.Coordinators;
-using Systems.Grid;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Vanguard;
 using Zenject;
 
 namespace UserInterface.UIToolkit
 {
+    /// <summary>
+    /// Handles the high-level state and visibility of the UI Toolkit Document.
+    /// </summary>
     public class UIController : MonoBehaviour
     {
         [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
-        [Inject] private AxialHexGrid _axialHexGrid;
-        [Inject] private AudioManager _audioManager;
-        [Inject] private VanguardController _vanguardController;
-        [Inject] private DebugDrawer _debugDrawer;
-        [Inject] private GameSettings _gameSettings;
-        [Inject] private PlayerSettings _playerSettings;
-        
+
         [SerializeField] private UIDocument uiDocument;
 
-        public CharacterAnimationEvents AnimationEvents { get; set; }
+        public VisualElement Root => uiDocument.rootVisualElement;
 
-        private VisualElement _root;
-        private Slider _sliderGrid;
-        private Slider _sliderVolume;
-        private Slider _sliderPopulation;
-        private Slider _sliderVision;
-        
-        private Button _btnGenerate;
-        private Button _btnRespawn;
-        private Button _btnExit;
-        
-        private Toggle _tglFps;
-        
-        void Start()
+        private void Start()
         {
             _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
-            
-            _root = uiDocument.rootVisualElement;
-            
-            _sliderGrid = uiDocument.rootVisualElement.Q<Slider>("slider_grid");
-            _sliderVolume = uiDocument.rootVisualElement.Q<Slider>("slider_volume");
-            _sliderPopulation = uiDocument.rootVisualElement.Q<Slider>("slider_population");
-            _sliderVision = uiDocument.rootVisualElement.Q<Slider>("slider_vision");
-
-            SetSliderRanges();
-            
-            _sliderGrid.RegisterValueChangedCallback(OnGridValueChanged);
-            _sliderVolume.RegisterValueChangedCallback(OnVolumeValueChanged);
-            _sliderPopulation.RegisterValueChangedCallback(OnPopulationValueChanged);
-            _sliderVision.RegisterValueChangedCallback(OnVisionValueChanged);
-            
-            _btnGenerate = uiDocument.rootVisualElement.Q<Button>("btn_generate");
-            _btnRespawn = uiDocument.rootVisualElement.Q<Button>("btn_respawn");
-            _btnExit = uiDocument.rootVisualElement.Q<Button>("btn_exit");
-            
-            _btnGenerate.clicked += OnGenerateClicked;
-            _btnRespawn.clicked += OnRespawnClicked;
-            _btnExit.clicked += OnExitClicked;
-            
-            _tglFps = uiDocument.rootVisualElement.Q<Toggle>("tgl_fps");
-            _tglFps.RegisterValueChangedCallback(OnTglFpsChanged);
-            
-            LoadSettings();
-            
             SetEnabled(false);
         }
 
         private void OnDestroy()
         {
-            _sliderGrid.UnregisterValueChangedCallback(OnGridValueChanged);
-            _sliderVolume.UnregisterValueChangedCallback(OnVolumeValueChanged);
-            _sliderPopulation.UnregisterValueChangedCallback(OnPopulationValueChanged);
-            _sliderVision.UnregisterValueChangedCallback(OnVisionValueChanged);
-            
-            _btnGenerate.clicked -= OnGenerateClicked;
-            _btnRespawn.clicked -= OnRespawnClicked;
-            _btnExit.clicked -= OnExitClicked;
-            
-            _tglFps.UnregisterValueChangedCallback(OnTglFpsChanged);
-            
-            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
+            if (_worldGeneratorCoordinator != null) 
+                _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
         }
 
-        private void OnGenerationComplete()
-        {
-            SetEnabled(true);
-        }
+        private void OnGenerationComplete() => SetEnabled(true);
 
-        private void OnGridValueChanged(ChangeEvent<float> evt)
-        {
-            int value = (int)(evt.newValue);
+        public void SetVisible(bool isVisible) => Root.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
 
-            _sliderGrid.label = $"Grid Radius: {value}";
-            _playerSettings.gridRadius = value;
-        }
-
-        private void OnVolumeValueChanged(ChangeEvent<float> evt)
-        {
-            // Apply to audio sources
-            _audioManager.MusicSource.volume = evt.newValue;
-
-            if (AnimationEvents != null)
-            {
-                AnimationEvents.AudioSource.volume = evt.newValue;
-            }
-    
-            // Display and save
-            int value = (int)evt.newValue;
-            _sliderVolume.label = $"Volume: {value}";
-            _gameSettings.MasterVolume = value;
-        }
-
-        private void OnPopulationValueChanged(ChangeEvent<float> evt)
-        {
-            int value = (int)(evt.newValue);
-
-            _sliderPopulation.label = $"Population: {value}";
-            _playerSettings.populationSize = value;
-        }
-
-        private void OnVisionValueChanged(ChangeEvent<float> evt)
-        {
-            int value = (int)(evt.newValue);
-            
-            _sliderVision.label = $"Vision Radius: {value}";
-            _playerSettings.visionRadius = value;
-        }
-
-        private void OnRespawnClicked()
-        {
-            _vanguardController.Respawn();
-        }
-
-        private void OnGenerateClicked()
-        {
-            SetEnabled(false);
-            _vanguardController.Stop();
-            _worldGeneratorCoordinator.GenerateWorld();
-        }
-
-        private void OnExitClicked()
-        {
-            Application.Quit();
-        }
-        
-        private void OnTglFpsChanged(ChangeEvent<bool> evt)
-        {
-            _debugDrawer.showDebug = evt.newValue;
-            _playerSettings.showFPS = evt.newValue;
-        }
-
-        public void SetSliderRanges()
-        {
-            _sliderGrid.lowValue = 10;
-            _sliderGrid.highValue = 1000;
-
-            _sliderVolume.lowValue = 0;
-            _sliderVolume.highValue = 100;
-
-            _sliderPopulation.lowValue = 0;
-            _sliderPopulation.highValue = 10000;
-
-            _sliderVision.lowValue = 2;
-            _sliderVision.highValue = 20;
-        }
-
-        public void LoadSettings()
-        {
-            _sliderGrid.label = $"Grid Radius: {_playerSettings.gridRadius}";
-            _sliderVolume.label = $"Volume: {_gameSettings.MasterVolume}";
-            _sliderPopulation.label = $"Population: {_playerSettings.populationSize}";
-            _sliderVision.label = $"Vision Radius: {_playerSettings.visionRadius}";
-            
-            _sliderGrid.value = _playerSettings.gridRadius;
-            _sliderVolume.value = _gameSettings.MasterVolume;
-            _sliderPopulation.value = _playerSettings.populationSize;
-            _sliderVision.value = _playerSettings.visionRadius;
-            
-            _tglFps.label = $"Show FPS:";
-            _tglFps.value = _playerSettings.showFPS;
-        }
-
-        public void SetVisible(bool isVisible)
-        {
-            uiDocument.rootVisualElement.visible = isVisible;
-        }
-
-        public void SetEnabled(bool isEnabled)
-        {
-            _root.SetEnabled(isEnabled);
-        }
+        public void SetEnabled(bool isEnabled) => Root.SetEnabled(isEnabled);
     }
 }

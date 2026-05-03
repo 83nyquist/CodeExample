@@ -1,5 +1,4 @@
 using Audio;
-using Character;
 using Input;
 using NPC;
 using Systems.Coordinators;
@@ -18,6 +17,7 @@ namespace Systems.DependencyInjection
     {
         public override void InstallBindings()
         {
+            Container.Bind<GameFlowCoordinator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<AxialHexGrid>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<WorldDecorator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<DecoratorFactory>().FromComponentInHierarchy().AsCached().NonLazy();
