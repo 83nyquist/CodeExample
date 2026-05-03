@@ -24,6 +24,7 @@ namespace Systems.Coordinators.Editor
             new MountainSmoothingAlterationPass(),
             new MassiveMountainAlterationPass(),
             new ForestAlterationPass(),
+            new WaterDepthAlterationPass(),
         };
 
         public override void OnInspectorGUI()

@@ -3254,6 +3254,8 @@ MonoBehaviour:
       rid: 863678564487135312
   - pass:
       rid: 863678564487135314
+  - pass:
+      rid: 863678566035357767
   references:
     version: 2
     RefIds:
@@ -3281,6 +3283,10 @@ MonoBehaviour:
       data:
         debugLog: 0
         variationCount: 3
+    - rid: 863678566035357767
+      type: {class: WaterDepthAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
+      data:
+        debugLog: 0
 --- !u!114 &1723073973
 MonoBehaviour:
   m_ObjectHideFlags: 0
