@@ -16,7 +16,7 @@ namespace Systems.DependencyInjection
     public class MonoInstaller : Zenject.MonoInstaller
     {
         public override void InstallBindings()
-        {
+        { 
             Container.Bind<GameFlowCoordinator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<AxialHexGrid>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<WorldDecorator>().FromComponentInHierarchy().AsCached().NonLazy();
@@ -31,6 +31,8 @@ namespace Systems.DependencyInjection
             
             Container.Bind<MouseInput>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<InputHandler>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<TileRaycaster>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<InputUIBlocker>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<UiManager>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<UIController>().FromComponentInHierarchy().AsCached().NonLazy();

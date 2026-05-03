@@ -1,12 +1,13 @@
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Zenject;
 
 namespace Input
 {
     public class CameraZoom : MonoBehaviour
     {
-        [Header("References")]
+        [Inject] private MouseInput _mouseInput;
+
         [SerializeField] private CinemachineCamera cinemachineCamera;
     
         [Header("Zoom Settings")]
@@ -54,21 +55,23 @@ namespace Input
             {
                 Debug.LogError("CinemachineFollow component not found on camera!");
             }
+
+            _mouseInput.OnScroll += HandleZoomInput;
         }
     
+        private void OnDestroy()
+        {
+            if (_mouseInput != null)
+                _mouseInput.OnScroll -= HandleZoomInput;
+        }
+
         private void Update()
         {
-            HandleZoomInput();
             ApplySmoothZoom();
         }
     
-        private void HandleZoomInput()
+        private void HandleZoomInput(float scrollDelta)
         {
-            float scrollDelta = Mouse.current.scroll.ReadValue().y;
-        
-            if (Mathf.Approximately(scrollDelta, 0f))
-                return;
-        
             // Scroll up (positive) = zoom in (decrease distance)
             // Scroll down (negative) = zoom out (increase distance)
             float zoomDelta = scrollDelta * zoomSpeed;
