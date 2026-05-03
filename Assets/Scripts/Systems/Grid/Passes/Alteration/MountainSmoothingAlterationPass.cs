@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Systems.Decoration.Components;
+using Systems.Grid.Components;
 using UnityEngine;
 
 namespace Systems.Grid.Passes.Alteration
@@ -16,19 +18,17 @@ namespace Systems.Grid.Passes.Alteration
             {
                 if (tile.type != TileType.Mountain) continue;
 
-                bool onlyMountainNeighbours = true;
+                bool surroundedByMountains = true;
                 foreach (var neighbour in tile.Neighbours)
                 {
                     if (neighbour == null || neighbour.type != TileType.Mountain)
                     {
-                        onlyMountainNeighbours = false;
+                        surroundedByMountains = false;
                         break;
                     }
                 }
 
-                // Set the variation index based on your requirements:
-                // Default (Small) = 0, Surrounded (Large) = 1
-                tile.VariationIndex = onlyMountainNeighbours ? 1 : 0;
+                tile.VariationIndex = surroundedByMountains ? 1 : 0;
             }
         }
     }

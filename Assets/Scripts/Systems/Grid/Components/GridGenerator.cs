@@ -22,7 +22,7 @@ namespace Systems.Grid.Components
             return ProcessInBatches(
                 HexGeometry.GetCoordinatesInRingRange(0, radius),
                 coord => grid.CreateTileData(coord.x, coord.y),
-                WorkUnitTypes.Tiles
+                GenerationProgressTracker.TaskTiles
             );
         }
 
@@ -41,10 +41,10 @@ namespace Systems.Grid.Components
                     neighbours[i] = grid.GetTile(neighborCoord);
                 }
                 data.SetNeighbours(neighbours);
-            }, WorkUnitTypes.Neighbors);
+            }, GenerationProgressTracker.TaskNeighbors);
         }
 
-        private IEnumerator ProcessInBatches<T>(IEnumerable<T> items, Action<T> action, WorkUnitTypes unitType)
+        private IEnumerator ProcessInBatches<T>(IEnumerable<T> items, Action<T> action, string workUnit)
         {
             float budgetSeconds = _maxMsPerFrame / 1000f;
             float lastYieldTime = Time.realtimeSinceStartup;
@@ -57,7 +57,7 @@ namespace Systems.Grid.Components
 
                 if (batchCount % 50 == 0 && Time.realtimeSinceStartup - lastYieldTime > budgetSeconds)
                 {
-                    _progressTracker.UpdateProgress(unitType, batchCount);
+                    _progressTracker.UpdateProgress(workUnit, batchCount);
                     batchCount = 0;
                     yield return null;
                     lastYieldTime = Time.realtimeSinceStartup;
@@ -65,7 +65,7 @@ namespace Systems.Grid.Components
             }
 
             if (batchCount > 0)
-                _progressTracker.UpdateProgress(unitType, batchCount);
+                _progressTracker.UpdateProgress(workUnit, batchCount);
         }
     }
 }

@@ -1,68 +1,54 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Systems.Coordinators
 {
-    public enum WorkUnitTypes
-    {
-        Tiles,
-        Neighbors,
-        Agents
-    }
-
     public class GenerationProgressTracker : MonoBehaviour
     {
-        private int _totalTiles;
-        private int _totalNeighbourHookups;
-        private int _totalAgents;
-
-        private int _currentTileData;
-        private int _currentNeighbors;
-        private int _currentAgents;
+        // Constant keys for core tasks
+        public const string TaskTiles = "Tiles";
+        public const string TaskNeighbors = "Neighbors";
+        public const string TaskAgents = "Agents";
         
+        private int _currentWorkUnits;
         private int _estimatedTotalWorkUnits;
+        private int _tilesInGrid;
 
         public event Action<int> OnInitialized;
-        public event Action<int, int, WorkUnitTypes> OnProgressUpdated;
+        public event Action<int, int, string> OnProgressUpdated;
 
-        public void Initialize(int radius, int populationSize)
+        public void Initialize(int radius, int populationSize, IEnumerable<string> passNames)
         {
-            _totalTiles = CalculateTotalTiles(radius);
-            _totalNeighbourHookups = _totalTiles;
-            _totalAgents = populationSize;
+            _tilesInGrid = CalculateTotalTiles(radius);
+            
+            // Base Work: Data Creation (Tiles) + Linkage (Neighbors)
+            int baseWork = _tilesInGrid * 2;
+            int agentWork = populationSize;
+            
+            // Dynamic Work: Every pass iterates over the grid (or significant portions)
+            // We treat one pass as 1 work unit per tile.
+            int passWork = passNames.Count() * _tilesInGrid;
 
-            _estimatedTotalWorkUnits = _totalTiles + _totalNeighbourHookups + _totalAgents;
+            _estimatedTotalWorkUnits = baseWork + agentWork + passWork;
+            _currentWorkUnits = 0;
             
-            _currentTileData = 0;
-            _currentNeighbors = 0;
-            _currentAgents = 0;
-            
-            OnInitialized?.Invoke( _estimatedTotalWorkUnits);
+            OnInitialized?.Invoke(_estimatedTotalWorkUnits);
         }
 
-        public void UpdateProgress(WorkUnitTypes workUnitType, int amount = 1)
+        public void UpdateProgress(string taskName, int amount = 1)
         {
-            switch (workUnitType)
-            {
-                case WorkUnitTypes.Tiles:
-                {
-                    _currentTileData += amount;
-                    break;
-                }
-                case WorkUnitTypes.Neighbors:
-                {
-                    _currentNeighbors += amount;
-                    break;
-                }
-                case WorkUnitTypes.Agents:
-                {
-                    _currentAgents += amount;
-                    break;
-                }
-            }
+            _currentWorkUnits += amount;
+            OnProgressUpdated?.Invoke(_currentWorkUnits, _estimatedTotalWorkUnits, taskName);
+        }
 
-            int total = _currentTileData + _currentNeighbors + _currentAgents;
-            OnProgressUpdated?.Invoke(total, _estimatedTotalWorkUnits, workUnitType);
+        /// <summary>
+        /// Marks a full pass as complete by adding the total tile count to progress.
+        /// </summary>
+        public void CompletePass(string passName)
+        {
+            UpdateProgress(passName, _tilesInGrid);
         }
         
         public int CalculateTotalTiles(int radius)

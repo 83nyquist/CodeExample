@@ -10,17 +10,28 @@ namespace Systems.Decoration.Components
         [SerializeField] private AxialHexGrid axialHexGrid;
         [SerializeField] private TileData tileData;
         
+        public GameObject SourcePrefab { get; private set; }
         public TileData TileData => tileData;
         
-        public void Initialize(AxialHexGrid grid, TileData data, Transform parent)
+        public void Initialize(AxialHexGrid grid, TileData data, Transform parent, GameObject sourcePrefab)
         {
             axialHexGrid = grid;
             tileData = data;
-            name = $"TileDecorator: {data.X}_{data.Z}";
+            SourcePrefab = sourcePrefab;
             
             transform.SetParent(parent);
-            transform.position = this.axialHexGrid.AxialToWorld(tileData.X, tileData.Z);
-            transform.rotation = Quaternion.Euler(tileData.Rotation);
+
+            if (data != null && grid != null)
+            {
+                name = $"TileDecorator: {data.X}_{data.Z}";
+                transform.position = grid.AxialToWorld(data.X, data.Z);
+                transform.rotation = Quaternion.Euler(data.Rotation);
+            }
+            else
+            {
+                name = "TileDecorator (Pooled)";
+            }
+
             enabled = true;
         }
         
