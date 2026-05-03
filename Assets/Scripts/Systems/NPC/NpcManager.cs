@@ -9,6 +9,8 @@ using UnityEngine;
 using Zenject;
 using Systems.Grid;
 using Systems.Decoration;
+using Systems.Grid.Components;
+using Systems.Grid.Extensions;
 using Systems.NPC.Components;
 using Systems.NPC.Structs;
 

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Systems.Grid
+namespace Systems.Coordinators
 {
     public enum WorkUnitTypes
     {

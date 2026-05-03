@@ -1,6 +1,7 @@
 using Systems.Grid;
 using System.Collections.Generic;
 using Core.Components;
+using Systems.Grid.Components;
 using UnityEngine;
 using Zenject;
 

@@ -1,4 +1,6 @@
 using Systems.Grid;
+using Systems.Grid.Components;
+using Systems.Grid.Extensions;
 using UnityEngine;
 
 namespace Systems.Decoration

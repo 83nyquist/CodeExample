@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using Core.Components;
 using Systems.Decoration;
-using Systems.Grid.Pathfinding;
+using Systems.Grid.Components;
+using Systems.Grid.Extensions;
 using UnityEngine;
 using Vanguard;
 using Zenject;
 
-namespace Systems.Grid
+namespace Systems.Grid.Pathfinding
 {
     public class AStarPathfinding : MonoBehaviour
     {

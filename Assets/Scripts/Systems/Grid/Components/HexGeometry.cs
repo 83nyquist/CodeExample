@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Core.Enumerations;
 using UnityEngine;
 
-namespace Systems.Grid
+namespace Systems.Grid.Components
 {
     public static class HexGeometry
     {

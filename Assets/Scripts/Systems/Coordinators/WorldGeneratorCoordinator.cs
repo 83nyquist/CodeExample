@@ -44,7 +44,9 @@ namespace Systems.Coordinators
             _inputLock = _inputHandler.RegisterInputLock(this);
 
             if (generateOnAwake)
+            {
                 GenerateWorld();
+            }
         }
 
         public void GenerateWorld()

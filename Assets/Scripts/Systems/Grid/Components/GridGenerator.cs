@@ -2,9 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Enumerations;
+using Systems.Coordinators;
 using UnityEngine;
 
-namespace Systems.Grid
+namespace Systems.Grid.Components
 {
     public class GridGenerator
     {

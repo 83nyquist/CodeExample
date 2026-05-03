@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
-using Systems.Grid.AlterationPasses;
+using Systems.Grid.Components;
 using UnityEditor;
-using UnityEngine;
 
 namespace Systems.Grid.Editor
 {

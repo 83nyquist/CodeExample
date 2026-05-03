@@ -5,6 +5,7 @@ using NPC;
 using Systems.Coordinators;
 using Systems.Decoration;
 using Systems.Grid;
+using Systems.Grid.Pathfinding;
 using UserInterface;
 using UserInterface.UGUI;
 using UserInterface.UIToolkit;
