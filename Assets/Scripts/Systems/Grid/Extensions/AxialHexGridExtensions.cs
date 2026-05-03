@@ -1,7 +1,8 @@
-using UnityEngine;
 using System.Collections.Generic;
+using Systems.Grid.Components;
+using UnityEngine;
 
-namespace Systems.Grid
+namespace Systems.Grid.Extensions
 {
     public static class AxialHexGridExtensions
     {

@@ -1,9 +1,9 @@
 using System;
 using Systems.Decoration;
-using Systems.Grid.AlterationPasses;
+using Systems.Grid.Components;
 using UnityEngine;
 
-namespace Systems.Grid
+namespace Systems.Grid.AlterationPasses
 {
     [Serializable]
     public class PerlinNoiseAlterationPass : BaseAlterationPass

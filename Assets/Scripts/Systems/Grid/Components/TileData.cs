@@ -4,7 +4,7 @@ using Core.Enumerations;
 using Systems.Decoration;
 using UnityEngine;
 
-namespace Systems.Grid
+namespace Systems.Grid.Components
 {
     [Serializable]
     public class TileData

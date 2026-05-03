@@ -1,6 +1,7 @@
 using Character;
 using Core.Components;
 using NPC;
+using Systems.Coordinators;
 using Systems.Grid;
 using TMPro;
 using UnityEngine;

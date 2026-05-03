@@ -4,6 +4,7 @@ using Data;
 using Input;
 using Systems.Coordinators;
 using Systems.Grid;
+using Systems.Grid.Components;
 using UnityEngine;
 using Vanguard;
 using Zenject;

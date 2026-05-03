@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Systems.Grid.Components;
 using UnityEngine;
 
 namespace Systems.Grid

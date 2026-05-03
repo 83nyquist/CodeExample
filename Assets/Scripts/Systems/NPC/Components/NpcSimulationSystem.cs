@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Systems.Decoration;
 using Systems.Grid;
+using Systems.Grid.Components;
 using Systems.NPC.Structs;
 using Unity.Collections;
 using Unity.Jobs;

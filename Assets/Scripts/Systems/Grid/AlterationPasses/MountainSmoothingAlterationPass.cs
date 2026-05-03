@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Systems.Grid.AlterationPasses
 {
     public class MountainSmoothingAlterationPass : BaseAlterationPass

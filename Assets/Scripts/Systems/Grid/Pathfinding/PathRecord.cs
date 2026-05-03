@@ -1,3 +1,5 @@
+using Systems.Grid.Components;
+
 namespace Systems.Grid.Pathfinding
 {
     public class PathRecord
