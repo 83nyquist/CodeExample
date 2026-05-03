@@ -14,7 +14,7 @@ namespace UserInterface.UGUI
     public class LoadingPanelController : MonoBehaviour
     {
         [Inject] private AxialHexGrid _axialHexGrid;
-        [Inject] private NpcManager _npcManager;
+        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private GenerationProgressTracker _progressTracker;
         [Inject] private VanguardController _vanguardController;
         [Inject] private UiManager _uiManager;
@@ -35,7 +35,7 @@ namespace UserInterface.UGUI
         {
             _progressTracker.OnInitialized += OnInitialized;
             _progressTracker.OnProgressUpdated += OnProgressUpdated;
-            _npcManager.OnComplete += OnComplete;
+            _worldGeneratorCoordinator.OnGenerationComplete += OnComplete;
             
             profileParent.GetComponent<DestroyChildren>().Activate();
             
@@ -46,7 +46,7 @@ namespace UserInterface.UGUI
         {
             _progressTracker.OnInitialized -= OnInitialized;
             _progressTracker.OnProgressUpdated -= OnProgressUpdated;
-            _npcManager.OnComplete -= OnComplete;
+            _worldGeneratorCoordinator.OnGenerationComplete -= OnComplete;
         }
 
         void Update()
