@@ -2,7 +2,7 @@ using Systems.Decoration;
 using Unity.Collections;
 using Unity.Mathematics;
 
-namespace NPC.Components
+namespace Systems.NPC.Components
 {
     public class VisionManager
     {

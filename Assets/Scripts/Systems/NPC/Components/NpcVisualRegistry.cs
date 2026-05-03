@@ -1,9 +1,9 @@
-using NPC.Structs;
+using Systems.NPC.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace NPC.Components
+namespace Systems.NPC.Components
 {
     public class NpcVisualRegistry
     {

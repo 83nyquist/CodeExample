@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Game.Data;
+using Data;
 using Input;
 using Systems.Grid;
 using UnityEngine;

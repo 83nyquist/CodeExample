@@ -2,7 +2,7 @@ using System;
 using Unity.Collections;
 using Unity.Mathematics;
 
-namespace NPC.Structs
+namespace Systems.NPC.Structs
 {
     public struct NativeHexGrid : IDisposable
     {

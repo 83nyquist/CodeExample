@@ -2068,6 +2068,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcManager
   minMoveInterval: 1
   maxMoveInterval: 3
+  visibilityUpdateInterval: 0.2
   npcVisualPrefab: {fileID: 8794614267443648548, guid: a4c860ce2bce89dde83e675fe00d7d2d, type: 3}
   moveSpeed: 3
   rotationSpeed: 15

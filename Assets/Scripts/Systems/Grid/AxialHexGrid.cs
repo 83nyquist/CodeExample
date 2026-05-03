@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Enumerations;
-using Game.Data;
+using Data;
 using Input;
 using Systems.Grid.AlterationPasses;
 using UnityEngine;
@@ -39,6 +39,7 @@ namespace Systems.Grid
         private int _radius = 5;
 
         // Events
+        public event Action OnGridStarted;
         public event Action<Dictionary<Vector2Int, TileData>> OnGridGenerated;
         public event Action OnAugmentationPassesComplete;
         
@@ -66,6 +67,7 @@ namespace Systems.Grid
 
         private IEnumerator GenerateGridRoutine()
         {
+            OnGridStarted?.Invoke();
             _inputLock.IsLocked = true;
             _radius = _playerSettings.gridRadius;
             
