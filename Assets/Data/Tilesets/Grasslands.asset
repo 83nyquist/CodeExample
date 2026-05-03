@@ -16,16 +16,22 @@ MonoBehaviour:
   - type: 0
     prefabs:
     - {fileID: 4110313678187046319, guid: 6083cb1f9d7f3443193f9d09474c70ca, type: 3}
+    shroudedPrefab: {fileID: 0}
   - type: 1
     prefabs:
     - {fileID: 4110313678187046319, guid: 223acb40f42522b7f8806e5ce34cc088, type: 3}
+    shroudedPrefab: {fileID: 0}
   - type: 2
     prefabs:
     - {fileID: 4110313678187046319, guid: 12887f16681f30a29bd83b00b4919de6, type: 3}
+    shroudedPrefab: {fileID: 0}
   - type: 3
     prefabs:
     - {fileID: 4110313678187046319, guid: 7ec87ed89156c6363b5e5c40682359b2, type: 3}
+    shroudedPrefab: {fileID: 0}
   - type: 4
     prefabs:
     - {fileID: 4110313678187046319, guid: a4825ea32453d10e8a502ffe33a79d17, type: 3}
     - {fileID: 4110313678187046319, guid: 8858ed5baf1bb9d86b60760657ca9487, type: 3}
+    - {fileID: 4110313678187046319, guid: a51862e4b20aaa63da4901ae3289285a, type: 3}
+    shroudedPrefab: {fileID: 0}

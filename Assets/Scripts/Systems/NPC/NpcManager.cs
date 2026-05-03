@@ -54,13 +54,11 @@ namespace NPC
         {
             InitializeComponents();
             _worldGeneratorCoordinator.OnGenerationStarted += CleanupActiveSimulation;
-            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
         }
         
         void OnDestroy()
         {
             _worldGeneratorCoordinator.OnGenerationStarted -= CleanupActiveSimulation;
-            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
             _simulation?.Dispose();
             _visuals?.Dispose();
         }
@@ -89,7 +87,11 @@ namespace NPC
             _visibilityTracker.OnCountChanged += (count) => OnVisibleAgentsCountChanged?.Invoke(count);
         }
         
-        private void OnGenerationComplete()
+        /// <summary>
+        /// Starts the NPC simulation and spawning process. 
+        /// This should be called once the grid data and passes are finalized.
+        /// </summary>
+        public void InitializeNpcs()
         {
             _simulation.Reset(_axialHexGrid.Tiles, _worldDecorator);
             _spawnCoroutine = StartCoroutine(SpawnNpcsRoutine(_axialHexGrid.Tiles));
@@ -130,7 +132,7 @@ namespace NPC
                 var slice = new NativeSlice<NpcData>(_simulation.Data, i, batch);
                 
                 _visuals.CreateVisualsInRange(slice, i, HexToWorld);
-                _progressTracker.UpdateProgress(WorkUnitTypes.Agents, batch);
+                _progressTracker.UpdateProgress(GenerationProgressTracker.TaskAgents, batch);
                 yield return null;
             }
 

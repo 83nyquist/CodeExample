@@ -90,10 +90,10 @@ namespace UserInterface.UGUI
             OnLoadingStarted?.Invoke();
         }
 
-        public void OnProgressUpdated(int amount, int total, WorkUnitTypes workUnitType)
+        public void OnProgressUpdated(int amount, int total, string workUnit)
         {
             loadingSlider.value = amount;
-            loadingSliderLabel.text = $"{workUnitType}: {amount} / {total}";
+            loadingSliderLabel.text = $"{workUnit}: {amount} / {total}";
             loadingSliderLabelPercentage.text = $"{((float)amount / total * 100):F0}%";
         }
 

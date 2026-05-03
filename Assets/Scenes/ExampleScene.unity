@@ -3246,12 +3246,16 @@ MonoBehaviour:
   customSeed: 42
   generationPasses:
   - pass:
-      rid: 863678564487135232
-  alterationPasses: []
+      rid: 863678564487135310
+  alterationPasses:
+  - pass:
+      rid: 863678564487135311
+  - pass:
+      rid: 863678564487135312
   references:
     version: 2
     RefIds:
-    - rid: 863678564487135232
+    - rid: 863678564487135310
       type: {class: PerlinNoiseGenerationPass, ns: Systems.Grid.Passes.Generation, asm: Assembly-CSharp}
       data:
         debugLog: 0
@@ -3262,6 +3266,14 @@ MonoBehaviour:
         mountainThreshold: 0.8
         forestMoisture: 0.6
         fieldMoisture: 0.3
+    - rid: 863678564487135311
+      type: {class: MountainSmoothingAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
+      data:
+        debugLog: 0
+    - rid: 863678564487135312
+      type: {class: MassiveMountainAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
+      data:
+        debugLog: 0
 --- !u!114 &1723073973
 MonoBehaviour:
   m_ObjectHideFlags: 0

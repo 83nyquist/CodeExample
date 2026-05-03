@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Systems.Decoration.Components
@@ -13,6 +12,7 @@ namespace Systems.Decoration.Components
         {
             public TileType type;
             public List<GameObject> prefabs;
+            public GameObject shroudedPrefab;
         }
 
         [SerializeField] private List<TileTypeGroup> tileGroups = new List<TileTypeGroup>();
@@ -25,6 +25,12 @@ namespace Systems.Decoration.Components
             // Use the specific index provided, clamped to existing variants
             int safeIndex = Mathf.Clamp(index < 0 ? 0 : index, 0, group.prefabs.Count - 1);
             return group.prefabs[safeIndex];
+        }
+
+        public GameObject GetShroudedPrefab(TileType type)
+        {
+            var group = tileGroups.Find(g => g.type == type);
+            return group.shroudedPrefab;
         }
 
         public int GetVariationCount(TileType type)

@@ -15,7 +15,7 @@ namespace Systems.Decoration.Components
         [SerializeField] private Transform activeParent;
         [SerializeField] private int preWarm = 10;
         
-        private Dictionary<TileType, Queue<TileDecorator>> _pools = new Dictionary<TileType, Queue<TileDecorator>>();
+        private Dictionary<GameObject, Queue<TileDecorator>> _pools = new Dictionary<GameObject, Queue<TileDecorator>>();
         private Dictionary<TileData, TileDecorator> _activeTiles = new Dictionary<TileData, TileDecorator>();
         
         public TileSet TileSet => tileSet;
@@ -33,11 +33,6 @@ namespace Systems.Decoration.Components
         
         private void InitializePools()
         {
-            foreach (TileType type in System.Enum.GetValues(typeof(TileType)))
-            {
-                _pools[type] = new Queue<TileDecorator>();
-            }
-            
             PreWarmPools(preWarm);
         }
         
@@ -56,10 +51,13 @@ namespace Systems.Decoration.Components
             
             if (prefab == null) return null;
             
+            if (!_pools.ContainsKey(prefab))
+                _pools[prefab] = new Queue<TileDecorator>();
+
             TileDecorator decorator;
-            if (_pools[type].Count > 0)
+            if (_pools[prefab].Count > 0)
             {
-                decorator = _pools[type].Dequeue();
+                decorator = _pools[prefab].Dequeue();
                 decorator.gameObject.SetActive(true);
             }
             else
@@ -67,7 +65,7 @@ namespace Systems.Decoration.Components
                 decorator = CreateNewDecorator(prefab);
             }
             
-            decorator.Initialize(_axialHexGrid, tileData, activeParent);
+            decorator.Initialize(_axialHexGrid, tileData, activeParent, prefab);
             
             _activeTiles[tileData] = decorator;
             return decorator;
@@ -81,15 +79,17 @@ namespace Systems.Decoration.Components
             if (decorator == null) return;
                 
             TileData tileData = decorator.TileData;
+            GameObject source = decorator.SourcePrefab;
+
             if (tileData != null) _activeTiles.Remove(tileData);
-            
             decorator.Return(poolParent);
-            
-            decorator.transform.SetParent(poolParent);
             decorator.gameObject.SetActive(false);
             
-            TileType type = decorator.TileData?.type ?? TileType.PrimaryGround;
-            _pools[type].Enqueue(decorator);
+            if (source != null)
+            {
+                if (!_pools.ContainsKey(source)) _pools[source] = new Queue<TileDecorator>();
+                _pools[source].Enqueue(decorator);
+            }
         }
         
         private TileDecorator CreateNewDecorator(GameObject prefab)
@@ -106,16 +106,31 @@ namespace Systems.Decoration.Components
         {
             foreach (TileType type in System.Enum.GetValues(typeof(TileType)))
             {
-                GameObject prefab = TileSet.GetTilePrefab(type, -1);
-                if (prefab == null) continue;
-                
-                for (int i = 0; i < preWarmCount; i++)
+                // Pre-warm variations
+                int variations = tileSet.GetVariationCount(type);
+                for (int v = 0; v < variations; v++)
                 {
-                    TileDecorator decorator = CreateNewDecorator(prefab);
-                    decorator.gameObject.SetActive(false);
-                    decorator.transform.SetParent(poolParent);
-                    _pools[type].Enqueue(decorator);
+                    GameObject prefab = tileSet.GetTilePrefab(type, v);
+                    WarmSpecificPrefab(prefab, preWarmCount);
                 }
+
+                // Pre-warm shrouded version
+                GameObject shroud = tileSet.GetShroudedPrefab(type);
+                if (shroud != null) WarmSpecificPrefab(shroud, preWarmCount);
+            }
+        }
+
+        private void WarmSpecificPrefab(GameObject prefab, int count)
+        {
+            if (prefab == null) return;
+            if (!_pools.ContainsKey(prefab)) _pools[prefab] = new Queue<TileDecorator>();
+
+            for (int i = 0; i < count; i++)
+            {
+                TileDecorator decorator = CreateNewDecorator(prefab);
+                decorator.Initialize(null, null, poolParent, prefab);
+                decorator.gameObject.SetActive(false);
+                _pools[prefab].Enqueue(decorator);
             }
         }
     }

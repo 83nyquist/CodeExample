@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Data;
+using NPC;
 using Input;
 using Systems.Grid;
 using Systems.Grid.Components;
@@ -33,6 +34,7 @@ namespace Systems.Coordinators
         [Inject] private InputHandler _inputHandler;
         [Inject] private UiManager _uiManager;
         [Inject] private GenerationProgressTracker _progressTracker;
+        [Inject] private NpcManager _npcManager;
 
         [Header("Async Settings")]
         [SerializeField] private float maxMsPerFrame = 5f;
@@ -75,7 +77,13 @@ namespace Systems.Coordinators
             _uiManager.ShowLoadingScreen();
 
             int radius = _playerSettings.gridRadius;
-            _progressTracker.Initialize(radius, _playerSettings.populationSize);
+            
+            // Collect all pass names to predict work units
+            var allPassNames = generationPasses.Select(w => w.pass?.PassName)
+                .Concat(alterationPasses.Select(w => w.pass?.PassName))
+                .Where(name => !string.IsNullOrEmpty(name));
+
+            _progressTracker.Initialize(radius, _playerSettings.populationSize, allPassNames);
             _currentSeed = useRandomSeed ? UnityEngine.Random.Range(1, 999999) : customSeed;
 
             // 1. Structural Generation
@@ -84,34 +92,53 @@ namespace Systems.Coordinators
             yield return StartCoroutine(_internalGenerator.BuildNeighborsRoutine(_grid, radius));
 
             // 2. Generation Passes (Set TileType, Elevation, etc.)
-            RunGenerationPasses();
+            yield return StartCoroutine(RunGenerationPassesRoutine());
 
             // 3. Alteration Passes (Rotation, Smoothing, Variation Indices)
-            RunAlterationPasses();
+            yield return StartCoroutine(RunAlterationPassesRoutine());
 
-            // 4. Finalization
+            // 4. Wait for NPC Spawning (since Agents are part of the WorkUnits)
+            bool npcsComplete = false;
+            Action handleNpcComplete = () => npcsComplete = true;
+            _npcManager.OnComplete += handleNpcComplete;
+            
+            _npcManager.InitializeNpcs();
+            yield return new WaitUntil(() => npcsComplete);
+            _npcManager.OnComplete -= handleNpcComplete;
+
+            // 5. Finalization
             _inputLock.IsLocked = false;
             
             Debug.Log($"World Generation Complete. Seed: {_currentSeed}");
             OnGenerationComplete?.Invoke();
         }
 
-        private void RunGenerationPasses()
+        private IEnumerator RunGenerationPassesRoutine()
         {
             var ordered = generationPasses
                 .Select(w => w.pass)
                 .Where(p => p != null);
 
-            foreach (var pass in ordered) pass.Execute(_grid, _currentSeed);
+            foreach (var pass in ordered)
+            {
+                pass.Execute(_grid, _currentSeed);
+                _progressTracker.CompletePass(pass.PassName);
+                yield return null; // Allow UI to update bar
+            }
         }
 
-        private void RunAlterationPasses()
+        private IEnumerator RunAlterationPassesRoutine()
         {
             var ordered = alterationPasses
                 .Select(w => w.pass)
                 .Where(p => p != null);
 
-            foreach (var pass in ordered) pass.Execute(_grid, _currentSeed);
+            foreach (var pass in ordered)
+            {
+                pass.Execute(_grid, _currentSeed);
+                _progressTracker.CompletePass(pass.PassName);
+                yield return null; // Allow UI to update bar
+            }
         }
 
         #region Editor Helpers

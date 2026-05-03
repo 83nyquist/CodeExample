@@ -14,14 +14,15 @@ namespace Systems.Coordinators.Editor
         {
             new PerlinNoiseGenerationPass(),
             new GeographyGenerationPass(),
-            new StandardBiomeGenerationPass()
+            new StandardBiomeGenerationPass(),
         };
 
         private readonly List<IGridAlterationPass> _alterationTemplates = new List<IGridAlterationPass>()
         {
             new DefaultVariationAlterationPass(),
             new RotationAlterationPass(),
-            new MountainSmoothingAlterationPass()
+            new MountainSmoothingAlterationPass(),
+            new MassiveMountainAlterationPass(),
         };
 
         public override void OnInspectorGUI()
