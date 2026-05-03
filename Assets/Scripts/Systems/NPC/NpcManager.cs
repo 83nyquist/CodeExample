@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Data;
+using Systems.Coordinators;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -16,7 +17,8 @@ namespace NPC
     public class NpcManager : MonoBehaviour
     {
         // Dependencies (DIP)
-        [Inject] private AxialHexGrid _hexGrid;
+        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
+        [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldDecorator _worldDecorator;
         [Inject] private PlayerSettings _playerSettings;
         [Inject] private GenerationProgressTracker _progressTracker;
@@ -49,14 +51,14 @@ namespace NPC
         void Awake()
         {
             InitializeComponents();
-            _hexGrid.OnGridStarted += CleanupActiveSimulation; // Signal to stop everything
-            _hexGrid.OnGridGenerated += OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationStarted += CleanupActiveSimulation;
+            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
         }
         
         void OnDestroy()
         {
-            _hexGrid.OnGridStarted -= CleanupActiveSimulation;
-            _hexGrid.OnGridGenerated -= OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationStarted -= CleanupActiveSimulation;
+            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
             _simulation?.Dispose();
             _visuals?.Dispose();
         }
@@ -85,10 +87,10 @@ namespace NPC
             _visibilityTracker.OnCountChanged += (count) => OnVisibleAgentsCountChanged?.Invoke(count);
         }
         
-        private void OnGridGenerated(Dictionary<Vector2Int, TileData> tiles)
+        private void OnGenerationComplete()
         {
-            _simulation.Reset(tiles, _worldDecorator);
-            _spawnCoroutine = StartCoroutine(SpawnNpcsRoutine(tiles));
+            _simulation.Reset(_axialHexGrid.Tiles, _worldDecorator);
+            _spawnCoroutine = StartCoroutine(SpawnNpcsRoutine(_axialHexGrid.Tiles));
         }
 
         /// <summary>
@@ -113,7 +115,7 @@ namespace NPC
             _visuals = new NpcVisualRegistry(npcVisualPrefab, moveSpeed, rotationSpeed, transform);
         }
 
-        private IEnumerator SpawnNpcsRoutine(Dictionary<Vector2Int, TileData> tiles)
+        private IEnumerator SpawnNpcsRoutine(IReadOnlyDictionary<Vector2Int, TileData> tiles)
         {
             int count = _playerSettings.populationSize;
             _simulation.InitializeData(count);
@@ -137,7 +139,7 @@ namespace NPC
         
         private Vector3 HexToWorld(int2 coord)
         {
-            return _hexGrid.AxialToWorld(coord.x, coord.y);
+            return _axialHexGrid.AxialToWorld(coord.x, coord.y);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Audio;
 using Character;
 using Data;
+using Systems.Coordinators;
 using Systems.Grid;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,6 +13,7 @@ namespace UserInterface.UIToolkit
 {
     public class UIController : MonoBehaviour
     {
+        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private AudioManager _audioManager;
         [Inject] private VanguardController _vanguardController;
@@ -37,7 +39,7 @@ namespace UserInterface.UIToolkit
         
         void Start()
         {
-            _axialHexGrid.OnGridGenerated += OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
             
             _root = uiDocument.rootVisualElement;
             
@@ -82,10 +84,10 @@ namespace UserInterface.UIToolkit
             
             _tglFps.UnregisterValueChangedCallback(OnTglFpsChanged);
             
-            _axialHexGrid.OnGridGenerated -= OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
         }
 
-        private void OnGridGenerated(Dictionary<Vector2Int, TileData> grid)
+        private void OnGenerationComplete()
         {
             SetEnabled(true);
         }
@@ -139,7 +141,7 @@ namespace UserInterface.UIToolkit
         {
             SetEnabled(false);
             _vanguardController.Stop();
-            _axialHexGrid.GenerateGrid();
+            _worldGeneratorCoordinator.GenerateWorld();
         }
 
         private void OnExitClicked()

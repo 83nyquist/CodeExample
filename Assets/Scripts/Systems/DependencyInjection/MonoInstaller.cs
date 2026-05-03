@@ -2,6 +2,7 @@ using Audio;
 using Character;
 using Input;
 using NPC;
+using Systems.Coordinators;
 using Systems.Decoration;
 using Systems.Grid;
 using UserInterface;
@@ -20,6 +21,7 @@ namespace Systems.DependencyInjection
             Container.Bind<DecoratorFactory>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<NpcManager>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<GenerationProgressTracker>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<WorldGeneratorCoordinator>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<VanguardController>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<AStarPathfinding>().FromComponentInHierarchy().AsCached().NonLazy();

@@ -1,8 +1,9 @@
 using System;
 using Systems.Decoration;
+using Systems.Grid.AlterationPasses;
 using UnityEngine;
 
-namespace Systems.Grid.AlterationPasses
+namespace Systems.Grid
 {
     [Serializable]
     public class PerlinNoiseAlterationPass : BaseAlterationPass
@@ -42,8 +43,11 @@ namespace Systems.Grid.AlterationPasses
                 tile.Moisture = moisture;
                 tile.type = DetermineTileType(elevation, moisture);
             }
-            
-            Debug.Log($"[{PassName}] Processed {grid.Tiles.Count} tiles on seed {_seed}");
+
+            if (debugLog)
+            {
+                Debug.Log($"[{PassName}] Processed {grid.Tiles.Count} tiles on seed {_seed}");
+            }
         }
         
         private float GetElevationAt(int x, int y)

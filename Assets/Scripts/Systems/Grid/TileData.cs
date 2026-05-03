@@ -60,16 +60,7 @@ namespace Systems.Grid
         
         public Vector2Int GetNeighborCoordinate(Directions.Axial direction)
         {
-            return direction switch
-            {
-                Directions.Axial.East => new Vector2Int(x + 1, z),
-                Directions.Axial.NorthEast => new Vector2Int(x + 1, z - 1),
-                Directions.Axial.NorthWest => new Vector2Int(x, z - 1),
-                Directions.Axial.West => new Vector2Int(x - 1, z),
-                Directions.Axial.SouthWest => new Vector2Int(x - 1, z + 1),
-                Directions.Axial.SouthEast => new Vector2Int(x, z + 1),
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
+            return HexGeometry.GetNeighborCoordinate(x, z, direction);
         }
 
         public void SetDecorator(TileDecorator decorator)

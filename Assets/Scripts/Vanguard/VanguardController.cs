@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Character;
 using Core.Components;
+using Systems.Coordinators;
 using Systems.Decoration;
 using Systems.Grid;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Vanguard
 {
     public class VanguardController : MonoBehaviour
     {
+        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private VanguardMover _vanguardMover;
         [Inject] private AStarPathfinding _aStarPathfinding;
         [Inject] private AxialHexGrid _axialHexGrid;
@@ -27,7 +29,7 @@ namespace Vanguard
         
         private void Awake()
         {
-            _axialHexGrid.OnGridGenerated += OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
             _vanguardMover.OnDestinationReached += SetCurrentTile;
 
             _destroyChildren = GetComponent<DestroyChildren>();
@@ -37,14 +39,14 @@ namespace Vanguard
         
         private void OnDestroy()
         {
-            _axialHexGrid.OnGridGenerated -= OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
             _vanguardMover.OnDestinationReached -= SetCurrentTile;
         }
 
-        private void OnGridGenerated(Dictionary<Vector2Int, TileData> grid)
+        private void OnGenerationComplete()
         {
             Stop();
-            TileData origin = grid.GetValueOrDefault(Vector2Int.zero);
+            TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
             ReturnToOrigin(origin);
         }
 
