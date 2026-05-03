@@ -40,6 +40,10 @@ namespace UserInterface.UIToolkit
             var tglFps = root.Q<Toggle>("tgl_fps");
             tglFps.label = "Show FPS:";
             tglFps.value = _playerSettings.showFPS;
+
+            // Ensure the initial state is applied to the drawer on start
+            _debugDrawer.showDebug = tglFps.value;
+
             tglFps.RegisterValueChangedCallback(evt => {
                 _debugDrawer.showDebug = evt.newValue;
                 _playerSettings.showFPS = evt.newValue;
@@ -69,6 +73,9 @@ namespace UserInterface.UIToolkit
             slider.highValue = max;
             slider.value = current;
             slider.label = $"{label}: {(int)current}";
+
+            // Trigger the update logic immediately to sync systems with stored prefs
+            onUpdate?.Invoke((int)current);
 
             slider.RegisterValueChangedCallback(evt => {
                 int val = (int)evt.newValue;
