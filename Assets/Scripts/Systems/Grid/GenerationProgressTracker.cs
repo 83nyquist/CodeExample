@@ -5,8 +5,8 @@ namespace Systems.Grid
 {
     public enum WorkUnitTypes
     {
-        TileCreation,
-        NeighborHookup,
+        Tiles,
+        Neighbors,
         Agents
     }
 
@@ -24,8 +24,6 @@ namespace Systems.Grid
 
         public event Action<int> OnInitialized;
         public event Action<int, int, WorkUnitTypes> OnProgressUpdated;
-        // public event Action OnComplete;
-        
 
         public void Initialize(int radius, int populationSize)
         {
@@ -46,12 +44,12 @@ namespace Systems.Grid
         {
             switch (workUnitType)
             {
-                case WorkUnitTypes.TileCreation:
+                case WorkUnitTypes.Tiles:
                 {
                     _currentTileData += amount;
                     break;
                 }
-                case WorkUnitTypes.NeighborHookup:
+                case WorkUnitTypes.Neighbors:
                 {
                     _currentNeighbors += amount;
                     break;

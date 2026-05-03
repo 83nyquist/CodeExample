@@ -108,7 +108,7 @@ namespace Systems.Grid
                 
                 if (Time.realtimeSinceStartup - startTime > budgetSeconds)
                 {
-                    _progressTracker.UpdateProgress(WorkUnitTypes.TileCreation, batchCount);
+                    _progressTracker.UpdateProgress(WorkUnitTypes.Tiles, batchCount);
                     batchCount = 0;
                     yield return null;
                     startTime = Time.realtimeSinceStartup;
@@ -116,7 +116,7 @@ namespace Systems.Grid
             }
             
             if (batchCount > 0)
-                _progressTracker.UpdateProgress(WorkUnitTypes.TileCreation, batchCount);
+                _progressTracker.UpdateProgress(WorkUnitTypes.Tiles, batchCount);
         }
 
         private IEnumerable<Vector2Int> GetCoordinatesInRingRange(int startRadius, int endRadius)
@@ -192,7 +192,7 @@ namespace Systems.Grid
                 // to reduce calls to Time.realtimeSinceStartup
                 if (batchCount % 50 == 0 && Time.realtimeSinceStartup - lastYieldTime > budgetSeconds)
                 {
-                    _progressTracker.UpdateProgress(WorkUnitTypes.NeighborHookup, batchCount);
+                    _progressTracker.UpdateProgress(WorkUnitTypes.Neighbors, batchCount);
                     batchCount = 0;
                     yield return null;
                     lastYieldTime = Time.realtimeSinceStartup;
@@ -200,7 +200,7 @@ namespace Systems.Grid
             }
             
             if (batchCount > 0)
-                _progressTracker.UpdateProgress(WorkUnitTypes.NeighborHookup, batchCount);
+                _progressTracker.UpdateProgress(WorkUnitTypes.Neighbors, batchCount);
         }
         
         private void SetSeed()
