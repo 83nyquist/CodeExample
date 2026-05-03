@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Systems.Decoration
+namespace Systems.Decoration.Components
 {
     [CreateAssetMenu(fileName = "TileSet", menuName = "Data/TileSet")]
     public class TileSet : ScriptableObject

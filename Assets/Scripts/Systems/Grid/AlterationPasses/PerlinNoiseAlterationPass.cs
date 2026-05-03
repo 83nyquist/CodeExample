@@ -1,5 +1,6 @@
 using System;
 using Systems.Decoration;
+using Systems.Decoration.Components;
 using Systems.Grid.Components;
 using UnityEngine;
 

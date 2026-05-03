@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Systems.Decoration;
+using Systems.Decoration.Components;
 using Systems.Grid;
 using Systems.Grid.Pathfinding;
 using UnityEngine;

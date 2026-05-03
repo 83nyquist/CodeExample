@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Components;
 using Systems.Decoration;
+using Systems.Decoration.Components;
 using Systems.Grid.Components;
 using Systems.Grid.Extensions;
 using UnityEngine;
