@@ -1,8 +1,12 @@
 # CodeExample - Hex Grid Terrain Generation
 
-A Unity demonstration project featuring a top-down hex grid system supporting 120 000+ tiles with Perlin noise terrain generation  
-UI Toolkit integration, coroutines, pooling 
-multithreading for performance optimization, running 2000+ agents
+A Unity demonstration project featuring a top-down axial hex grid system supporting 3 000 000 tiles with Perlin noise terrain generation and 10 000 independent agents with simple pathfinding.
+
+Keywords:
+- UI Toolkit and UGUI integration.
+- Object pooling to utilizes memory efficiently by reusing instances instead of allocating and garbage collecting them repeatedly.
+- Coroutines to utilize the main thread efficiently by spreading work across multiple frames.
+- Multithreading with the C# Job System for performance optimization.
 
 ## Technical Highlights
 
@@ -13,7 +17,7 @@ v1.0.2
 - **Performance optimization**
 
 v1.0.1
-- **Multithreading in Unity Job System** - NPC system supporting a large amount of individiual agents
+- **Multithreading using the Job System** - NPC system supporting a large amount of individiual agents
 
 v1.0.0
 - **Hex Grid System** - Complete top-down hex grid implementation with cell navigation
