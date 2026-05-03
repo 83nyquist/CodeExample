@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Character;
 using Systems.Decoration;
 using Systems.Grid;
 using UnityEngine;
@@ -15,7 +14,7 @@ namespace Input
         [Inject] private AStarPathfinding _aStarPathfinding;
         [Inject] private VanguardMover _vanguardMover;
 
-        private List<InputLock> _inputLocks = new List<InputLock>();
+        private readonly List<InputLock> _inputLocks = new List<InputLock>();
         
         private bool IsInputLocked => _inputLocks.Any(inputLock => inputLock.IsLocked);
         
