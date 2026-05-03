@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.Enumerations;
 using Systems.Decoration;
+using Systems.Decoration.Components;
 using UnityEngine;
 
 namespace Systems.Grid.Components

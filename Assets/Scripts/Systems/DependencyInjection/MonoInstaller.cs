@@ -4,6 +4,7 @@ using Input;
 using NPC;
 using Systems.Coordinators;
 using Systems.Decoration;
+using Systems.Decoration.Components;
 using Systems.Grid;
 using Systems.Grid.Pathfinding;
 using UserInterface;

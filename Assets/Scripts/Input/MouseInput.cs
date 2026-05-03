@@ -1,5 +1,6 @@
 using System;
 using Systems.Decoration;
+using Systems.Decoration.Components;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
