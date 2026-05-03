@@ -585,6 +585,7 @@ GameObject:
   m_Component:
   - component: {fileID: 237140873}
   - component: {fileID: 237140874}
+  - component: {fileID: 237140875}
   m_Layer: 0
   m_Name: Path
   m_TagString: Untagged
@@ -620,6 +621,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.Components.DestroyChildren
   activate: 0
+--- !u!114 &237140875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237140872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab1a76386e152eb01a552d987b53eb2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Systems.Grid.Pathfinding.PathVisualizer
+  pathPrefab: {fileID: 1104603753107038638, guid: cb0c4d79f1941be68bbe6258b50ef9e8, type: 3}
+  pathParent: {fileID: 237140873}
 --- !u!1 &276038710
 GameObject:
   m_ObjectHideFlags: 0
@@ -2970,6 +2985,8 @@ GameObject:
   - component: {fileID: 1720891977}
   - component: {fileID: 1720891972}
   - component: {fileID: 1720891974}
+  - component: {fileID: 1720891979}
+  - component: {fileID: 1720891978}
   - component: {fileID: 1720891976}
   - component: {fileID: 1720891975}
   m_Layer: 5
@@ -3070,6 +3087,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e07e4aea3f1ff6e3fae28047a983a981, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UserInterface.UiManager
+--- !u!114 &1720891978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720891971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77f1e094dcfc44b39ee2f69ba5638f8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UserInterface.UIToolkit.UIActionsController
+--- !u!114 &1720891979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720891971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 261c402fb6574e56a9c5ad92e5989554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UserInterface.UIToolkit.UISettingsController
 --- !u!1 &1723073965
 GameObject:
   m_ObjectHideFlags: 0
@@ -3079,6 +3120,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1723073966}
+  - component: {fileID: 1723073973}
   - component: {fileID: 1723073972}
   - component: {fileID: 1723073969}
   - component: {fileID: 1723073968}
@@ -3195,6 +3237,18 @@ MonoBehaviour:
         mountainThreshold: 0.8
         forestMoisture: 0.6
         fieldMoisture: 0.401
+--- !u!114 &1723073973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723073965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8c588ba0df94120b9317ed0697a3182, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Systems.Coordinators.GameFlowCoordinator
 --- !u!1 &1778644301
 GameObject:
   m_ObjectHideFlags: 0

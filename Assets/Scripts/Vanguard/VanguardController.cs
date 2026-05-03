@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Character;
 using Core.Components;
@@ -8,7 +9,6 @@ using Systems.Grid.Components;
 using Systems.Grid.Extensions;
 using Systems.Grid.Pathfinding;
 using UnityEngine;
-using UserInterface.UIToolkit;
 using Zenject;
 
 namespace Vanguard
@@ -20,10 +20,11 @@ namespace Vanguard
         [Inject] private AStarPathfinding _aStarPathfinding;
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldDecorator _worldDecorator;
-        [Inject] private UIController _uiController;
         
         [Inject] private DiContainer _container;
         
+        public event Action<CharacterAnimationEvents> OnAnimationEventsChanged;
+
         [SerializeField] private CharacterItem selectedLeader;
         private DestroyChildren _destroyChildren;
         
@@ -62,13 +63,13 @@ namespace Vanguard
         {
             GameObject go = Instantiate(selectedLeader.gamePrefab, transform);
             _vanguardMover.Animator = go.GetComponent<Animator>();
-            _uiController.AnimationEvents = go.GetComponent<CharacterAnimationEvents>();
+            OnAnimationEventsChanged?.Invoke(go.GetComponent<CharacterAnimationEvents>());
         }
 
         public void DeSpawn()
         {
             _vanguardMover.Animator = null;
-            _uiController.AnimationEvents = null;
+            OnAnimationEventsChanged?.Invoke(null);
             _destroyChildren.Activate();
         }
 

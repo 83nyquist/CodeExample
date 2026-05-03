@@ -1,12 +1,11 @@
+using System;
 using Character;
 using Core.Components;
-using NPC;
 using Systems.Coordinators;
 using Systems.Grid;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Vanguard;
 using Zenject;
 
 namespace UserInterface.UGUI
@@ -16,11 +15,10 @@ namespace UserInterface.UGUI
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private GenerationProgressTracker _progressTracker;
-        [Inject] private VanguardController _vanguardController;
-        [Inject] private UiManager _uiManager;
         
-        private bool _isLeaderSelected = false;
-        private bool _isWorldLoaded = false;
+        public event Action<CharacterItem> OnCharacterSelected;
+        public event Action OnLoadingStarted;
+        public event Action OnLoadingFinished;
         
         [SerializeField] private Slider loadingSlider;
         [SerializeField] private TextMeshProUGUI titleLabel;
@@ -49,14 +47,6 @@ namespace UserInterface.UGUI
             _worldGeneratorCoordinator.OnGenerationComplete -= OnComplete;
         }
 
-        void Update()
-        {
-            if (_isLeaderSelected && _isWorldLoaded)
-            {
-                InitializeVanguard();
-            }
-        }
-
         public void CreateLeaderProfiles()
         {
             foreach (CharacterItem item in characterSet.characters)
@@ -81,18 +71,6 @@ namespace UserInterface.UGUI
                 waitLabel.gameObject.SetActive(false);
                 profileParent.gameObject.SetActive(true);
             }
-            else
-            {
-                _isLeaderSelected = false;
-                _isWorldLoaded = false;
-            }
-        }
-
-        public void InitializeVanguard()
-        {
-            _vanguardController.Spawn();
-            SetVisible(false);
-            _uiManager.ShowDebugGui();
         }
 
         public void OnSelectLeader(CharacterItem item)
@@ -100,16 +78,16 @@ namespace UserInterface.UGUI
             titleLabel.gameObject.SetActive(false);
             waitLabel.gameObject.SetActive(true);
             profileParent.gameObject.SetActive(false);
-            _vanguardController.SetLeader(item);
-            _isLeaderSelected = true;
+            
+            OnCharacterSelected?.Invoke(item);
         }
 
         public void OnInitialized(int total)
         {
             loadingSlider.minValue = 0;
             loadingSlider.maxValue = total;
-            _isWorldLoaded = false;
-            _vanguardController.DeSpawn();
+            
+            OnLoadingStarted?.Invoke();
         }
 
         public void OnProgressUpdated(int amount, int total, WorkUnitTypes workUnitType)
@@ -122,7 +100,7 @@ namespace UserInterface.UGUI
         public void OnComplete()
         {
             loadingSlider.value = loadingSlider.maxValue;
-            _isWorldLoaded = true;
+            OnLoadingFinished?.Invoke();
         }
     }
 }

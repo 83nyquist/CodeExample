@@ -58,7 +58,7 @@ namespace Systems.Coordinators
         {
             OnGenerationStarted?.Invoke();
             _inputLock.IsLocked = true;
-            _uiManager.ShowLoadingScrean();
+            _uiManager.ShowLoadingScreen();
 
             int radius = _playerSettings.gridRadius;
             _progressTracker.Initialize(radius, _playerSettings.populationSize);
