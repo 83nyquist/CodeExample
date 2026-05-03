@@ -6,6 +6,7 @@ namespace Systems.Grid.AlterationPasses
     public abstract class BaseAlterationPass : IGridAlterationPass
     {
         [Range(0, 100)]
+        public bool debugLog = false;
         public int priority = 10;
     
         public abstract string PassName { get; }

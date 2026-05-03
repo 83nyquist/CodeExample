@@ -33,7 +33,7 @@ namespace Systems.NPC.Components
             _maxInterval = max;
         }
 
-        public void Reset(Dictionary<Vector2Int, TileData> tiles, WorldDecorator decorator)
+        public void Reset(IReadOnlyDictionary<Vector2Int, TileData> tiles, WorldDecorator decorator)
         {
             IsActive = false;
             // Dispose is safe to call even if already disposed by CleanupActiveSimulation

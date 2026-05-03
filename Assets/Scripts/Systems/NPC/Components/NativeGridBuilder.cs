@@ -9,7 +9,7 @@ namespace Systems.NPC.Components
 {
     public class NativeGridBuilder
     {
-        public NativeHexGrid BuildFromTileData(Dictionary<Vector2Int, TileData> tiles, Allocator allocator)
+        public NativeHexGrid BuildFromTileData(IReadOnlyDictionary<Vector2Int, TileData> tiles, Allocator allocator)
         {
             var nativeGrid = new NativeHexGrid(tiles.Count, allocator);
             

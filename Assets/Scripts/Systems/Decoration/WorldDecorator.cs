@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Data;
 using Input;
+using Systems.Coordinators;
 using Systems.Grid;
 using UnityEngine;
 using Vanguard;
@@ -11,6 +12,7 @@ namespace Systems.Decoration
 {
     public class WorldDecorator : MonoBehaviour
     {
+        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private DecoratorFactory _decoratorFactory;
         [Inject] private VanguardMover _vanguardMover;
@@ -34,19 +36,19 @@ namespace Systems.Decoration
         private void Awake()
         {
             _inputLock = _inputHandler.RegisterInputLock(this);
-            _axialHexGrid.OnGridGenerated += OnGridGenerated; // Listen to the new event
-            _vanguardMover.OnPathNodeReached += OnPathNodeReached; // New handler
+            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
+            _vanguardMover.OnPathNodeReached += OnPathNodeReached;
         }
 
         private void OnDestroy()
         {
-            _axialHexGrid.OnGridGenerated -= OnGridGenerated; // Unsubscribe from the new event
+            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
             _vanguardMover.OnPathNodeReached -= OnPathNodeReached;
         }
 
-        private void OnGridGenerated(Dictionary<Vector2Int, TileData> grid)
+        private void OnGenerationComplete()
         {
-            TileData origin = grid.GetValueOrDefault(Vector2Int.zero);
+            TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
             UpdateDecorations(origin);
         }
 

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using NPC;
+using Systems.Coordinators;
 using Systems.Decoration;
 using Systems.Grid;
 using UnityEngine;
@@ -11,6 +11,7 @@ namespace UserInterface.UIToolkit
 {
     public class UiLabels : MonoBehaviour
     {
+        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private UIController _uIController;
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldDecorator _worldDecorator;
@@ -26,7 +27,7 @@ namespace UserInterface.UIToolkit
         
         private void Start()
         {
-            _axialHexGrid.OnGridGenerated += OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
             _vanguardMover.OnDestinationReached += OnDestinationReached;
             
             _lblVisibleAgents = uiDocument.rootVisualElement.Q<Label>("VisibleAgents");
@@ -39,12 +40,12 @@ namespace UserInterface.UIToolkit
 
         private void OnDestroy()
         {
-            _axialHexGrid.OnGridGenerated -= OnGridGenerated;
+            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
             _vanguardMover.OnDestinationReached -= OnDestinationReached;
             _npcManager.OnVisibleAgentsCountChanged -= OnVisibleAgentsCountChanged;
         }
 
-        private void OnGridGenerated(Dictionary<Vector2Int, TileData> obj)
+        private void OnGenerationComplete()
         {
             UpdateStaticLabels();
         }

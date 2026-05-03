@@ -41,7 +41,7 @@ namespace Systems.NPC.Components
                 };
             }
             
-            Debug.Log($"Spawned {count} NPCs on {walkableTiles.Count} walkable tiles");
+            // Debug.Log($"Spawned {count} NPCs on {walkableTiles.Count} walkable tiles");
             return npcs;
         }
         

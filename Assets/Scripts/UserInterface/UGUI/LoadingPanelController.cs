@@ -91,7 +91,7 @@ namespace UserInterface.UGUI
         {
             _vanguardController.Spawn();
             SetVisible(false);
-            _uiManager.ShowGameMenu();
+            _uiManager.ShowDebugGui();
         }
 
         public void OnSelectLeader(CharacterItem item)
