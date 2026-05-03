@@ -23,6 +23,7 @@ namespace Systems.Coordinators.Editor
             new RotationAlterationPass(),
             new MountainSmoothingAlterationPass(),
             new MassiveMountainAlterationPass(),
+            new ForestAlterationPass(),
         };
 
         public override void OnInspectorGUI()
