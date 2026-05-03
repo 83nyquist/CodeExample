@@ -1160,6 +1160,8 @@ GameObject:
   - component: {fileID: 583918624}
   - component: {fileID: 583918623}
   - component: {fileID: 583918625}
+  - component: {fileID: 583918626}
+  - component: {fileID: 583918627}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -1194,12 +1196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 938bc67089a5f81ac955e1d4e73ce3b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.UserInputManager
-  inputCamera: {fileID: 0}
-  tileLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  blockingUIDocuments:
-  - {fileID: 1720891972}
   dragThresholdPixels: 5
 --- !u!114 &583918624
 MonoBehaviour:
@@ -1233,6 +1229,36 @@ MonoBehaviour:
   defaultY: 30
   defaultZ: -20
   maintainAngle: 1
+--- !u!114 &583918626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583918621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4264b3534a424f1ba8861de305051864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Input.TileRaycaster
+  inputCamera: {fileID: 0}
+  tileLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+--- !u!114 &583918627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583918621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da5c83964b9d40c9984a4382eb119ea8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Input.InputUIBlocker
+  blockingUIDocuments:
+  - {fileID: 1720891972}
 --- !u!1 &663264069
 GameObject:
   m_ObjectHideFlags: 0

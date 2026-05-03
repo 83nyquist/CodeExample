@@ -1,37 +1,28 @@
 using System;
-using Systems.Decoration;
 using Systems.Decoration.Components;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
+using Zenject;
 
 namespace Input
 {
     public class MouseInput : MonoBehaviour
     {
-        [SerializeField] private Camera inputCamera;
-        [SerializeField] private LayerMask tileLayerMask = ~0;
-        [SerializeField] private UIDocument[] blockingUIDocuments;
+        [Inject] private TileRaycaster _tileRaycaster;
+        [Inject] private InputUIBlocker _uiBlocker;
+
         [SerializeField] private float dragThresholdPixels = 5f;
 
         public event Action<TileDecorator> OnTileDecoratorPointerDown;
         public event Action<TileDecorator> OnTileDecoratorPointerUp;
         public event Action<TileDecorator> OnTileDecoratorDrag;
+        public event Action<float> OnScroll;
 
         private bool _isPointerDown;
         private bool _isDragging;
         private Vector2 _pointerDownPosition;
         private TileDecorator _pointerDownTileDecorator;
         private TileDecorator _lastDraggedTileDecorator;
-
-        private void Awake()
-        {
-            if (inputCamera == null)
-            {
-                inputCamera = Camera.main;
-            }
-        }
 
         private void Update()
         {
@@ -56,16 +47,22 @@ namespace Input
             {
                 HandlePointerUp(mousePosition);
             }
+
+            float scrollDelta = Mouse.current.scroll.ReadValue().y;
+            if (!Mathf.Approximately(scrollDelta, 0f) && !_uiBlocker.IsPointerOverUI(mousePosition))
+            {
+                OnScroll?.Invoke(scrollDelta);
+            }
         }
 
         private void HandlePointerDown(Vector2 mousePosition)
         {
-            if (IsPointerOverUI(mousePosition))
+            if (_uiBlocker.IsPointerOverUI(mousePosition))
             {
                 return;
             }
 
-            TileDecorator tileDecorator = RaycastTileDecorator(mousePosition);
+            TileDecorator tileDecorator = _tileRaycaster.RaycastTileDecorator(mousePosition);
 
             if (tileDecorator == null)
             {
@@ -83,7 +80,7 @@ namespace Input
 
         private void HandlePointerDrag(Vector2 mousePosition)
         {
-            if (IsPointerOverUI(mousePosition))
+            if (_uiBlocker.IsPointerOverUI(mousePosition))
             {
                 OnTileDecoratorDrag?.Invoke(null);
                 _lastDraggedTileDecorator = null;
@@ -99,7 +96,7 @@ namespace Input
 
             _isDragging = true;
 
-            TileDecorator tileDecorator = RaycastTileDecorator(mousePosition);
+            TileDecorator tileDecorator = _tileRaycaster.RaycastTileDecorator(mousePosition);
 
             if (tileDecorator == null)
             {
@@ -127,9 +124,9 @@ namespace Input
 
             TileDecorator tileDecorator = null;
 
-            if (!IsPointerOverUI(mousePosition))
+            if (!_uiBlocker.IsPointerOverUI(mousePosition))
             {
-                tileDecorator = RaycastTileDecorator(mousePosition);
+                tileDecorator = _tileRaycaster.RaycastTileDecorator(mousePosition);
             }
 
             if (tileDecorator != null)
@@ -141,63 +138,6 @@ namespace Input
             _isDragging = false;
             _pointerDownTileDecorator = null;
             _lastDraggedTileDecorator = null;
-        }
-
-        private TileDecorator RaycastTileDecorator(Vector2 mousePosition)
-        {
-            if (inputCamera == null)
-            {
-                return null;
-            }
-
-            Ray ray = inputCamera.ScreenPointToRay(mousePosition);
-
-            if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, tileLayerMask))
-            {
-                return null;
-            }
-
-            return hit.collider.GetComponentInParent<TileDecorator>();
-        }
-
-        private bool IsPointerOverUI(Vector2 mousePosition)
-        {
-            // Check UGUI (EventSystem)
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-            {
-                return true;
-            }
-
-            // Check UI Toolkit
-            if (blockingUIDocuments == null)
-            {
-                return false;
-            }
-
-            foreach (UIDocument uiDocument in blockingUIDocuments)
-            {
-                if (uiDocument == null || uiDocument.rootVisualElement == null)
-                {
-                    continue;
-                }
-
-                VisualElement root = uiDocument.rootVisualElement;
-
-                if (root.panel == null)
-                {
-                    continue;
-                }
-
-                Vector2 panelPosition = RuntimePanelUtils.ScreenToPanel(root.panel, mousePosition);
-                VisualElement pickedElement = root.panel.Pick(panelPosition);
-
-                if (pickedElement != null && pickedElement != root)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }
