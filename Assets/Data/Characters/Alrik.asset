@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Alrik
   m_EditorClassIdentifier: Assembly-CSharp::Character.CharacterItem
   gamePrefab: {fileID: 4336427945477894687, guid: 99a1af3204654f2ec97dc1251745631f, type: 3}
-  profileImage: {fileID: 21300000, guid: 5f81c2ff7b37ad49e9c2c02b5cf75a1a, type: 3}
+  profileImage: {fileID: 21300000, guid: 8bcd07c4563e2055db00c0e88b5dcc84, type: 3}
