@@ -5,21 +5,22 @@ using UnityEngine;
 namespace Systems.Grid.Passes.Alteration
 {
     [Serializable]
-    public class MountainSmoothingAlterationPass : BaseAlterationPass
+    public class WaterDepthAlterationPass : BaseAlterationPass
     {
-        [Header("MountainSmoothingAlterationPass")]
-        public override string PassName => "Mountain Smoothing Pass";
+        
+        [Header("WaterDepthAlterationPass")]
+        public override string PassName => "Water Depth Pass";
     
         public override void Execute(AxialHexGrid grid, int seed)
         {
             foreach (var tile in grid.Tiles.Values)
             {
-                if (tile.type != TileType.Mountain) continue;
+                if (tile.type != TileType.Water) continue;
 
                 bool surroundedByMountains = true;
                 foreach (var neighbour in tile.Neighbours)
                 {
-                    if (neighbour == null || neighbour.type != TileType.Mountain)
+                    if (neighbour == null || neighbour.type != TileType.Water)
                     {
                         surroundedByMountains = false;
                         break;

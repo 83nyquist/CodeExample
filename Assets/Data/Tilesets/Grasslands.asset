@@ -24,6 +24,7 @@ MonoBehaviour:
   - type: 2
     prefabs:
     - {fileID: 4110313678187046319, guid: 12887f16681f30a29bd83b00b4919de6, type: 3}
+    - {fileID: 4110313678187046319, guid: 57d2131717c973829b9af955c6ad12db, type: 3}
     shroudedPrefab: {fileID: 0}
   - type: 3
     prefabs:
