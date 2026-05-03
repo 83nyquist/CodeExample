@@ -22,6 +22,8 @@ namespace Systems.Grid.Components
         public float Elevation { get; set; }
         public float Moisture { get; set; }
         public TileType type;
+        public bool IsDiscovered { get; set; }
+        public bool IsInVision { get; set; }
         public int VariationIndex { get; set; } = -1;
         public Vector3 Rotation { get; set; }
 
