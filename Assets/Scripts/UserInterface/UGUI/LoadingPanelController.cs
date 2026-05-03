@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Character;
 using Core.Components;
+using NPC;
 using Systems.Grid;
 using TMPro;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace UserInterface.UGUI
     public class LoadingPanelController : MonoBehaviour
     {
         [Inject] private AxialHexGrid _axialHexGrid;
+        [Inject] private NpcManager _npcManager;
         [Inject] private GenerationProgressTracker _progressTracker;
         [Inject] private VanguardController _vanguardController;
         [Inject] private UiManager _uiManager;
@@ -32,7 +34,7 @@ namespace UserInterface.UGUI
         {
             _progressTracker.OnInitialized += OnInitialized;
             _progressTracker.OnProgressUpdated += OnProgressUpdated;
-            _axialHexGrid.OnGridGenerated += OnComplete;
+            _npcManager.OnComplete += OnComplete;
             
             profileParent.GetComponent<DestroyChildren>().Activate();
             
@@ -43,7 +45,7 @@ namespace UserInterface.UGUI
         {
             _progressTracker.OnInitialized -= OnInitialized;
             _progressTracker.OnProgressUpdated -= OnProgressUpdated;
-            _axialHexGrid.OnGridGenerated -= OnComplete;
+            _npcManager.OnComplete -= OnComplete;
         }
 
         void Update()
@@ -114,11 +116,9 @@ namespace UserInterface.UGUI
             loadingSliderLabelPercentage.text = $"{((float)amount / total * 100):F0}%";
         }
 
-        public void OnComplete(Dictionary<Vector2Int, TileData> grid)
+        public void OnComplete()
         {
             loadingSlider.value = loadingSlider.maxValue;
-            loadingSliderLabel.text = "Loading Completed";
-            loadingSliderLabel.text = "100%";
             _isWorldLoaded = true;
         }
     }

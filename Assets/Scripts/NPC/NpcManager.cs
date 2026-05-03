@@ -52,7 +52,7 @@ namespace NPC
         
         public int NpcCount => _npcs.IsCreated ? _npcs.Length : 0;
         public event Action<int> OnVisibleAgentsCountChanged;
-        public event Action<NativeArray<NpcData>> OnNpcsSpawned;
+        public event Action OnComplete;
         public bool IsInitialized => _isSimulationActive;
         
         void Awake()
@@ -145,7 +145,7 @@ namespace NPC
             _isSimulationActive = true;
 
             // 4. Finalize
-            OnNpcsSpawned?.Invoke(_npcs);
+            OnComplete?.Invoke();
 
             _cachedVisibleCount = -1;
             _eventUpdateTimer = 0;
