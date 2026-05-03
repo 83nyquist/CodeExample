@@ -73,7 +73,6 @@ namespace Systems.Coordinators
             RunAugmentationPasses();
 
             // 3. Finalization
-            _uiManager.ShowDebugGui();
             _inputLock.IsLocked = false;
             
             Debug.Log($"World Generation Complete. Seed: {_currentSeed}");

@@ -3079,6 +3079,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1723073966}
+  - component: {fileID: 1723073972}
   - component: {fileID: 1723073969}
   - component: {fileID: 1723073968}
   - component: {fileID: 1723073970}
@@ -3122,27 +3123,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Systems.WorldTileSystem.AxialHexGridGenerator
   hexSize: 1.05
-  generateOnAwake: 1
-  maxMsPerFrame: 5
-  useRandomSeed: 1
-  customSeed: 0
-  augmentationPasses:
-  - pass:
-      rid: 863678531634987247
-  references:
-    version: 2
-    RefIds:
-    - rid: 863678531634987247
-      type: {class: PerlinNoiseAlterationPass, ns: Systems.Grid.AlterationPasses, asm: Assembly-CSharp}
-      data:
-        priority: 10
-        elevationScale: 0.1
-        moistureScale: 0.15
-        elevationOffset: 0
-        waterThreshold: 0.3
-        mountainThreshold: 0.8
-        forestMoisture: 0.6
-        fieldMoisture: 0.3
 --- !u!114 &1723073969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3183,6 +3163,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 240c7439f48c40049b7bd2b7fa3540c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Systems.Grid.GenerationProgressTracker
+--- !u!114 &1723073972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723073965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b64c4238da1b4d3c8be7ae7fac2b5e47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Systems.Grid.WorldGeneratorCoordinator
+  maxMsPerFrame: 5
+  generateOnAwake: 1
+  useRandomSeed: 1
+  customSeed: 42
+  augmentationPasses:
+  - pass:
+      rid: 863678559414124621
+  references:
+    version: 2
+    RefIds:
+    - rid: 863678559414124621
+      type: {class: PerlinNoiseAlterationPass, ns: Systems.Grid.AlterationPasses, asm: Assembly-CSharp}
+      data:
+        debugLog: 0
+        priority: 10
+        elevationScale: 0.1
+        moistureScale: 0.15
+        elevationOffset: 0
+        waterThreshold: 0.3
+        mountainThreshold: 0.8
+        forestMoisture: 0.6
+        fieldMoisture: 0.401
 --- !u!1 &1778644301
 GameObject:
   m_ObjectHideFlags: 0
