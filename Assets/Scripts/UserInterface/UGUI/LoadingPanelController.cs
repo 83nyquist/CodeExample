@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Character;
 using Core.Components;
 using NPC;
@@ -24,6 +23,7 @@ namespace UserInterface.UGUI
         
         [SerializeField] private Slider loadingSlider;
         [SerializeField] private TextMeshProUGUI titleLabel;
+        [SerializeField] private TextMeshProUGUI waitLabel;
         [SerializeField] private TextMeshProUGUI loadingSliderLabel;
         [SerializeField] private TextMeshProUGUI loadingSliderLabelPercentage;
         [SerializeField] private CharacterSet characterSet;
@@ -77,6 +77,7 @@ namespace UserInterface.UGUI
             if (isVisible)
             {
                 titleLabel.gameObject.SetActive(true);
+                waitLabel.gameObject.SetActive(false);
                 profileParent.gameObject.SetActive(true);
             }
             else
@@ -96,6 +97,7 @@ namespace UserInterface.UGUI
         public void OnSelectLeader(CharacterItem item)
         {
             titleLabel.gameObject.SetActive(false);
+            waitLabel.gameObject.SetActive(true);
             profileParent.gameObject.SetActive(false);
             _vanguardController.SetLeader(item);
             _isLeaderSelected = true;
