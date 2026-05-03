@@ -3148,8 +3148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d50099a27cfdd668eb2a34f80c171f10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Character.CharacterPathfinding
-  pathPrefab: {fileID: 1104603753107038638, guid: cb0c4d79f1941be68bbe6258b50ef9e8, type: 3}
-  pathParent: {fileID: 237140873}
   currentPath: []
 --- !u!114 &1723073971
 MonoBehaviour:
