@@ -34,15 +34,23 @@ namespace Systems.Decoration
             _scheduler.OnProcessingFinished += ReleaseInputLock;
 
             _inputLock = _inputHandler.RegisterInputLock(this);
+            _worldGeneratorCoordinator.OnGenerationStarted += OnGenerationStarted;
             _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
             _vanguardMover.OnPathNodeReached += OnPathNodeReached;
         }
 
         private void OnDestroy()
         {
+            _worldGeneratorCoordinator.OnGenerationStarted -= OnGenerationStarted;
             _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
             _vanguardMover.OnPathNodeReached -= OnPathNodeReached;
             _scheduler.OnProcessingFinished -= ReleaseInputLock;
+        }
+
+        private void OnGenerationStarted()
+        {
+            _currentlyVisibleTiles.Clear();
+            _decoratorFactory.CleanupActiveDecorators();
         }
 
         private void OnGenerationComplete()
@@ -70,12 +78,31 @@ namespace Systems.Decoration
             List<TileData> toShow = new List<TileData>();
             List<TileData> toHide = new List<TileData>();
 
-            // Identify Deltas
+            // Identify Deltas and handle visibility transitions
             foreach (var tile in newTilesSet)
-                if (!_currentlyVisibleTiles.Contains(tile)) toShow.Add(tile);
+            {
+                if (!_currentlyVisibleTiles.Contains(tile))
+                {
+                    // Transition: Entering Vision. 
+                    // If it was already discovered, it is currently "Shrouded"; return it first.
+                    if (tile.IsDiscovered) toHide.Add(tile);
+                    
+                    tile.IsDiscovered = true;
+                    tile.IsInVision = true;
+                    toShow.Add(tile);
+                }
+            }
 
             foreach (var tile in _currentlyVisibleTiles)
-                if (!newTilesSet.Contains(tile)) toHide.Add(tile);
+            {
+                if (!newTilesSet.Contains(tile))
+                {
+                    // Transition: Leaving Vision. Return detail and queue shrouded version.
+                    toHide.Add(tile);
+                    tile.IsInVision = false;
+                    toShow.Add(tile);
+                }
+            }
 
             if (toShow.Count == 0 && toHide.Count == 0) return;
 

@@ -43,11 +43,13 @@ namespace Systems.Decoration.Components
         {
             if (tileData == null) return null;
                 
-            TileType type = tileData.type;
-
-            // The TileData now explicitly tells us which index to use. 
-            // If it's -1, TileSet.GetTilePrefab handles the fallback to index 0.
-            GameObject prefab = tileSet.GetTilePrefab(type, tileData.VariationIndex);
+            GameObject prefab = null;
+            
+            // Choose prefab based on visibility state
+            if (tileData.IsInVision)
+                prefab = tileSet.GetTilePrefab(tileData.type, tileData.VariationIndex);
+            else if (tileData.IsDiscovered)
+                prefab = tileSet.GetShroudedPrefab(tileData.type);
             
             if (prefab == null) return null;
             
@@ -81,7 +83,12 @@ namespace Systems.Decoration.Components
             TileData tileData = decorator.TileData;
             GameObject source = decorator.SourcePrefab;
 
-            if (tileData != null) _activeTiles.Remove(tileData);
+            if (tileData != null)
+            {
+                _activeTiles.Remove(tileData);
+                // Clear reference to avoid stale data
+                tileData.SetDecorator(null);
+            }
             decorator.Return(poolParent);
             decorator.gameObject.SetActive(false);
             
@@ -99,6 +106,19 @@ namespace Systems.Decoration.Components
             return decorator;
         }
         
+        /// <summary>
+        /// Returns all active decorators to their respective pools.
+        /// </summary>
+        public void CleanupActiveDecorators()
+        {
+            // Create a copy to safely iterate while the original collection is modified by ReturnTileDecorator
+            var active = new List<TileDecorator>(_activeTiles.Values);
+            foreach (var decorator in active)
+            {
+                ReturnTileDecorator(decorator);
+            }
+        }
+
         /// <summary>
         /// Pre-warm pools by creating instances upfront
         /// </summary>
