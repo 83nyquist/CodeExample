@@ -1,9 +1,7 @@
+using System;
 using System.Collections.Generic;
-using Core.Components;
-using Systems.Decoration;
 using Systems.Decoration.Components;
 using Systems.Grid.Components;
-using Systems.Grid.Extensions;
 using UnityEngine;
 using Vanguard;
 using Zenject;
@@ -14,19 +12,14 @@ namespace Systems.Grid.Pathfinding
     {
         [Inject] private VanguardController _vanguardController;
         [Inject] private VanguardMover _vanguardMover;
-        [Inject] private AxialHexGrid _axialHexGrid;
 
-        [SerializeField] private GameObject pathPrefab;
-        [SerializeField] private Transform pathParent;
-        
-        private DestroyChildren _destroyPathChildren;
+        public event Action<List<TileData>> OnPathCreated;
+        public event Action OnPathCleared;
 
         public List<TileData> currentPath;
         
         private void Awake()
         {
-            _destroyPathChildren = pathParent.GetComponent<DestroyChildren>();
-            
             _vanguardMover.OnDestinationReached += ErasePath;
         }
         
@@ -57,17 +50,13 @@ namespace Systems.Grid.Pathfinding
                 return;
             }
 
-            foreach (TileData tile in currentPath)
-            {
-                Vector3 worldPosition = _axialHexGrid.AxialToWorld(tile.X, tile.Z);
-                Instantiate(pathPrefab, worldPosition, Quaternion.identity, pathParent);
-            }
+            OnPathCreated?.Invoke(currentPath);
         }
-        
+
         public void ErasePath(TileData data = null)
         {
             currentPath = null;
-            _destroyPathChildren.Activate();
+            OnPathCleared?.Invoke();
         }
         
         private void CreatePath(TileDecorator origin, TileDecorator target)
