@@ -14,13 +14,14 @@ namespace UserInterface.UIToolkit
     {
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private AudioManager _audioManager;
-        [Inject] private CharacterAnimationEvents _characterAnimationEvents;
         [Inject] private VanguardController _vanguardController;
         [Inject] private DebugDrawer _debugDrawer;
         [Inject] private GameSettings _gameSettings;
         [Inject] private PlayerSettings _playerSettings;
         
         [SerializeField] private UIDocument uiDocument;
+
+        public CharacterAnimationEvents AnimationEvents { get; set; }
 
         private VisualElement _root;
         private Slider _sliderGrid;
@@ -101,7 +102,11 @@ namespace UserInterface.UIToolkit
         {
             // Apply to audio sources
             _audioManager.MusicSource.volume = evt.newValue;
-            _characterAnimationEvents.AudioSource.volume = evt.newValue;
+
+            if (AnimationEvents != null)
+            {
+                AnimationEvents.AudioSource.volume = evt.newValue;
+            }
     
             // Display and save
             int value = (int)evt.newValue;

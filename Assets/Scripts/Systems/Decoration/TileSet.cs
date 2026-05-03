@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Systems.Decoration
 {
-    [CreateAssetMenu(fileName = "TileSet", menuName = "World Generation/TileSet")]
+    [CreateAssetMenu(fileName = "TileSet", menuName = "Data/TileSet")]
     public class TileSet : ScriptableObject
     {
         [Header("Tile Prefabs")]

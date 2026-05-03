@@ -15,10 +15,10 @@ namespace Vanguard
      
         private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
-        [SerializeField] private Animator animator;
         [SerializeField] private float moveSpeed = 4f;
         [SerializeField] private float rotationSpeed = 12f;
 
+        public Animator Animator { get; set; }
         public event Action<TileData> OnDestinationReached;
         public event Action<TileData> OnPathNodeReached;
     
@@ -128,9 +128,9 @@ namespace Vanguard
         private void SetIsMoving(bool isMoving)
         {
             _inputLock.IsLocked = isMoving;
-            if (animator != null)
+            if (Animator != null)
             {
-                animator.SetBool(IsMoving, isMoving);
+                Animator.SetBool(IsMoving, isMoving);
             }
         }
     }

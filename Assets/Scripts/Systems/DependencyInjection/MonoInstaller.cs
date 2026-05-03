@@ -35,7 +35,10 @@ namespace Systems.DependencyInjection
             Container.Bind<LoadingPanelController>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<AudioManager>().FromComponentInHierarchy().AsCached().NonLazy();
-            Container.Bind<CharacterAnimationEvents>().FromComponentInHierarchy().AsCached().NonLazy();
+            
+            // Container.Bind<CharacterAnimationEvents>()
+            //     .FromComponentInNewPrefab(leaderPrefab)  // Your prefab with the component already attached
+            //     .AsTransient();
         }
     }
 }

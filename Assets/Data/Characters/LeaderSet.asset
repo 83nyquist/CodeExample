@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cf3c4be3f05db183a227247aa78edeb, type: 3}
+  m_Name: LeaderSet
+  m_EditorClassIdentifier: Assembly-CSharp::Character.LeaderSet
+  characters:
+  - {fileID: 11400000, guid: 069743125a87fbb06addcd69bc9a6d1d, type: 2}
+  - {fileID: 11400000, guid: 5ddd54ff5aa007ba69714b180b8ff920, type: 2}
+  - {fileID: 11400000, guid: fd06a6c0b90625e2880b95af48d0f257, type: 2}
