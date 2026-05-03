@@ -1,13 +1,12 @@
 using System;
-using Systems.Decoration;
 using Systems.Decoration.Components;
 using Systems.Grid.Components;
 using UnityEngine;
 
-namespace Systems.Grid.AlterationPasses
+namespace Systems.Grid.Passes.Generation
 {
     [Serializable]
-    public class PerlinNoiseAlterationPass : BaseAlterationPass
+    public class PerlinNoiseGenerationPass : BaseGenerationPass
     {
         [Header("PerlinNoiseGeneratorPass")]
         [Header("Frequency Settings")]
@@ -44,7 +43,7 @@ namespace Systems.Grid.AlterationPasses
                 tile.Moisture = moisture;
                 tile.type = DetermineTileType(elevation, moisture);
             }
-
+        
             if (debugLog)
             {
                 Debug.Log($"[{PassName}] Processed {grid.Tiles.Count} tiles on seed {_seed}");
@@ -86,9 +85,9 @@ namespace Systems.Grid.AlterationPasses
                 return TileType.Forest;
             
             if (moisture > fieldMoisture)
-                return TileType.Field;
+                return TileType.PrimaryGround;
             
-            return TileType.Ground;
+            return TileType.SecondaryGround;
         }
     }
 }

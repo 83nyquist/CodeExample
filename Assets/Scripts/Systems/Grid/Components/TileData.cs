@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using Core.Enumerations;
-using Systems.Decoration;
 using Systems.Decoration.Components;
 using UnityEngine;
 
@@ -17,13 +15,14 @@ namespace Systems.Grid.Components
         public int X => x;  // Q coordinate
         public int Z => z;  // R coordinate
         
-        private Dictionary<Directions.Axial, TileData> _neighbours = new Dictionary<Directions.Axial, TileData>();
-        public Dictionary<Directions.Axial, TileData> Neighbours => _neighbours;
+        [NonSerialized] private TileData[] _neighbours = new TileData[6];
+        public TileData[] Neighbours => _neighbours;
         
         //Properties
         public float Elevation { get; set; }
         public float Moisture { get; set; }
         public TileType type;
+        public int VariationIndex { get; set; } = -1;
         public Vector3 Rotation { get; set; }
 
         public TileDecorator Decorator { get; private set;}
@@ -43,25 +42,24 @@ namespace Systems.Grid.Components
             z = r;
         }
         
-        public TileData GetNeighbour(Directions.Axial direction)
+        /// <summary>
+        /// Gets neighbor by clockwise index (0-5)
+        /// </summary>
+        public TileData GetNeighbour(int directionIndex)
         {
-            _neighbours.TryGetValue(direction, out TileData neighbour);
-            return neighbour;
+            if (directionIndex < 0 || directionIndex >= 6) return null;
+            return _neighbours[directionIndex];
         }
         
-        public void SetNeighbours(Dictionary<Directions.Axial, TileData> neighbours)
+        public void SetNeighbours(TileData[] neighbours)
         {
+            if (neighbours.Length != 6) return;
             _neighbours = neighbours;
         }
-        
-        public Dictionary<Directions.Axial, TileData> GetAllNeighbours()
+
+        public Vector2Int GetNeighborCoordinate(int directionIndex)
         {
-            return new Dictionary<Directions.Axial, TileData>(_neighbours);
-        }
-        
-        public Vector2Int GetNeighborCoordinate(Directions.Axial direction)
-        {
-            return HexGeometry.GetNeighborCoordinate(x, z, direction);
+            return HexGeometry.GetNeighborCoordinate(x, z, (Directions.Axial)directionIndex);
         }
 
         public void SetDecorator(TileDecorator decorator)

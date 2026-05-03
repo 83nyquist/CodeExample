@@ -2647,7 +2647,6 @@ MonoBehaviour:
   tileSet: {fileID: 11400000, guid: d09acbede9d2e1abb9af7e6ce31edf2e, type: 2}
   poolParent: {fileID: 1507263552}
   activeParent: {fileID: 1001720007}
-  enableTileVariations: 1
   preWarm: 25
 --- !u!4 &1507263552
 Transform:
@@ -3245,24 +3244,24 @@ MonoBehaviour:
   generateOnAwake: 1
   useRandomSeed: 1
   customSeed: 42
-  augmentationPasses:
+  generationPasses:
   - pass:
-      rid: 863678559414124621
+      rid: 863678564487135232
+  alterationPasses: []
   references:
     version: 2
     RefIds:
-    - rid: 863678559414124621
-      type: {class: PerlinNoiseAlterationPass, ns: Systems.Grid.AlterationPasses, asm: Assembly-CSharp}
+    - rid: 863678564487135232
+      type: {class: PerlinNoiseGenerationPass, ns: Systems.Grid.Passes.Generation, asm: Assembly-CSharp}
       data:
         debugLog: 0
-        priority: 10
         elevationScale: 0.1
         moistureScale: 0.15
         elevationOffset: 0
         waterThreshold: 0.3
         mountainThreshold: 0.8
         forestMoisture: 0.6
-        fieldMoisture: 0.401
+        fieldMoisture: 0.3
 --- !u!114 &1723073973
 MonoBehaviour:
   m_ObjectHideFlags: 0

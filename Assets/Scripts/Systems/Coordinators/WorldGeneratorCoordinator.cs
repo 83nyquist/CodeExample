@@ -5,14 +5,27 @@ using System.Linq;
 using Data;
 using Input;
 using Systems.Grid;
-using Systems.Grid.AlterationPasses;
 using Systems.Grid.Components;
+using Systems.Grid.Passes.Alteration;
+using Systems.Grid.Passes.Generation;
 using UnityEngine;
 using UserInterface;
 using Zenject;
 
 namespace Systems.Coordinators
 {
+    [Serializable]
+    public class GenerationPassWrapper
+    {
+        [SerializeReference] public IGridGenerationPass pass;
+    }
+
+    [Serializable]
+    public class AlterationPassWrapper
+    {
+        [SerializeReference] public IGridAlterationPass pass;
+    }
+
     public class WorldGeneratorCoordinator : MonoBehaviour
     {
         [Inject] private AxialHexGrid _grid;
@@ -29,7 +42,8 @@ namespace Systems.Coordinators
         [SerializeField] private bool useRandomSeed = true;
         [SerializeField] private int customSeed = 42;
 
-        [SerializeField] private List<GridGeneratorPassWrapper> augmentationPasses = new();
+        [SerializeField] private List<GenerationPassWrapper> generationPasses = new();
+        [SerializeField] private List<AlterationPassWrapper> alterationPasses = new();
 
         public event Action OnGenerationStarted;
         public event Action OnGenerationComplete;
@@ -69,46 +83,66 @@ namespace Systems.Coordinators
             yield return StartCoroutine(_internalGenerator.CreateDataRoutine(_grid, radius));
             yield return StartCoroutine(_internalGenerator.BuildNeighborsRoutine(_grid, radius));
 
-            // 2. Logical Passes (Perlin, Biomes, etc.)
-            RunAugmentationPasses();
+            // 2. Generation Passes (Set TileType, Elevation, etc.)
+            RunGenerationPasses();
 
-            // 3. Finalization
+            // 3. Alteration Passes (Rotation, Smoothing, Variation Indices)
+            RunAlterationPasses();
+
+            // 4. Finalization
             _inputLock.IsLocked = false;
             
             Debug.Log($"World Generation Complete. Seed: {_currentSeed}");
             OnGenerationComplete?.Invoke();
         }
 
-        private void RunAugmentationPasses()
+        private void RunGenerationPasses()
         {
-            var ordered = augmentationPasses
-                .Where(w => w.pass != null)
+            var ordered = generationPasses
                 .Select(w => w.pass)
-                .OrderBy(p => p.Priority);
+                .Where(p => p != null);
 
-            foreach (var pass in ordered)
-            {
-                pass.Execute(_grid, _currentSeed);
-            }
+            foreach (var pass in ordered) pass.Execute(_grid, _currentSeed);
+        }
+
+        private void RunAlterationPasses()
+        {
+            var ordered = alterationPasses
+                .Select(w => w.pass)
+                .Where(p => p != null);
+
+            foreach (var pass in ordered) pass.Execute(_grid, _currentSeed);
         }
 
         #region Editor Helpers
-        public void AddGeneratorPass(IGridAlterationPass pass)
+        public void AddGenerationPass(IGridGenerationPass pass)
         {
-            augmentationPasses.Add(new GridGeneratorPassWrapper { pass = pass });
+            generationPasses.Add(new GenerationPassWrapper { pass = pass });
+        }
+        
+        public void RemoveGenerationPass(Type type)
+        {
+            generationPasses.RemoveAll(w => w.pass?.GetType() == type);
+        }
+        
+        public void AddAlterationPass(IGridAlterationPass pass)
+        {
+            alterationPasses.Add(new AlterationPassWrapper { pass = pass });
+        }
+        
+        public void RemoveAlterationPass(Type type)
+        {
+            alterationPasses.RemoveAll(w => w.pass?.GetType() == type);
+        }
+        
+        public bool HasGenerationPass(Type type)
+        {
+            return generationPasses.Any(w => w.pass?.GetType() == type);
         }
 
-        public void RemoveGeneratorPass(IGridAlterationPass pass)
+        public bool HasAlterationPass(Type type)
         {
-            augmentationPasses.RemoveAll(w => w.pass == pass);
-        }
-
-        public List<IGridAlterationPass> GetGeneratorPasses()
-        {
-            return augmentationPasses
-                .Where(w => w.pass != null)
-                .Select(w => w.pass)
-                .ToList();
+            return alterationPasses.Any(w => w.pass?.GetType() == type);
         }
         #endregion
     }

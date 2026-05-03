@@ -1,4 +1,4 @@
-using Systems.Grid.AlterationPasses;
+using Systems.Grid.Passes.Alteration;
 using UnityEngine;
 
 namespace Systems.Grid.Components

@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using Systems.Grid;
-using Systems.Grid.AlterationPasses;
+using Systems.Grid.Passes.Alteration;
+using Systems.Grid.Passes.Generation;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,11 +10,18 @@ namespace Systems.Coordinators.Editor
     [CustomEditor(typeof(WorldGeneratorCoordinator))]
     public class WorldGeneratorCoordinatorEditor : UnityEditor.Editor
     {
-        private readonly List<IGridAlterationPass> _availablePasses = new List<IGridAlterationPass>()
+        private readonly List<IGridGenerationPass> _generationTemplates = new List<IGridGenerationPass>()
         {
-            new PerlinNoiseAlterationPass(),
-            new MountainSmoothingAlterationPass(),
-            new RotationAlterationPass()
+            new PerlinNoiseGenerationPass(),
+            new GeographyGenerationPass(),
+            new StandardBiomeGenerationPass()
+        };
+
+        private readonly List<IGridAlterationPass> _alterationTemplates = new List<IGridAlterationPass>()
+        {
+            new DefaultVariationAlterationPass(),
+            new RotationAlterationPass(),
+            new MountainSmoothingAlterationPass()
         };
 
         public override void OnInspectorGUI()
@@ -24,36 +31,71 @@ namespace Systems.Coordinators.Editor
             WorldGeneratorCoordinator coord = (WorldGeneratorCoordinator)target;
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("Generation Pipeline Setup", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox("Add passes here to define the sequence of world generation.", MessageType.Info);
+            EditorGUILayout.LabelField("Pipeline Templates", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("Use these buttons to quickly add new passes to the generation or alteration lists.", MessageType.Info);
 
-            EditorGUILayout.LabelField("Available Pass Templates", EditorStyles.miniLabel);
-            foreach (IGridAlterationPass pass in _availablePasses)
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField("Available Generation Passes", EditorStyles.miniBoldLabel);
+            foreach (var pass in _generationTemplates)
             {
-                if (GUILayout.Button($"Add {pass.GetType().Name}"))
-                {
-                    Undo.RecordObject(coord, "Add Generator Pass");
-                    coord.AddGeneratorPass(pass);
-                    EditorUtility.SetDirty(coord);
-                }
-            }
-
-            var currentPasses = coord.GetGeneratorPasses();
-            if (currentPasses.Count > 0)
-            {
-                EditorGUILayout.Space(10);
-                EditorGUILayout.LabelField("Active Pipeline Actions", EditorStyles.boldLabel);
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(pass.PassName, GUILayout.ExpandWidth(true));
                 
-                foreach (IGridAlterationPass pass in currentPasses)
+                bool exists = coord.HasGenerationPass(pass.GetType());
+
+                using (new EditorGUI.DisabledScope(exists))
                 {
-                    if (GUILayout.Button($"Remove {pass.GetType().Name}", EditorStyles.miniButton))
+                    if (GUILayout.Button("Add", GUILayout.Width(60)))
                     {
-                        Undo.RecordObject(coord, "Remove Generator Pass");
-                        coord.RemoveGeneratorPass(pass);
+                        Undo.RecordObject(coord, "Add Generation Pass");
+                        coord.AddGenerationPass(pass);
                         EditorUtility.SetDirty(coord);
                     }
                 }
+
+                using (new EditorGUI.DisabledScope(!exists))
+                {
+                    if (GUILayout.Button("Remove", GUILayout.Width(60)))
+                    {
+                        Undo.RecordObject(coord, "Remove Generation Pass");
+                        coord.RemoveGenerationPass(pass.GetType());
+                        EditorUtility.SetDirty(coord);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
             }
+
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("Available Alteration Passes", EditorStyles.miniBoldLabel);
+            foreach (var pass in _alterationTemplates)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(pass.PassName, GUILayout.ExpandWidth(true));
+
+                bool exists = coord.HasAlterationPass(pass.GetType());
+
+                using (new EditorGUI.DisabledScope(exists))
+                {
+                    if (GUILayout.Button("Add", GUILayout.Width(60)))
+                    {
+                        Undo.RecordObject(coord, "Add Alteration Pass");
+                        coord.AddAlterationPass(pass);
+                        EditorUtility.SetDirty(coord);
+                    }
+                }
+
+                using (new EditorGUI.DisabledScope(!exists))
+                {
+                    if (GUILayout.Button("Remove", GUILayout.Width(60)))
+                    {
+                        Undo.RecordObject(coord, "Remove Alteration Pass");
+                        coord.RemoveAlterationPass(pass.GetType());
+                        EditorUtility.SetDirty(coord);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.Space(10);
         }
     }
 }

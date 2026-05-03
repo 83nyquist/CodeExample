@@ -21,7 +21,7 @@ namespace Systems.Grid.Editor
             if (origin != null)
             {
                 // Check if Neighbors logic is linked
-                int neighborCount = origin.Neighbours?.Count ?? 0;
+                int neighborCount = origin.Neighbours?.Length ?? 0;
                 EditorGUILayout.LabelField($"Origin (0,0) Neighbors: {neighborCount}");
             }
         }

@@ -1,10 +1,9 @@
-namespace Systems.Grid.AlterationPasses
+namespace Systems.Grid.Passes.Alteration
 {
     public interface IGridAlterationPass
     {
         string PassName { get; }
-        int Priority { get; } // Lower = runs first
-        
+
         void Execute(AxialHexGrid grid, int seed);
     }
 }

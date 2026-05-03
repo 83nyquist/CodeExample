@@ -49,7 +49,7 @@ namespace Systems.Grid.Pathfinding
                 openSet.Remove(current);
                 closedSet.Add(current);
 
-                foreach (TileData neighbour in current.Neighbours.Values)
+                foreach (TileData neighbour in current.Neighbours)
                 {
                     if (neighbour == null)
                     {

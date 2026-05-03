@@ -13,10 +13,8 @@ namespace Systems.Decoration.Components
         [SerializeField] private TileSet tileSet;
         [SerializeField] private Transform poolParent;
         [SerializeField] private Transform activeParent;
-        [SerializeField] private bool enableTileVariations = true;
         [SerializeField] private int preWarm = 10;
         
-        private ITileVariationService _variationService;
         private Dictionary<TileType, Queue<TileDecorator>> _pools = new Dictionary<TileType, Queue<TileDecorator>>();
         private Dictionary<TileData, TileDecorator> _activeTiles = new Dictionary<TileData, TileDecorator>();
         
@@ -30,8 +28,6 @@ namespace Systems.Decoration.Components
             if (activeParent == null)
                 activeParent = transform;
 
-            _variationService = new TileVariationService();
-                
             InitializePools();
         }
         
@@ -53,9 +49,11 @@ namespace Systems.Decoration.Components
             if (tileData == null) return null;
                 
             TileType type = tileData.type;
-            Vector2Int coordinates = tileData.AxialCoordinates;
+
+            // The TileData now explicitly tells us which index to use. 
+            // If it's -1, TileSet.GetTilePrefab handles the fallback to index 0.
+            GameObject prefab = tileSet.GetTilePrefab(type, tileData.VariationIndex);
             
-            GameObject prefab = _variationService.GetPrefab(tileSet, type, coordinates, enableTileVariations);
             if (prefab == null) return null;
             
             TileDecorator decorator;
@@ -70,8 +68,7 @@ namespace Systems.Decoration.Components
             }
             
             decorator.Initialize(_axialHexGrid, tileData, activeParent);
-            _variationService.ApplyVariation(decorator, type, coordinates);
-
+            
             _activeTiles[tileData] = decorator;
             return decorator;
         }
@@ -91,7 +88,7 @@ namespace Systems.Decoration.Components
             decorator.transform.SetParent(poolParent);
             decorator.gameObject.SetActive(false);
             
-            TileType type = decorator.TileData?.type ?? TileType.Ground;
+            TileType type = decorator.TileData?.type ?? TileType.PrimaryGround;
             _pools[type].Enqueue(decorator);
         }
         
