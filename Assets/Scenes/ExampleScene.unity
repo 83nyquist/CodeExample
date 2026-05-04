@@ -2093,7 +2093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6d7e68508e74725b269c08f2048b2a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Systems.Decoration.Components.TileDecoratorAnimator
-  spawnOffset: {x: 0, y: -3, z: 0}
+  spawnOffset: {x: 0, y: -2, z: 0}
   transitionDuration: 0.2
 --- !u!114 &1001720010
 MonoBehaviour:
