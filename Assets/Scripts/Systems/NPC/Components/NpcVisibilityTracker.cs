@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using Systems.Grid;
+using Systems.Grid.Components;
 using Systems.NPC.Structs;
 using Unity.Collections;
 
@@ -16,7 +19,7 @@ namespace Systems.NPC.Components
 
         public NpcVisibilityTracker(float interval) => _interval = interval;
 
-        public void Process(NativeArray<NpcData> npcs, float dt)
+        public void Process(NativeArray<NpcData> npcs, AxialHexGrid grid, HashSet<TileData> visionSet, float dt)
         {
             if (!npcs.IsCreated) return;
 
@@ -26,7 +29,13 @@ namespace Systems.NPC.Components
 
             int count = 0;
             for (int i = 0; i < npcs.Length; i++)
-                if (npcs[i].IsVisible) count++;
+            {
+                // We check the grid for the tile at the NPC's position.
+                // If that tile is in the vision set, the NPC is logically visible.
+                var tile = grid.GetTile(npcs[i].Position.x, npcs[i].Position.y);
+                if (tile != null && visionSet.Contains(tile)) 
+                    count++;
+            }
 
             if (count != _lastCount)
             {

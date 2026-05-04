@@ -40,6 +40,9 @@ namespace NPC
         private NpcVisualRegistry _visuals;
         private NpcVisibilityTracker _visibilityTracker;
         
+        private HashSet<TileData> _currentVisionSet = new();
+        private bool _isVisibilityForced;
+        private int _lastShroudedCount;
         private Coroutine _spawnCoroutine;
 
         // Properties
@@ -75,7 +78,7 @@ namespace NPC
             
             _simulation.CompleteCurrentJob();
             _visuals.UpdateVisuals(_simulation.Data, HexToWorld, Time.deltaTime);
-            _visibilityTracker.Process(_simulation.Data, Time.deltaTime);
+            _visibilityTracker.Process(_simulation.Data, _axialHexGrid, _currentVisionSet, Time.deltaTime);
         }
         
         private void InitializeComponents()
@@ -84,7 +87,11 @@ namespace NPC
             _visuals = new NpcVisualRegistry(npcVisualPrefab, moveSpeed, rotationSpeed, transform);
             _visibilityTracker = new NpcVisibilityTracker(visibilityUpdateInterval);
             
-            _visibilityTracker.OnCountChanged += (count) => OnVisibleAgentsCountChanged?.Invoke(count);
+            _visibilityTracker.OnCountChanged += (count) => 
+            {
+                _lastShroudedCount = count;
+                InvokeVisibleCountChanged();
+            };
         }
         
         /// <summary>
@@ -116,6 +123,11 @@ namespace NPC
             // 2. Clear visual GameObjects
             // Note: We call Dispose to destroy objects, then we must re-prepare the registry
             _visuals?.Dispose();
+            
+            _lastShroudedCount = 0;
+            _currentVisionSet.Clear();
+            InvokeVisibleCountChanged();
+            
             _visuals = new NpcVisualRegistry(npcVisualPrefab, moveSpeed, rotationSpeed, transform);
         }
 
@@ -148,11 +160,17 @@ namespace NPC
         /// <param name="forceVisible">If true, ignores the vision set (debug mode).</param>
         public void UpdateNpcVisibility(HashSet<TileData> visionSet, bool forceVisible)
         {
-            if (!IsInitialized || _visuals == null) return;
+            _isVisibilityForced = forceVisible;
+            _currentVisionSet = visionSet;
 
-            // We pass the visibility requirements down to the visual registry, 
-            // which handles the specific GameObject.SetActive calls.
-            _visuals.UpdateVisibilityStates(_simulation.Data, visionSet, forceVisible);
+            if (IsInitialized && _visuals != null)
+            {
+                // We pass the visibility requirements down to the visual registry, 
+                // which handles the specific GameObject.SetActive calls.
+                _visuals.UpdateVisibilityStates(_simulation.Data, visionSet, forceVisible);
+            }
+
+            InvokeVisibleCountChanged();
         }
 
         /// <summary>
@@ -161,6 +179,15 @@ namespace NPC
         public void CleanupNpcs()
         {
             CleanupActiveSimulation();
+        }
+
+        /// <summary>
+        /// Calculates the final visible count based on shroud logic or debug overrides
+        /// and notifies subscribers (UI).
+        /// </summary>
+        private void InvokeVisibleCountChanged()
+        {
+            OnVisibleAgentsCountChanged?.Invoke(_lastShroudedCount);
         }
 
         private Vector3 HexToWorld(int2 coord)
