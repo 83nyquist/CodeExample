@@ -1,4 +1,5 @@
 using Systems.Coordinators;
+using Systems.Decoration;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Vanguard;
@@ -12,6 +13,7 @@ namespace UserInterface.UIToolkit
         [Inject] private UiManager _uiManager;
         [Inject] private VanguardController _vanguardController;
         [Inject] private WorldGeneratorCoordinator _worldGenerator;
+        [Inject] private WorldDecorator _worldDecorator;
 
         private bool _isProcessing;
 
@@ -20,6 +22,7 @@ namespace UserInterface.UIToolkit
             var root = _uiController.Root;
             root.Q<Button>("btn_generate").clicked += OnGenerateClicked;
             root.Q<Button>("btn_respawn").clicked += OnRespawnClicked;
+            root.Q<Button>("btn_agentVisibility").clicked += OnToggleAgentsClicked;
             root.Q<Button>("btn_exit").clicked += OnExitClicked;
         }
 
@@ -38,6 +41,11 @@ namespace UserInterface.UIToolkit
 #else
             Application.Quit();
 #endif
+        }
+
+        private void OnToggleAgentsClicked()
+        {
+            _worldDecorator.IsNpcVisibilityDebugEnabled = !_worldDecorator.IsNpcVisibilityDebugEnabled;
         }
 
         private async void OnRespawnClicked()
