@@ -9,6 +9,7 @@
         <ui:Slider label="Volume" value="30" high-value="100" name="slider_volume"/>
         <ui:Toggle label="FPS" name="tgl_fps"/>
         <ui:Button text="Respawn" name="btn_respawn" class="button"/>
+        <ui:Button text="Toggle Agent Visibility" name="btn_agentVisibility" class="button"/>
         <ui:VisualElement name="divider" class="divider"/>
         <ui:GroupBox class="output">
             <ui:Label text="Visible Agents" name="VisibleAgents" class="Label"/>

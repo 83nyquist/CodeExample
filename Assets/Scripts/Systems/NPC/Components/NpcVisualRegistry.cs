@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Systems.Grid.Components;
 using Systems.NPC.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -12,6 +14,9 @@ namespace Systems.NPC.Components
         private readonly float _rotationSpeed;
         private readonly Transform _parent;
         
+        private readonly HashSet<int2> _visibleCoords = new HashSet<int2>();
+        private bool _forceVisible;
+
         private GameObject[] _visuals;
         private Animator[] _animators;
         private Vector3[] _lastPositions;  // Track last position to detect movement
@@ -46,6 +51,24 @@ namespace Systems.NPC.Components
             }
         }
         
+        /// <summary>
+        /// Caches the current vision set coordinates to determine visibility during the visual update loop.
+        /// </summary>
+        public void UpdateVisibilityStates(NativeArray<NpcData> npcs, HashSet<TileData> visionSet, bool forceVisible)
+        {
+            _forceVisible = forceVisible;
+            _visibleCoords.Clear();
+            
+            if (visionSet != null)
+            {
+                foreach (var tile in visionSet)
+                {
+                    // Mapping TileData X/Z to the int2 coordinate used by NPCs
+                    _visibleCoords.Add(new int2(tile.X, tile.Z));
+                }
+            }
+        }
+
         public void UpdateVisuals(NativeArray<NpcData> npcs, System.Func<int2, Vector3> hexToWorld, float deltaTime)
         {
             for (int i = 0; i < _visuals.Length; i++)
@@ -53,7 +76,11 @@ namespace Systems.NPC.Components
                 if (_visuals[i] == null) continue;
                 
                 UpdatePositionAndRotation(i, npcs[i].Position, hexToWorld, deltaTime);
-                UpdateVisibility(i, npcs[i].IsVisible);
+
+                // Overriding data visibility with the world vision set + debug toggle
+                bool isVisible = _forceVisible || _visibleCoords.Contains(npcs[i].Position);
+                UpdateVisibility(i, isVisible);
+
                 UpdateAnimatorState(i);  // Update based on actual movement, not NpcData.IsMoving
             }
         }
@@ -138,6 +165,7 @@ namespace Systems.NPC.Components
             _visuals = null;
             _animators = null;
             _lastPositions = null;
+            _visibleCoords.Clear();
         }
     }
 }

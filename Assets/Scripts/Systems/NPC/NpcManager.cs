@@ -141,6 +141,28 @@ namespace NPC
             _spawnCoroutine = null;
         }
         
+        /// <summary>
+        /// Updates the visibility of all NPC GameObjects based on the player's vision.
+        /// </summary>
+        /// <param name="visionSet">The set of tiles currently in the player's vision radius.</param>
+        /// <param name="forceVisible">If true, ignores the vision set (debug mode).</param>
+        public void UpdateNpcVisibility(HashSet<TileData> visionSet, bool forceVisible)
+        {
+            if (!IsInitialized || _visuals == null) return;
+
+            // We pass the visibility requirements down to the visual registry, 
+            // which handles the specific GameObject.SetActive calls.
+            _visuals.UpdateVisibilityStates(_simulation.Data, visionSet, forceVisible);
+        }
+
+        /// <summary>
+        /// Public access to clean up the simulation, used by the WorldDecorator during regeneration.
+        /// </summary>
+        public void CleanupNpcs()
+        {
+            CleanupActiveSimulation();
+        }
+
         private Vector3 HexToWorld(int2 coord)
         {
             return _axialHexGrid.AxialToWorld(coord.x, coord.y);
