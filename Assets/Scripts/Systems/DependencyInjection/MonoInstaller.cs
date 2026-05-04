@@ -24,6 +24,7 @@ namespace Systems.DependencyInjection
             Container.Bind<NpcManager>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<GenerationProgressTracker>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<WorldGeneratorCoordinator>().FromComponentInHierarchy().AsCached().NonLazy();
+            Container.Bind<TileDecoratorAnimator>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<VanguardController>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<AStarPathfinding>().FromComponentInHierarchy().AsCached().NonLazy();

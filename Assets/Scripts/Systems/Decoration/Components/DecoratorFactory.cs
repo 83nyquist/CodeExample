@@ -9,6 +9,7 @@ namespace Systems.Decoration.Components
     public class DecoratorFactory : MonoBehaviour
     {
         [Inject] private AxialHexGrid _axialHexGrid;
+        [Inject] private TileDecoratorAnimator _animator;
         
         [SerializeField] private TileSet tileSet;
         [SerializeField] private Transform poolParent;
@@ -67,7 +68,7 @@ namespace Systems.Decoration.Components
                 decorator = CreateNewDecorator(prefab);
             }
             
-            decorator.Initialize(_axialHexGrid, tileData, activeParent, prefab);
+            decorator.Initialize(_axialHexGrid, tileData, activeParent, prefab, _animator);
             
             _activeTiles[tileData] = decorator;
             return decorator;
@@ -148,7 +149,7 @@ namespace Systems.Decoration.Components
             for (int i = 0; i < count; i++)
             {
                 TileDecorator decorator = CreateNewDecorator(prefab);
-                decorator.Initialize(null, null, poolParent, prefab);
+                decorator.Initialize(null, null, poolParent, prefab, null);
                 decorator.gameObject.SetActive(false);
                 _pools[prefab].Enqueue(decorator);
             }
