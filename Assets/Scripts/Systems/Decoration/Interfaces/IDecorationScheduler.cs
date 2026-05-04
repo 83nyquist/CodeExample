@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Systems.Grid.Components;
 
-namespace Systems.Decoration.Components
+namespace Systems.Decoration.Interfaces
 {
     public interface IDecorationScheduler
     {
