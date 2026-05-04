@@ -2,7 +2,6 @@
 
 A Unity demonstration project featuring a top-down axial hex grid system supporting 3,000,000 tiles with Perlin noise terrain generation and 10,000 independent agents with independent roaming.
 
-<img src="images/commanderSelection.png" alt="Commander selection screen" width="300" height="300">
 <img src="images/map.png" alt="Hex grid terrain map" width="300" height="300">
 
 ## Technical Highlights
