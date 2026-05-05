@@ -16,11 +16,9 @@ A Unity demonstration project featuring a top-down axial hex grid system support
 ## Technical Debt & Known Architecture Concerns
 This project uses heavy DI (Zenject) for component communication.
 
-#Current concern: 
-Logic and UI are tightly coupled through DI, creating unnecessary dependencies between systems that should remain separate.
+- Current concern: Logic and UI are tightly coupled through DI, creating unnecessary dependencies between systems that should remain separate.
 
-#Planned refactor: 
-Migrate to an event-driven architecture using an EventBus to fully decouple logic from UI. DI will be reserved for ScriptableObjects, services, and interface abstractions only.
+- Planned refactor: Migrate to an event-driven architecture using an EventBus to fully decouple logic from UI. DI will be reserved for ScriptableObjects, services, and interface abstractions only.
 
 
 ## How to Run the Build
