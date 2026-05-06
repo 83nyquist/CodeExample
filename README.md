@@ -9,28 +9,48 @@ A Unity demonstration project featuring a top-down axial hex grid system support
 - **Hex Grid System** - Complete top-down hex grid implementation with cell navigation (Systems/Grid)
 - **A-Star Pathfinding** - Optimal route calculation across hex grid (Systems/Grid)
 - **Perlin Noise Generation** - Procedural terrain height and feature mapping (Systems/Grid)
-- **Coroutine & Object Pooling** - Optimized generation of tile decoration for smooth performance (System/Decorator)
+- **Coroutine & Object Pooling** - Optimized generation of tile decoration for smooth performance (Systems/Decorator)
+- **Dependency Injection** - VContainer for service management and decoupling (Systems/DependencyInjection/BootloaderScope)
+- **Event-Driven Architecture** - Centralized `GameEventBus` with source tracking for debugging (Systems/EventBus)
 - **UI Toolkit and UGUI Integration** - Hybrid UI system combining modern Toolkit with legacy UGUI for maximum compatibility and flexibility (UserInterface)
 
 
-## Technical Debt & Known Architecture Concerns
-This project uses heavy DI (Zenject) for component communication.
+## 🤖 AI-First Development (Upcoming)
 
-- Current concern: Logic and UI are tightly coupled through DI, creating unnecessary dependencies between systems that should remain separate.
+To me, AI-First Development means the engineer acts as a **curator**—defining intent, architecture, and constraints—while AI agents handle implementation. The curator owns decisions, not keystrokes.
 
-- Planned refactor: Migrate to an event-driven architecture using an EventBus to fully decouple logic from UI. DI will be reserved for ScriptableObjects, services, and interface abstractions only.
+This project is **transitioning toward** an AI-First Development approach - a pragmatic code organization optimized for human-AI collaboration.
 
+### What's Changing
 
-## How to Run the Build
+**Current State (Traditional):**
+- One class per file
+- Systems spread across many small files
+- Optimized for human navigation and merge conflicts
 
-### Windows Build
-1. Download `WindowsBuild-Windows.zip` from the [Releases](https://github.com/83nyquist/CodeExample/releases) section
-2. Extract the archive to a folder
-3. Double-click `CodeExample.exe` to launch the game
+**Goal (Next Update):**
+- Cohesive systems in single files (monoliths)
+- Related classes live together (e.g., entire NPC system in `NpcSystem.cs`)
+- Event definitions centralized in `GameEventBus.cs`
+- Clear region separation using `// === SECTION ===` comments
 
-### Linux Build
-1. Download `LinuxBuild-Linux.zip` from the [Releases](https://github.com/83nyquist/CodeExample/releases) section
-2. Extract the archive
-3. Make the executable runnable:
-   ```bash
-   chmod +x CodeExample.x86_64
+### Why the Shift
+
+When working with AI coding assistants, the limiting factor is **context window**. A system spread across 11 files requires the AI to read 11 separate files to understand the complete system. This is inefficient, token-expensive, and increases the chance of missed connections.
+
+### When This Approach Works Well
+
+| ✅ Good for | ❌ Not for |
+| :--- | :--- |
+| Small teams (1-3 developers) | Large teams (10+ developers) |
+| AI-assisted development | Open source with many contributors |
+| Rapid iteration and prototyping | Projects requiring strict merge workflows |
+| Personal/solo projects | Enterprise with rigid coding standards |
+
+### The Bottom Line
+
+> *"Break the rules when the rules don't serve you."*
+
+The next update will prioritize **AI collaboration efficiency** over traditional file organization. The code will be structured for machines (and AI) to read, not just for humans to navigate by filename.
+
+*If you're a human reviewing this code: use your IDE's search. If you're AI: enjoy the full context.*
