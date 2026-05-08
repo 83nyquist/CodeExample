@@ -1,10 +1,8 @@
-using System;
-using Character;
-using UnityEngine;
+using Systems.EventBus;
 using Vanguard;
 using Zenject;
 
-namespace Systems.Coordinators
+namespace Coordinators
 {
     public enum GameState
     {
@@ -13,12 +11,10 @@ namespace Systems.Coordinators
         Playing
     }
 
-    public class GameFlowCoordinator : MonoBehaviour
+    public class GameFlowCoordinator : EventBusSubscriber
     {
         [Inject] private VanguardController _vanguardController;
         [Inject] private WorldGeneratorCoordinator _worldGenerator;
-
-        public event Action<GameState> OnStateChanged;
         
         private GameState _currentState;
         private bool _isWorldReady;
@@ -26,7 +22,8 @@ namespace Systems.Coordinators
 
         private void Start()
         {
-            _worldGenerator.OnGenerationComplete += HandleWorldReady;
+            Subscribe<CommanderSelectedRequest>(SelectCharacter);
+            Subscribe<WorldGenerationFinishedEvent>(HandleWorldReady);
             SetState(GameState.Initializing);
         }
 
@@ -34,24 +31,18 @@ namespace Systems.Coordinators
         {
             _isWorldReady = false;
             _vanguardController.DeSpawn();
-            // We don't necessarily reset _isCharacterSelected here 
-            // in case the user wants to keep their leader choice across re-gens
+            
             SetState(GameState.Initializing);
         }
 
-        private void OnDestroy()
+        public void SelectCharacter(CommanderSelectedRequest obj)
         {
-            if (_worldGenerator != null) _worldGenerator.OnGenerationComplete -= HandleWorldReady;
-        }
-
-        public void SelectCharacter(CharacterItem leader)
-        {
-            _vanguardController.SetLeader(leader);
+            _vanguardController.SetLeader(obj.Character);
             _isCharacterSelected = true;
             CheckTransitionToGameplay();
         }
 
-        private void HandleWorldReady()
+        private void HandleWorldReady(WorldGenerationFinishedEvent e)
         {
             _isWorldReady = true;
             
@@ -77,7 +68,7 @@ namespace Systems.Coordinators
         private void SetState(GameState newState)
         {
             _currentState = newState;
-            OnStateChanged?.Invoke(_currentState);
+            Publish(new GameStateChangedEvent(_currentState));
         }
     }
 }

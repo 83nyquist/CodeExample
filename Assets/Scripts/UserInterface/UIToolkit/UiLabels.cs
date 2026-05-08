@@ -1,6 +1,7 @@
+using Coordinators;
 using NPC;
-using Systems.Coordinators;
 using Systems.Decoration;
+using Systems.EventBus;
 using Systems.Grid;
 using Systems.Grid.Components;
 using UnityEngine;
@@ -10,7 +11,7 @@ using Zenject;
 
 namespace UserInterface.UIToolkit
 {
-    public class UiLabels : MonoBehaviour
+    public class UiLabels : EventBusSubscriber
     {
         [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private UIController _uIController;
@@ -28,37 +29,32 @@ namespace UserInterface.UIToolkit
         
         private void Start()
         {
-            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
-            _vanguardMover.OnDestinationReached += OnDestinationReached;
+            Subscribe<GridInitializationFinishedEvent>(OnGenerationComplete);
+            Subscribe<PlayerDestinationReachedEvent>(OnDestinationReached);
+            Subscribe<NpcVisibleAgentsCountChangedEvent>(OnVisibleAgentsCountChanged);
+            // _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
+            // _vanguardMover.OnDestinationReached += OnDestinationReached;
+            // _npcManager.OnVisibleAgentsCountChanged += OnVisibleAgentsCountChanged;
             
             _lblVisibleAgents = uiDocument.rootVisualElement.Q<Label>("VisibleAgents");
             _lblActiveAgents = uiDocument.rootVisualElement.Q<Label>("ActiveAgents");
             _lblVisibleTiles = uiDocument.rootVisualElement.Q<Label>("VisibleTiles");
             _lblTotalTiles = uiDocument.rootVisualElement.Q<Label>("TotalTiles");
-
-            _npcManager.OnVisibleAgentsCountChanged += OnVisibleAgentsCountChanged;
         }
 
-        private void OnDestroy()
-        {
-            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
-            _vanguardMover.OnDestinationReached -= OnDestinationReached;
-            _npcManager.OnVisibleAgentsCountChanged -= OnVisibleAgentsCountChanged;
-        }
-
-        private void OnGenerationComplete()
+        private void OnGenerationComplete(GridInitializationFinishedEvent obj)
         {
             UpdateStaticLabels();
         }
 
-        private void OnDestinationReached(TileData obj)
+        private void OnDestinationReached(PlayerDestinationReachedEvent obj)
         {
             UpdateStaticLabels();
         }
 
-        private void OnVisibleAgentsCountChanged(int count)
+        private void OnVisibleAgentsCountChanged(NpcVisibleAgentsCountChangedEvent obj)
         {
-            _lblVisibleAgents.text = $"Visible Agents: {count}";
+            _lblVisibleAgents.text = $"Visible Agents: {obj.VisibleCount}";
         }
 
         public void UpdateStaticLabels()

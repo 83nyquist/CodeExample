@@ -1,14 +1,14 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Coordinators;
 using Data;
-using Systems.Coordinators;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Zenject;
 using Systems.Grid;
 using Systems.Decoration;
+using Systems.EventBus;
 using Systems.Grid.Components;
 using Systems.Grid.Extensions;
 using Systems.NPC.Components;
@@ -16,7 +16,7 @@ using Systems.NPC.Structs;
 
 namespace NPC
 {
-    public class NpcManager : MonoBehaviour
+    public class NpcManager : EventBusSubscriber
     {
         // Dependencies (DIP)
         [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
@@ -48,22 +48,20 @@ namespace NPC
         // Properties
         public int NpcCount => _simulation?.NpcCount ?? 0;
         public bool IsInitialized => _simulation?.IsActive ?? false;
-
-        // Events
-        public event Action<int> OnVisibleAgentsCountChanged;
-        public event Action OnComplete;
         
-        void Awake()
+        void Start()
         {
             InitializeComponents();
-            _worldGeneratorCoordinator.OnGenerationStarted += CleanupActiveSimulation;
+            Subscribe<WorldGenerationStartedEvent>(CleanupActiveSimulation);
+            Subscribe<GridInitializationFinishedEvent>(InitializeNpcs);
         }
-        
-        void OnDestroy()
+
+        protected override void OnDestroy()
         {
-            _worldGeneratorCoordinator.OnGenerationStarted -= CleanupActiveSimulation;
             _simulation?.Dispose();
             _visuals?.Dispose();
+            
+            base.OnDestroy();
         }
         
         void Update()
@@ -98,7 +96,7 @@ namespace NPC
         /// Starts the NPC simulation and spawning process. 
         /// This should be called once the grid data and passes are finalized.
         /// </summary>
-        public void InitializeNpcs()
+        public void InitializeNpcs(GridInitializationFinishedEvent obj)
         {
             _simulation.Reset(_axialHexGrid.Tiles, _worldDecorator);
             _spawnCoroutine = StartCoroutine(SpawnNpcsRoutine(_axialHexGrid.Tiles));
@@ -108,7 +106,7 @@ namespace NPC
         /// Ensures all existing NPCs (Data and Visuals) are destroyed 
         /// before starting a new simulation cycle.
         /// </summary>
-        private void CleanupActiveSimulation()
+        private void CleanupActiveSimulation(WorldGenerationStartedEvent obj)
         {
             // 1. Stop any spawning currently in progress
             if (_spawnCoroutine != null)
@@ -144,12 +142,13 @@ namespace NPC
                 var slice = new NativeSlice<NpcData>(_simulation.Data, i, batch);
                 
                 _visuals.CreateVisualsInRange(slice, i, HexToWorld);
-                _progressTracker.UpdateProgress(GenerationProgressTracker.TaskAgents, batch);
+                // _progressTracker.UpdateProgress(GenerationProgressTracker.TaskAgents, batch);
+                Publish(new ReportWorkProgressRequest(0, batch));
                 yield return null;
             }
 
             _simulation.Activate();
-            OnComplete?.Invoke();
+            Publish(new NpcSimulationCompleteEvent(count));
             _spawnCoroutine = null;
         }
         
@@ -178,18 +177,15 @@ namespace NPC
         /// </summary>
         public void CleanupNpcs()
         {
-            CleanupActiveSimulation();
+            CleanupActiveSimulation(null);
         }
 
         /// <summary>
         /// Calculates the final visible count based on shroud logic or debug overrides
         /// and notifies subscribers (UI).
         /// </summary>
-        private void InvokeVisibleCountChanged()
-        {
-            OnVisibleAgentsCountChanged?.Invoke(_lastShroudedCount);
-        }
-
+        private void InvokeVisibleCountChanged() => Publish(new NpcVisibleAgentsCountChangedEvent(_lastShroudedCount));
+        
         private Vector3 HexToWorld(int2 coord)
         {
             return _axialHexGrid.AxialToWorld(coord.x, coord.y);

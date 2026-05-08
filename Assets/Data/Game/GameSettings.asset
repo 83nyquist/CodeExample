@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e250ef6c808f49a0bf8dac88e90fd60f, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: Assembly-CSharp::Game.Data.GameSettingsData
+  masterVolume: 12

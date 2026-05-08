@@ -1,4 +1,4 @@
-namespace Systems.Grid.Passes.Generation
+namespace Systems.Grid.Passes.Abstraction
 {
     [System.Serializable]
     public abstract class BaseGenerationPass : IGridGenerationPass
@@ -7,6 +7,8 @@ namespace Systems.Grid.Passes.Generation
     
         public abstract string PassName { get; }
     
+        public virtual int EstimateWorkUnits(int totalTiles) => totalTiles;
+
         public abstract void Execute(AxialHexGrid grid, int seed);
     }
 }

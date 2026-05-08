@@ -1,7 +1,7 @@
 using Audio;
+using Coordinators;
 using Input;
 using NPC;
-using Systems.Coordinators;
 using Systems.Decoration;
 using Systems.Decoration.Components;
 using Systems.Grid;

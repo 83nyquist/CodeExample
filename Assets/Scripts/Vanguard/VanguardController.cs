@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Character;
+using Coordinators;
 using Core.Components;
-using Systems.Coordinators;
 using Systems.Decoration;
+using Systems.EventBus;
 using Systems.Grid;
 using Systems.Grid.Components;
 using Systems.Grid.Extensions;
@@ -13,7 +14,7 @@ using Zenject;
 
 namespace Vanguard
 {
-    public class VanguardController : MonoBehaviour
+    public class VanguardController : EventBusSubscriber
     {
         [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private VanguardMover _vanguardMover;
@@ -34,21 +35,17 @@ namespace Vanguard
         
         private void Awake()
         {
-            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
-            _vanguardMover.OnDestinationReached += SetCurrentTile;
+            Subscribe<WorldGenerationFinishedEvent>(OnGenerationComplete);
+            Subscribe<PlayerDestinationReachedEvent>(SetCurrentTile);
+            // _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
+            // _vanguardMover.OnDestinationReached += SetCurrentTile;
 
             _destroyChildren = GetComponent<DestroyChildren>();
             
             DeSpawn();
         }
-        
-        private void OnDestroy()
-        {
-            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
-            _vanguardMover.OnDestinationReached -= SetCurrentTile;
-        }
 
-        private void OnGenerationComplete()
+        private void OnGenerationComplete(WorldGenerationFinishedEvent obj)
         {
             Stop();
             TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
@@ -96,11 +93,11 @@ namespace Vanguard
             transform.position = _axialHexGrid.AxialToWorld(_currentTile.X, _currentTile.Z);
         }
 
-        private void SetCurrentTile(TileData tileData)
+        private void SetCurrentTile(PlayerDestinationReachedEvent obj)
         {
             if (_isResetting) return;
             
-            _currentTile = tileData;
+            _currentTile = obj.Tile;
         }
     }
 }
