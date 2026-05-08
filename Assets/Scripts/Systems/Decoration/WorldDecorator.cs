@@ -1,19 +1,20 @@
 using System.Collections.Generic;
+using Coordinators;
 using Data;
 using Input;
-using Systems.Coordinators;
 using Systems.Decoration.Components;
 using Systems.Grid;
 using Systems.Grid.Components;
 using UnityEngine;
 using NPC;
 using Systems.Decoration.Interfaces;
+using Systems.EventBus;
 using Vanguard;
 using Zenject;
 
 namespace Systems.Decoration
 {
-    public class WorldDecorator : MonoBehaviour
+    public class WorldDecorator : EventBusSubscriber
     {
         public enum ShroudMode
         {
@@ -46,7 +47,7 @@ namespace Systems.Decoration
         private TileData _lastOrigin;
         private InputLock _inputLock;
 
-        private void Awake()
+        private void Start()
         {
             _scheduler = new DecorationScheduler(_decoratorFactory, maxMsPerFrame);
             _scheduler.OnProcessingFinished += ReleaseInputLock;
@@ -54,10 +55,10 @@ namespace Systems.Decoration
             _inputLock = _inputHandler.RegisterInputLock(this);
             
             InitializeStrategy();
-
-            _worldGeneratorCoordinator.OnGenerationStarted += OnGenerationStarted;
-            _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
-            _vanguardMover.OnPathNodeReached += OnPathNodeReached;
+            
+            Subscribe<WorldGenerationStartedEvent>(OnGenerationStarted);
+            Subscribe<GridInitializationFinishedEvent>(OnGenerationComplete);
+            Subscribe<PlayerMovedEvent>(OnPathNodeReached);
         }
 
         private void InitializeStrategy()
@@ -67,12 +68,10 @@ namespace Systems.Decoration
                 : new RadiusVisionStrategy(_axialHexGrid, _playerSettings, secondaryShroudRadius);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
-            _worldGeneratorCoordinator.OnGenerationStarted -= OnGenerationStarted;
-            _worldGeneratorCoordinator.OnGenerationComplete -= OnGenerationComplete;
-            _vanguardMover.OnPathNodeReached -= OnPathNodeReached;
             _scheduler.OnProcessingFinished -= ReleaseInputLock;
+            base.OnDestroy();
         }
 
         private void OnValidate()
@@ -84,7 +83,7 @@ namespace Systems.Decoration
             }
         }
 
-        private void OnGenerationStarted()
+        private void OnGenerationStarted(WorldGenerationStartedEvent obj)
         {
             _activeDecorators.Clear();
             _currentVisionSet.Clear();
@@ -94,15 +93,15 @@ namespace Systems.Decoration
                 _npcManager.CleanupNpcs();
         }
 
-        private void OnGenerationComplete()
+        private void OnGenerationComplete(GridInitializationFinishedEvent obj)
         {
             TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
             UpdateDecorations(origin);
         }
 
-        private void OnPathNodeReached(TileData tile)
+        private void OnPathNodeReached(PlayerMovedEvent obj)
         {
-            UpdateDecorations(tile);
+            UpdateDecorations(obj.NewTile);
         }
 
         public void UpdateDecorations(TileData origin)
@@ -141,7 +140,22 @@ namespace Systems.Decoration
 
         private void ReleaseInputLock()
         {
+            Publish(new WorldVisualsReadyEvent());
             _inputLock.IsLocked = false;
+        }
+        
+        public int GetInitialWorkEstimate()
+        {
+            // Calculate based on the radius used by the current strategy
+            if (_decoratorFactory.TileSet == null)
+            {
+                // If no TileSet is assigned, the DecoratorSystem won't actually create any visuals.
+                // Therefore, it contributes 0 work units to the total generation progress.
+                Debug.LogWarning("[DecoratorSystem] TileSet not assigned. Initial work estimate is 0. Please assign a TileSet ScriptableObject in the Inspector.", this);
+                return 0;
+            }
+            int radius = shroudMode == ShroudMode.DiscoveryBased ? _playerSettings.visionRadius : secondaryShroudRadius;
+            return 3 * radius * radius + 3 * radius + 1;
         }
         
         public HashSet<TileData> GetVisibleTiles() => _activeDecorators;

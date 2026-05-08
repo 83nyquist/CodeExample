@@ -1,50 +1,47 @@
 using System;
+using System.Collections.Generic;
 using Character;
+using Coordinators;
 using Core.Components;
-using Systems.Coordinators;
-using Systems.Grid;
+using Systems.EventBus;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
+using Random = UnityEngine.Random;
 
 namespace UserInterface.UGUI
 {
-    public class LoadingPanelController : MonoBehaviour
+    /// <summary>
+    /// Loading panel UI controller. Attached to a UI GameObject in the scene.
+    /// Uses EventBusSubscriber for automatic event cleanup.
+    /// </summary>
+    public class LoadingPanelController : EventBusSubscriber
     {
-        [Inject] private AxialHexGrid _axialHexGrid;
-        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
-        [Inject] private GenerationProgressTracker _progressTracker;
-        
-        public event Action<CharacterItem> OnCharacterSelected;
-        public event Action OnLoadingStarted;
-        public event Action OnLoadingFinished;
-        
         [SerializeField] private Slider loadingSlider;
         [SerializeField] private TextMeshProUGUI titleLabel;
         [SerializeField] private TextMeshProUGUI waitLabel;
-        [SerializeField] private TextMeshProUGUI loadingSliderLabel;
+        [SerializeField] private TextMeshProUGUI loadingSliderTilesLabel;
+        [SerializeField] private TextMeshProUGUI loadingSliderNpcLabel;
         [SerializeField] private TextMeshProUGUI loadingSliderLabelPercentage;
         [SerializeField] private CharacterSet characterSet;
+        [SerializeField] private GameObject containerParent;
         [SerializeField] private Transform profileParent;
         [SerializeField] private GameObject profilePrefab;
         
         private void Awake()
         {
-            _progressTracker.OnInitialized += OnInitialized;
-            _progressTracker.OnProgressUpdated += OnProgressUpdated;
-            _worldGeneratorCoordinator.OnGenerationComplete += OnComplete;
-            
             profileParent.GetComponent<DestroyChildren>().Activate();
-            
             CreateLeaderProfiles();
         }
 
-        private void OnDestroy()
+        private void Start()
         {
-            _progressTracker.OnInitialized -= OnInitialized;
-            _progressTracker.OnProgressUpdated -= OnProgressUpdated;
-            _worldGeneratorCoordinator.OnGenerationComplete -= OnComplete;
+            Subscribe<CommanderSelectedRequest>(OnCharacterSelectedRequest);
+            Subscribe<GenerationProgressInitializedEvent>(OnProgressInit);
+            Subscribe<GenerationProgressUpdatedEvent>(OnProgressUpdate);
+            Subscribe<NpcSimulationCompleteEvent>(OnAllComplete);
+            Subscribe<GameStateChangedEvent>(OnGameStateChangedEvent);
+            Subscribe<CommanderSelectedRequest>(OnCharacterSelectedRequest);
         }
 
         public void CreateLeaderProfiles()
@@ -56,14 +53,16 @@ namespace UserInterface.UGUI
                 CharacterProfile characterProfile = go.GetComponent<CharacterProfile>();
                 characterProfile.SetCharacter(item);
                 
-                Button btn = go.GetComponent<Button>();
-                btn.onClick.AddListener(() => OnSelectLeader(item));
+                go.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    Publish(new CommanderSelectedRequest(item));
+                });
             }
         }
 
         public void SetVisible(bool isVisible)
         {
-            gameObject.SetActive(isVisible);
+            containerParent.SetActive(isVisible);
             
             if (isVisible)
             {
@@ -73,34 +72,62 @@ namespace UserInterface.UGUI
             }
         }
 
-        public void OnSelectLeader(CharacterItem item)
+        public void OnCharacterSelectedRequest(CommanderSelectedRequest obj)
         {
             titleLabel.gameObject.SetActive(false);
             waitLabel.gameObject.SetActive(true);
             profileParent.gameObject.SetActive(false);
+
+            //TODO Refactor to a list of localized lines, this is just for fun
+            List<string> quotes = new List<string>()
+            {
+                "Wait in daylight; avoid waiting in the dark without a headlamp.",
+                "Wait for those behind to make contact, never go on without seeing them.",
+                "Wait patiently in dense fog – moving on without visibility increases risk.",
+                "Wait to cross a river until the water level has dropped.",
+                "Better to wait one hour too many than one hour too little, the mountain always waits."
+            };
             
-            OnCharacterSelected?.Invoke(item);
+            waitLabel.text = $"{obj.Character.name} - {quotes[Random.Range(0, quotes.Count)]}";
+            
+            Publish(new GameFlowInitUnlockRequest(ToString()));
+        }
+        
+        private void OnGameStateChangedEvent(GameStateChangedEvent obj)
+        {
+            if (obj.State == GameState.Initializing)
+            {
+                Publish(new GameFlowInitLockRequest(ToString()));
+            }
         }
 
-        public void OnInitialized(int total)
+        private void OnProgressInit(GenerationProgressInitializedEvent e)
         {
             loadingSlider.minValue = 0;
-            loadingSlider.maxValue = total;
-            
-            OnLoadingStarted?.Invoke();
+            loadingSlider.maxValue = e.TotalTileWorkUnits + e.TotalNpcWorkUnits; // Max value is total work units
+            loadingSlider.value = 0; // Ensure slider starts at 0
         }
 
-        public void OnProgressUpdated(int amount, int total, string workUnit)
+        private void OnProgressUpdate(GenerationProgressUpdatedEvent e)
         {
-            loadingSlider.value = amount;
-            loadingSliderLabel.text = $"{workUnit}: {amount} / {total}";
-            loadingSliderLabelPercentage.text = $"{((float)amount / total * 100):F0}%";
+            // Slider value should be the sum of all completed work
+            loadingSlider.value = e.CompletedTileWorkUnits + e.CompletedNpcWorkUnits;
+            bool isFinished = loadingSlider.value >= loadingSlider.maxValue;
+            
+            loadingSliderTilesLabel.text = $"Tiles: {e.CompletedTileWorkUnits} / {e.TotalTileWorkUnits}";
+            loadingSliderNpcLabel.text = $"NPCs: {e.CompletedNpcWorkUnits} / {e.TotalNpcWorkUnits}";
+
+            // Visual hack: Cap display at 99% until the slider actually hits the max value
+            float displayPercentage = isFinished ? 100f : Mathf.Min(e.Progress, 99f);
+            loadingSliderLabelPercentage.text = $"{displayPercentage:F0}%";
+
+            if (isFinished) loadingSlider.value = loadingSlider.maxValue;
         }
 
-        public void OnComplete()
+        private void OnAllComplete(NpcSimulationCompleteEvent e)
         {
             loadingSlider.value = loadingSlider.maxValue;
-            OnLoadingFinished?.Invoke();
+            loadingSliderLabelPercentage.text = "100%";
         }
     }
 }

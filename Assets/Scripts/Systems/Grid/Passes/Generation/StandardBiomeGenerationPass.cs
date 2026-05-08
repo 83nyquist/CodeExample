@@ -1,5 +1,6 @@
 using System;
 using Systems.Decoration.Components;
+using Systems.Grid.Passes.Abstraction;
 using UnityEngine;
 
 namespace Systems.Grid.Passes.Generation
