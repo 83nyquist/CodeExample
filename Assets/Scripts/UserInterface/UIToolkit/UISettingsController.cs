@@ -15,7 +15,6 @@ namespace UserInterface.UIToolkit
         [Inject] private GameSettings _gameSettings;
         [Inject] private PlayerSettings _playerSettings;
         [Inject] private DebugDrawer _debugDrawer;
-        [Inject] private VanguardController _vanguardController;
 
         private CharacterAnimationEvents _currentCharacterEvents;
 
@@ -25,46 +24,29 @@ namespace UserInterface.UIToolkit
 
             // Bind Sliders
             BindSlider(root.Q<Slider>("slider_grid"), "Grid Radius", 10, 1000, 
-                _playerSettings.gridRadius, val => _playerSettings.gridRadius = val);
+                _playerSettings.GridRadius, val => _playerSettings.GridRadius = val);
 
             BindSlider(root.Q<Slider>("slider_volume"), "Volume", 0, 100, 
                 _gameSettings.MasterVolume, OnVolumeChanged);
 
             BindSlider(root.Q<Slider>("slider_population"), "Population", 0, 10000, 
-                _playerSettings.populationSize, val => _playerSettings.populationSize = val);
+                _playerSettings.PopulationSize, val => _playerSettings.PopulationSize = val);
 
             BindSlider(root.Q<Slider>("slider_vision"), "Vision Radius", 2, 20, 
-                _playerSettings.visionRadius, val => _playerSettings.visionRadius = val);
+                _playerSettings.VisionRadius, val => _playerSettings.VisionRadius = val);
 
             // Bind Toggles
             var tglFps = root.Q<Toggle>("tgl_fps");
             tglFps.label = "Show FPS:";
-            tglFps.value = _playerSettings.showFPS;
+            tglFps.value = _playerSettings.ShowFPS;
 
             // Ensure the initial state is applied to the drawer on start
             _debugDrawer.showDebug = tglFps.value;
 
             tglFps.RegisterValueChangedCallback(evt => {
                 _debugDrawer.showDebug = evt.newValue;
-                _playerSettings.showFPS = evt.newValue;
+                _playerSettings.ShowFPS = evt.newValue;
             });
-
-            _vanguardController.OnAnimationEventsChanged += HandleAnimationEventsChanged;
-        }
-
-        private void OnDestroy()
-        {
-            if (_vanguardController != null)
-                _vanguardController.OnAnimationEventsChanged -= HandleAnimationEventsChanged;
-        }
-
-        private void HandleAnimationEventsChanged(CharacterAnimationEvents events)
-        {
-            _currentCharacterEvents = events;
-            
-            // When a new character spawns, immediately sync its volume to current settings
-            if (_currentCharacterEvents != null)
-                ApplyVolumeToCharacter(_gameSettings.MasterVolume);
         }
 
         private void BindSlider(Slider slider, string label, float min, float max, float current, System.Action<int> onUpdate)

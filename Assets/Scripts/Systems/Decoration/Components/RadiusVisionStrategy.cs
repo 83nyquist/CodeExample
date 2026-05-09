@@ -22,7 +22,7 @@ namespace Systems.Decoration.Components
 
         public VisionContext CalculateVision(TileData origin)
         {
-            var visionTiles = _grid.GetTilesInRadius(origin.AxialCoordinates, _settings.visionRadius);
+            var visionTiles = _grid.GetTilesInRadius(origin.AxialCoordinates, _settings.VisionRadius);
             var activeTiles = _grid.GetTilesInRadius(origin.AxialCoordinates, _radius);
             
             return new VisionContext(new HashSet<TileData>(visionTiles), new HashSet<TileData>(activeTiles));

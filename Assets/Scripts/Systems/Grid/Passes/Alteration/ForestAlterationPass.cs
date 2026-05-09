@@ -1,4 +1,4 @@
-using Systems.Decoration.Components;
+using Data;
 using Systems.Grid.Passes.Abstraction;
 using UnityEngine;
 
@@ -21,7 +21,7 @@ namespace Systems.Grid.Passes.Alteration
 
             foreach (var tile in grid.Tiles.Values)
             {
-                if (tile.type == TileType.Forest)
+                if (tile.type == Enumerations.TileType.Forest)
                 {
                     tile.VariationIndex = random.Next(0, variationCount);
                     forestTilesProcessed++;

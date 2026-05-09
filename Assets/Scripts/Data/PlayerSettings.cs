@@ -6,30 +6,55 @@ namespace Data
     public class PlayerSettings : ScriptableObject
     {
         [Header("Grid Settings")]
-        public int gridRadius = 100;
-        public int visionRadius = 10;
+        [SerializeField] private int gridRadius = 100;
+        [SerializeField] private int visionRadius = 10;
 
         [Header("Simulation")]
-        public int populationSize = 1000;
-        public bool showFPS = true;
+        [SerializeField] private int populationSize = 1000;
+        [SerializeField] private bool showFPS = true;
 
-        private void OnEnable()
+        public int GridRadius
         {
-            Load();
+            get => gridRadius;
+            set
+            {
+                gridRadius = Mathf.Max(1, value);
+                PlayerPrefs.SetInt(nameof(gridRadius), gridRadius);
+                PlayerPrefs.Save();
+            }
         }
 
-        private void OnValidate()
+        public int VisionRadius
         {
-            Save();
+            get => visionRadius;
+            set
+            {
+                visionRadius = Mathf.Clamp(value, 2, 20);
+                PlayerPrefs.SetInt(nameof(visionRadius), visionRadius);
+                PlayerPrefs.Save();
+            }
         }
 
-        public void Save()
+        public int PopulationSize
         {
-            PlayerPrefs.SetInt(nameof(gridRadius), gridRadius);
-            PlayerPrefs.SetInt(nameof(visionRadius), visionRadius);
-            PlayerPrefs.SetInt(nameof(populationSize), populationSize);
-            PlayerPrefs.SetInt(nameof(showFPS), showFPS ? 1 : 0);
-            PlayerPrefs.Save();
+            get => populationSize;
+            set
+            {
+                populationSize = Mathf.Clamp(value, 0, 10000);
+                PlayerPrefs.SetInt(nameof(populationSize), populationSize);
+                PlayerPrefs.Save();
+            }
+        }
+
+        public bool ShowFPS
+        {
+            get => showFPS;
+            set
+            {
+                showFPS = value;
+                PlayerPrefs.SetInt(nameof(showFPS), showFPS ? 1 : 0);
+                PlayerPrefs.Save();
+            }
         }
 
         public void Load()

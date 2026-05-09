@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Data;
 using Systems.Decoration.Components;
+using Systems.EventBus;
 using Systems.Grid.Components;
 using UnityEngine;
 using Vanguard;
@@ -8,55 +10,51 @@ using Zenject;
 
 namespace Systems.Grid.Pathfinding
 {
-    public class AStarPathfinding : MonoBehaviour
+    public class AStarPathfinding : EventBusSubscriber
     {
         [Inject] private VanguardController _vanguardController;
         [Inject] private VanguardMover _vanguardMover;
 
-        public event Action<List<TileData>> OnPathCreated;
-        public event Action OnPathCleared;
+        // public event Action<List<TileData>> OnPathCreated;
+        // public event Action OnPathCleared;
 
-        public List<TileData> currentPath;
+        public List<TileData> CurrentPath { get; private set; }
+        private TileData _playerTile;
         
         private void Awake()
         {
-            _vanguardMover.OnDestinationReached += ErasePath;
+            // _vanguardMover.OnDestinationReached += ErasePath;
+            Subscribe<PlayerDestinationReachedEvent>(OnDestinationReached);
+            Subscribe<PlayerMovedEvent>(OnPlayerMoved);
+            Subscribe<DrawPathRequest>(OnDrawPathRequest);
+            Subscribe<ClearPathRequest>(OnClearPathRequest);
+            Subscribe<WorldCleanupEvent>(OnWorldCleanup);
+            Subscribe<RespawnRequest>(OnRespawnRequest);
         }
         
-        private void OnDestroy()
-        {
-            _vanguardMover.OnDestinationReached -= ErasePath;
-        }
+        private void OnRespawnRequest(RespawnRequest e) => ErasePath();
+        private void OnDestinationReached(PlayerDestinationReachedEvent e) => ErasePath();
+        private void OnPlayerMoved(PlayerMovedEvent e) => _playerTile = e.NewTile;
+        private void OnDrawPathRequest(DrawPathRequest e) => DrawPath(e.Target);
+        private void OnClearPathRequest(ClearPathRequest e) => ErasePath();
+        private void OnWorldCleanup(WorldCleanupEvent e) => ErasePath();
         
         public void DrawPath(TileDecorator targetDecorator)
         {
-            // Ensure the Vanguard has a valid tile and that tile's visual decorator has been spawned
-            if (targetDecorator == null || _vanguardController.CurrentTile == null || _vanguardController.CurrentTile.Decorator == null)
-            {
-                return;
-            }
-
-            if (!CanTraverse(targetDecorator.TileData))
-            {
-                return;
-            }
+            if (targetDecorator == null || _playerTile == null || _playerTile.Decorator == null) return;
+            if (!CanTraverse(targetDecorator.TileData)) return;
             
             ErasePath();
-            CreatePath(_vanguardController.CurrentTile.Decorator, targetDecorator);
+            CreatePath(_playerTile.Decorator, targetDecorator);
+            if (CurrentPath == null) return;
 
-            // If CreatePath failed to find a valid path, currentPath will be null
-            if (currentPath == null)
-            {
-                return;
-            }
-
-            OnPathCreated?.Invoke(currentPath);
+            Publish(new PathCreatedEvent(CurrentPath));
         }
 
-        public void ErasePath(TileData data = null)
+        public void ErasePath()
         {
-            currentPath = null;
-            OnPathCleared?.Invoke();
+            CurrentPath = null;
+            Publish(new PathClearedEvent());
         }
         
         private void CreatePath(TileDecorator origin, TileDecorator target)
@@ -67,31 +65,20 @@ namespace Systems.Grid.Pathfinding
                 return;
             }
 
-            currentPath = TilePathfinder.FindPath(origin.TileData, target.TileData, CanTraverse);
+            CurrentPath = TilePathfinder.FindPath(origin.TileData, target.TileData, CanTraverse);
 
-            if (currentPath == null || currentPath.Count == 0)
+            if (CurrentPath == null || CurrentPath.Count == 0)
             {
-                //TODO User feedback
                 Debug.Log("No path found.");
-                return;
             }
         }
 
         private bool CanTraverse(TileData tile)
         {
-            if (tile == null)
-            {
-                return false;
-            }
-
-            if (tile.type == TileType.Water || 
-                tile.type == TileType.Mountain || 
-                tile.type == TileType.Forest)
-            {
-                return false;
-            }
-
-            return true;
+            if (tile == null) return false;
+            return tile.type != Enumerations.TileType.Water && 
+                   tile.type != Enumerations.TileType.Mountain && 
+                   tile.type != Enumerations.TileType.Forest;
         }
     }
 }

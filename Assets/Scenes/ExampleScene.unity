@@ -634,6 +634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab1a76386e152eb01a552d987b53eb2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Systems.Grid.Pathfinding.PathVisualizer
+  logLevel: 1
   pathPrefab: {fileID: 1104603753107038638, guid: cb0c4d79f1941be68bbe6258b50ef9e8, type: 3}
   pathParent: {fileID: 237140873}
 --- !u!1 &276038710
@@ -1149,6 +1150,66 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 543539721}
   m_CullTransparentMesh: 1
+--- !u!1 &547430964
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 547430967}
+  - component: {fileID: 547430966}
+  - component: {fileID: 547430965}
+  m_Layer: 0
+  m_Name: Game
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &547430965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547430964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f5e299ed5b83a240a5480e4d3a9a6ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Coordinators.SettingsSyncHandler
+  logLevel: 1
+--- !u!114 &547430966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547430964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8c588ba0df94120b9317ed0697a3182, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Systems.Coordinators.GameFlowCoordinator
+  logLevel: 1
+  currentState: 0
+--- !u!4 &547430967
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 547430964}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 406.29495, y: 0, z: 391.90988}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &551376044
 GameObject:
   m_ObjectHideFlags: 0
@@ -1368,6 +1429,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cda962aefb99ab6fb8be4aa4b776187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Input.InputHandler
+  logLevel: 1
 --- !u!114 &583918625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3421,13 +3483,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1723073966}
-  - component: {fileID: 1723073973}
   - component: {fileID: 1723073972}
   - component: {fileID: 1723073968}
   - component: {fileID: 1723073970}
   - component: {fileID: 1723073971}
   m_Layer: 0
-  m_Name: Game
+  m_Name: World
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3477,7 +3538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d50099a27cfdd668eb2a34f80c171f10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Character.CharacterPathfinding
-  currentPath: []
+  logLevel: 1
 --- !u!114 &1723073971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3555,19 +3616,6 @@ MonoBehaviour:
       type: {class: WaterDepthAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
       data:
         debugLog: 0
---- !u!114 &1723073973
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1723073965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8c588ba0df94120b9317ed0697a3182, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Systems.Coordinators.GameFlowCoordinator
-  logLevel: 1
 --- !u!1 &1778644301
 GameObject:
   m_ObjectHideFlags: 0
@@ -3854,6 +3902,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399714fcf0f5898ed8af0c43234535fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Character.CharacterMover
+  logLevel: 1
   moveSpeed: 10
   rotationSpeed: 12
 --- !u!114 &1871277603
@@ -4016,4 +4065,5 @@ SceneRoots:
   - {fileID: 937940296}
   - {fileID: 583918622}
   - {fileID: 1507263552}
+  - {fileID: 547430967}
   - {fileID: 1723073966}

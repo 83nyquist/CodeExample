@@ -1,5 +1,5 @@
 using System;
-using Systems.Decoration.Components;
+using Data;
 using Systems.Grid.Passes.Abstraction;
 using UnityEngine;
 
@@ -22,14 +22,14 @@ namespace Systems.Grid.Passes.Generation
             }
         }
 
-        private TileType DetermineType(float elevation, float moisture)
+        private Enumerations.TileType DetermineType(float elevation, float moisture)
         {
-            if (elevation < waterThreshold) return TileType.Water;
-            if (elevation > mountainThreshold) return TileType.Mountain;
+            if (elevation < waterThreshold) return Enumerations.TileType.Water;
+            if (elevation > mountainThreshold) return Enumerations.TileType.Mountain;
             
             // Example: Simple split
-            if (moisture > 0.5f) return TileType.Forest;
-            return TileType.PrimaryGround;
+            if (moisture > 0.5f) return Enumerations.TileType.Forest;
+            return Enumerations.TileType.PrimaryGround;
         }
     }
 }

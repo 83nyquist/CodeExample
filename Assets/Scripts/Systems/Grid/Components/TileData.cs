@@ -1,5 +1,6 @@
 using System;
 using Core.Enumerations;
+using Data;
 using Systems.Decoration.Components;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace Systems.Grid.Components
         //Properties
         public float Elevation { get; set; }
         public float Moisture { get; set; }
-        public TileType type;
+        public Enumerations.TileType type;
         public bool IsDiscovered { get; set; }
         public bool IsInVision { get; set; }
         public int VariationIndex { get; set; } = -1;
@@ -33,9 +34,9 @@ namespace Systems.Grid.Components
         // public Vector3 WorldCoordinates => grid.AxialToWorld(X, Z);
         public Vector3Int CubeCoordinates => AxialToCube(x, z);
         
-        public bool IsWalkable => type != TileType.Water && 
-                                  type != TileType.Forest && 
-                                  type != TileType.Mountain;
+        public bool IsWalkable => type != Enumerations.TileType.Water && 
+                                  type != Enumerations.TileType.Forest && 
+                                  type != Enumerations.TileType.Mountain;
         
         public TileData(int q, int r)
         {

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Systems.Decoration.Components;
+using Data;
 using Systems.Grid.Components;
 using Systems.Grid.Passes.Abstraction;
 using UnityEngine;
@@ -22,13 +22,13 @@ namespace Systems.Grid.Passes.Alteration
             foreach (var tile in grid.Tiles.Values)
             {
                 // Only consider mountains that are already "Large" (Index 1)
-                if (tile.type != TileType.Mountain || tile.VariationIndex != 1) continue;
+                if (tile.type != Enumerations.TileType.Mountain || tile.VariationIndex != 1) continue;
 
                 bool surroundedByLarge = true;
                 foreach (var neighbour in tile.Neighbours)
                 {
                     // Must be surrounded by mountains that are at least Index 1
-                    if (neighbour == null || neighbour.type != TileType.Mountain || neighbour.VariationIndex < 1)
+                    if (neighbour == null || neighbour.type != Enumerations.TileType.Mountain || neighbour.VariationIndex < 1)
                     {
                         surroundedByLarge = false;
                         break;

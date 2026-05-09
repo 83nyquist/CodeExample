@@ -1,14 +1,11 @@
-using System;
 using System.Collections.Generic;
 using Character;
 using Coordinators;
 using Core.Components;
-using Systems.Decoration;
 using Systems.EventBus;
 using Systems.Grid;
 using Systems.Grid.Components;
 using Systems.Grid.Extensions;
-using Systems.Grid.Pathfinding;
 using UnityEngine;
 using Zenject;
 
@@ -16,88 +13,115 @@ namespace Vanguard
 {
     public class VanguardController : EventBusSubscriber
     {
-        [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
-        [Inject] private VanguardMover _vanguardMover;
-        [Inject] private AStarPathfinding _aStarPathfinding;
         [Inject] private AxialHexGrid _axialHexGrid;
-        [Inject] private WorldDecorator _worldDecorator;
-        
-        [Inject] private DiContainer _container;
-        
-        public event Action<CharacterAnimationEvents> OnAnimationEventsChanged;
+        private VanguardMover _vanguardMover;
 
         [SerializeField] private CharacterItem selectedLeader;
+
         private DestroyChildren _destroyChildren;
-        
         private TileData _currentTile;
-        public TileData CurrentTile => _currentTile;
+        private IReadOnlyDictionary<Vector2Int, TileData> _gridTiles;
+        private List<TileData> _latestPath;
+        private float _hexSize;
         private bool _isResetting;
-        
+
+        public TileData CurrentTile => _currentTile;
+
         private void Awake()
         {
-            Subscribe<WorldGenerationFinishedEvent>(OnGenerationComplete);
-            Subscribe<PlayerDestinationReachedEvent>(SetCurrentTile);
-            // _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
-            // _vanguardMover.OnDestinationReached += SetCurrentTile;
-
+            _vanguardMover = GetComponent<VanguardMover>();
             _destroyChildren = GetComponent<DestroyChildren>();
-            
+            DeSpawn();
+
+            Subscribe<WorldGenerationFinishedEvent>(OnGenerationFinished);
+            Subscribe<GridInitializationFinishedEvent>(OnGridInitialized);
+            Subscribe<PlayerDestinationReachedEvent>(OnDestinationReached);
+            Subscribe<RespawnRequest>(OnRespawnRequest);
+            Subscribe<CommanderSelectedRequest>(OnCharacterSelected);
+            Subscribe<GameStateChangedEvent>(OnGameStateChanged);
+            Subscribe<WorldCleanupEvent>(OnWorldCleanup);
+            Subscribe<PlayerMoveRequest>(OnMoveRequest);
+            Subscribe<PathCreatedEvent>(OnPathCreated);
+            Subscribe<PathClearedEvent>(OnPathCleared);
+        }
+
+        private void OnWorldCleanup(WorldCleanupEvent e)
+        {
+            Stop();
             DeSpawn();
         }
 
-        private void OnGenerationComplete(WorldGenerationFinishedEvent obj)
+        private void OnGridInitialized(GridInitializationFinishedEvent e)
         {
-            Stop();
-            TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
-            ReturnToOrigin(origin);
+            _gridTiles = e.Tiles;
+            _hexSize = e.HexSize;
         }
 
-        public void SetLeader(CharacterItem item)
+        private void OnGenerationFinished(WorldGenerationFinishedEvent e)
         {
-            selectedLeader = item;
+            Stop();
+            if (_gridTiles != null && _gridTiles.TryGetValue(Vector2Int.zero, out var origin))
+            {
+                ReturnToOrigin(origin);
+            }
+        }
+
+        private void OnGameStateChanged(GameStateChangedEvent e)
+        {
+            if (e.State == GameState.Playing) Spawn();
+            else if (e.State == GameState.Initializing)
+            {
+                Stop();
+                DeSpawn();
+            }
+        }
+
+        private void OnCharacterSelected(CommanderSelectedRequest e) => selectedLeader = e.Character;
+        private void OnRespawnRequest(RespawnRequest e) => Respawn();
+        private void OnDestinationReached(PlayerDestinationReachedEvent e) => _currentTile = e.Tile;
+        private void OnPathCreated(PathCreatedEvent e) => _latestPath = e.Path;
+        private void OnPathCleared(PathClearedEvent e) => _latestPath = null;
+
+        private void OnMoveRequest(PlayerMoveRequest e)
+        {
+            if (_latestPath != null) _vanguardMover.TraversePath(_latestPath);
         }
 
         public void Spawn()
         {
+            if (selectedLeader == null) return;
+            
+            // Defensive check: Ensure we don't double-spawn if DeSpawn hasn't finished yet
+            foreach (Transform child in transform) { Destroy(child.gameObject); }
+
             GameObject go = Instantiate(selectedLeader.gamePrefab, transform);
             _vanguardMover.Animator = go.GetComponent<Animator>();
-            OnAnimationEventsChanged?.Invoke(go.GetComponent<CharacterAnimationEvents>());
+            Publish(new CharacterAnimationEventsChangedEvent(go.GetComponent<CharacterAnimationEvents>()));
         }
 
         public void DeSpawn()
         {
             _vanguardMover.Animator = null;
-            OnAnimationEventsChanged?.Invoke(null);
+            Publish(new CharacterAnimationEventsChangedEvent(null));
             _destroyChildren.Activate();
         }
 
         public void Respawn()
         {
-            _isResetting = true;
             Stop();
-            TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
-            ReturnToOrigin(origin);
-            _worldDecorator.UpdateDecorations(_currentTile);
-            _isResetting = false;
+            if (_gridTiles != null && _gridTiles.TryGetValue(Vector2Int.zero, out var origin))
+                ReturnToOrigin(origin);
         }
 
-        public void Stop()
-        {
-            _vanguardMover.StopMoving();
-            _aStarPathfinding.ErasePath();
-        }
+        public void Stop() => _vanguardMover.StopMoving();
 
         private void ReturnToOrigin(TileData origin)
         {
             _currentTile = origin;
-            transform.position = _axialHexGrid.AxialToWorld(_currentTile.X, _currentTile.Z);
-        }
-
-        private void SetCurrentTile(PlayerDestinationReachedEvent obj)
-        {
-            if (_isResetting) return;
-            
-            _currentTile = obj.Tile;
+            Vector3 pos = _axialHexGrid.AxialToWorld(origin.X, origin.Z);
+            pos.y = origin.Elevation;
+            transform.position = pos;
+            Publish(new PlayerMovedEvent(_currentTile));
         }
     }
 }

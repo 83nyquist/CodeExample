@@ -2,13 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Input;
+using Systems.EventBus;
 using Systems.Grid.Components;
 using UnityEngine;
 using Zenject;
 
 namespace Vanguard
 {
-    public class VanguardMover : MonoBehaviour
+    public class VanguardMover : EventBusSubscriber
     {
         [Inject] private InputHandler _inputHandler;
         [Inject] private VanguardController _vanguardController;

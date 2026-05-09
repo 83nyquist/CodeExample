@@ -17,33 +17,14 @@ namespace Data
             set
             {
                 masterVolume = Mathf.Clamp(value, 0, 100);
-                Save();
+                PlayerPrefs.SetInt(MasterVolumeKey, masterVolume);
+                PlayerPrefs.Save();
             }
         }
 
-        private void OnEnable()
+        public void Load()
         {
-            // Load from PlayerPrefs when the asset is initialized
             masterVolume = PlayerPrefs.GetInt(MasterVolumeKey, 100);
-            ApplySettings();
-        }
-
-        private void OnValidate()
-        {
-            // Save and apply changes immediately when edited in Inspector
-            Save();
-        }
-
-        private void Save()
-        {
-            PlayerPrefs.SetInt(MasterVolumeKey, masterVolume);
-            PlayerPrefs.Save();
-            ApplySettings();
-        }
-
-        private void ApplySettings()
-        {
-            AudioListener.volume = masterVolume / 100f;
         }
     }
 }
