@@ -154,7 +154,7 @@ namespace Systems.Decoration
                 Debug.LogWarning("[DecoratorSystem] TileSet not assigned. Initial work estimate is 0. Please assign a TileSet ScriptableObject in the Inspector.", this);
                 return 0;
             }
-            int radius = shroudMode == ShroudMode.DiscoveryBased ? _playerSettings.visionRadius : secondaryShroudRadius;
+            int radius = shroudMode == ShroudMode.DiscoveryBased ? _playerSettings.VisionRadius : secondaryShroudRadius;
             return 3 * radius * radius + 3 * radius + 1;
         }
         

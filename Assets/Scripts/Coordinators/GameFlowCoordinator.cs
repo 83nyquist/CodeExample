@@ -1,5 +1,7 @@
+using System.Collections.Generic;
+using Data;
 using Systems.EventBus;
-using Vanguard;
+using UnityEngine;
 using Zenject;
 
 namespace Coordinators
@@ -7,68 +9,71 @@ namespace Coordinators
     public enum GameState
     {
         Initializing,
-        CharacterSelection,
         Playing
     }
 
     public class GameFlowCoordinator : EventBusSubscriber
     {
-        [Inject] private VanguardController _vanguardController;
-        [Inject] private WorldGeneratorCoordinator _worldGenerator;
+        [Inject] private SettingsSyncHandler _settingsSyncHandler;
+        [Inject] private PlayerSettings _playerSettings;
         
-        private GameState _currentState;
-        private bool _isWorldReady;
-        private bool _isCharacterSelected;
+        [Header("Debugging")]
+        [SerializeField] private GameState currentState;
+
+        private readonly HashSet<string> _activeInitBlockers = new();
 
         private void Start()
         {
-            Subscribe<CommanderSelectedRequest>(SelectCharacter);
-            Subscribe<WorldGenerationFinishedEvent>(HandleWorldReady);
-            SetState(GameState.Initializing);
-        }
-
-        public void ResetWorldState()
-        {
-            _isWorldReady = false;
-            _vanguardController.DeSpawn();
+            Subscribe<GameFlowInitLockRequest>(HandleInitLockRequest);
+            Subscribe<GameFlowInitUnlockRequest>(HandleInitUnlockRequest);
+            Subscribe<GenerateWorldRequest>(HandleGenerateWorldRequest);
+            
+            _settingsSyncHandler.Initialize();
             
             SetState(GameState.Initializing);
         }
 
-        public void SelectCharacter(CommanderSelectedRequest obj)
+        private void HandleGenerateWorldRequest(GenerateWorldRequest obj)
         {
-            _vanguardController.SetLeader(obj.Character);
-            _isCharacterSelected = true;
-            CheckTransitionToGameplay();
+            SetState(GameState.Initializing);
         }
 
-        private void HandleWorldReady(WorldGenerationFinishedEvent e)
+        protected override void OnDestroy()
         {
-            _isWorldReady = true;
+            // Release any input locks held by this coordinator (custom cleanup)
+            Publish(new InputLockRequest(this, false));
             
-            if (!_isCharacterSelected)
-            {
-                SetState(GameState.CharacterSelection);
-            }
-            
-            CheckTransitionToGameplay();
+            // Base class handles unsubscription automatically
+            base.OnDestroy();
         }
 
-        private void CheckTransitionToGameplay()
+        private void HandleInitLockRequest(GameFlowInitLockRequest e)
         {
-            if (_isWorldReady && _isCharacterSelected)
+            _activeInitBlockers.Add(e.BlockerId);
+            EvaluateState();
+        }
+
+        private void HandleInitUnlockRequest(GameFlowInitUnlockRequest e)
+        {
+            _activeInitBlockers.Remove(e.BlockerId);
+            EvaluateState();
+        }
+
+        private void EvaluateState()
+        {
+            // Determine the current state based on high-priority blockers
+            if (_activeInitBlockers.Count <= 0)
             {
-                _isWorldReady = false; 
-                _isCharacterSelected = false;
-                _vanguardController.Spawn();
                 SetState(GameState.Playing);
             }
         }
 
         private void SetState(GameState newState)
         {
-            _currentState = newState;
-            Publish(new GameStateChangedEvent(_currentState));
+            currentState = newState;
+            // Lock input in any state other than Playing
+            Publish(new InputLockRequest(this, newState != GameState.Playing));
+            Publish(new GameStateChangedEvent(newState));
         }
     }
 }

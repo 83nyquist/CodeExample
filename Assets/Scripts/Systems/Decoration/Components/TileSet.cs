@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Data;
 using UnityEngine;
 
 namespace Systems.Decoration.Components
@@ -10,14 +11,14 @@ namespace Systems.Decoration.Components
         [Serializable]
         public struct TileTypeGroup
         {
-            public TileType type;
+            public Enumerations.TileType type;
             public List<GameObject> prefabs;
             public GameObject shroudedPrefab;
         }
 
         [SerializeField] private List<TileTypeGroup> tileGroups = new List<TileTypeGroup>();
 
-        public GameObject GetTilePrefab(TileType type, int index)
+        public GameObject GetTilePrefab(Enumerations.TileType type, int index)
         {
             var group = tileGroups.Find(g => g.type == type);
             if (group.prefabs == null || group.prefabs.Count == 0) return null;
@@ -27,25 +28,16 @@ namespace Systems.Decoration.Components
             return group.prefabs[safeIndex];
         }
 
-        public GameObject GetShroudedPrefab(TileType type)
+        public GameObject GetShroudedPrefab(Enumerations.TileType type)
         {
             var group = tileGroups.Find(g => g.type == type);
             return group.shroudedPrefab;
         }
 
-        public int GetVariationCount(TileType type)
+        public int GetVariationCount(Enumerations.TileType type)
         {
             var group = tileGroups.Find(g => g.type == type);
             return group.prefabs?.Count ?? 0;
         }
-    }
-    
-    public enum TileType
-    {
-        PrimaryGround,
-        SecondaryGround,
-        Water,
-        Forest,
-        Mountain
     }
 }

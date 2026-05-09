@@ -1,5 +1,5 @@
 using System;
-using Systems.Decoration.Components;
+using Data;
 using Systems.Grid.Passes.Abstraction;
 using UnityEngine;
 
@@ -15,12 +15,12 @@ namespace Systems.Grid.Passes.Alteration
         {
             foreach (var tile in grid.Tiles.Values)
             {
-                if (tile.type != TileType.Mountain) continue;
+                if (tile.type != Enumerations.TileType.Mountain) continue;
 
                 bool surroundedByMountains = true;
                 foreach (var neighbour in tile.Neighbours)
                 {
-                    if (neighbour == null || neighbour.type != TileType.Mountain)
+                    if (neighbour == null || neighbour.type != Enumerations.TileType.Mountain)
                     {
                         surroundedByMountains = false;
                         break;

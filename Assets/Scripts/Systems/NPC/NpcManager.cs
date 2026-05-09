@@ -131,7 +131,7 @@ namespace NPC
 
         private IEnumerator SpawnNpcsRoutine(IReadOnlyDictionary<Vector2Int, TileData> tiles)
         {
-            int count = _playerSettings.populationSize;
+            int count = _playerSettings.PopulationSize;
             _simulation.InitializeData(count);
             _visuals.PrepareRegistry(count);
 

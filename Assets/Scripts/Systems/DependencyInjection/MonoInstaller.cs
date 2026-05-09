@@ -42,6 +42,8 @@ namespace Systems.DependencyInjection
             Container.Bind<LoadingPanelController>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<AudioManager>().FromComponentInHierarchy().AsCached().NonLazy();
+            
+            Container.Bind<SettingsSyncHandler>().FromComponentInHierarchy().AsCached().NonLazy();
         }
     }
 }

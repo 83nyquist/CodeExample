@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Data;
 using Systems.Grid;
 using Systems.Grid.Components;
 using UnityEngine;
@@ -125,7 +126,7 @@ namespace Systems.Decoration.Components
         /// </summary>
         public void PreWarmPools(int preWarmCount = 5)
         {
-            foreach (TileType type in System.Enum.GetValues(typeof(TileType)))
+            foreach (Enumerations.TileType type in System.Enum.GetValues(typeof(Enumerations.TileType)))
             {
                 // Pre-warm variations
                 int variations = tileSet.GetVariationCount(type);

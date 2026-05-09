@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Systems.Decoration.Components;
+using Systems.EventBus;
 using Systems.Grid.Pathfinding;
 using UnityEngine;
 using Vanguard;
@@ -8,7 +9,7 @@ using Zenject;
 
 namespace Input
 {
-    public class InputHandler : MonoBehaviour
+    public class InputHandler : EventBusSubscriber
     {
         [Inject] private MouseInput _mouseInput;
         [Inject] private AStarPathfinding _aStarPathfinding;
@@ -25,11 +26,13 @@ namespace Input
             _mouseInput.OnTileDecoratorDrag += DrawPath;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             _mouseInput.OnTileDecoratorPointerUp -= MoveTo;
             _mouseInput.OnTileDecoratorPointerDown -= DrawPath;
             _mouseInput.OnTileDecoratorDrag -= DrawPath;
+            
+            base.OnDestroy();
         }
         
         private void MoveTo(TileDecorator decorator)
@@ -39,7 +42,8 @@ namespace Input
                 return;
             }
             
-            _vanguardMover.TraversePath(_aStarPathfinding.currentPath);
+            _vanguardMover.TraversePath(_aStarPathfinding.CurrentPath);
+            Publish(new PlayerMoveRequest());
         }
         
         private void DrawPath(TileDecorator decorator)

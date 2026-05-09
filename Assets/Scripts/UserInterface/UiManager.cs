@@ -23,7 +23,6 @@ namespace UserInterface
             switch (obj.State)
             {
                 case GameState.Initializing:
-                case GameState.CharacterSelection:
                     ShowLoadingScreen();
                     break;
                 case GameState.Playing:

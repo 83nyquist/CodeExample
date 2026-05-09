@@ -88,7 +88,7 @@ namespace Coordinators
 
         private IEnumerator WorldGenerationFlow()
         {
-            int radius = _playerSettings.gridRadius;
+            int radius = _playerSettings.GridRadius;
             _tilesInGrid = CalculateTotalTiles(radius);
             _currentSeed = useRandomSeed ? UnityEngine.Random.Range(1, 999999) : customSeed;
             
@@ -104,7 +104,7 @@ namespace Coordinators
                 if (pass.pass != null) totalTileWorkEstimate += pass.pass.EstimateWorkUnits(_tilesInGrid);
             
             // Ensure we capture the population size here to avoid issues if the slider is moved during generation
-            int npcWorkLoad = _playerSettings.populationSize;
+            int npcWorkLoad = _playerSettings.PopulationSize;
             
             Publish(new GenerationProgressInitializedEvent(totalTileWorkEstimate + _worldDecorator.GetInitialWorkEstimate(), npcWorkLoad));
 
