@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Character;
 using Coordinators;
@@ -95,7 +94,7 @@ namespace UserInterface.UGUI
         
         private void OnGameStateChangedEvent(GameStateChangedEvent obj)
         {
-            if (obj.State == GameState.Initializing)
+            if (obj.State == GameState.Loading)
             {
                 Publish(new GameFlowInitLockRequest(ToString()));
             }

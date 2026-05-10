@@ -22,7 +22,7 @@ namespace Systems.DependencyInjection
             Container.Bind<WorldDecorator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<DecoratorFactory>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<NpcManager>().FromComponentInHierarchy().AsCached().NonLazy();
-            Container.Bind<GenerationProgressTracker>().FromComponentInHierarchy().AsCached().NonLazy();
+            // Container.Bind<GenerationProgressTracker>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<WorldGeneratorCoordinator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<TileDecoratorAnimator>().FromComponentInHierarchy().AsCached().NonLazy();
             
@@ -30,9 +30,9 @@ namespace Systems.DependencyInjection
             Container.Bind<AStarPathfinding>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<VanguardMover>().FromComponentInHierarchy().AsCached().NonLazy();
             
-            Container.Bind<MouseInput>().FromComponentInHierarchy().AsCached().NonLazy();
-            Container.Bind<InputHandler>().FromComponentInHierarchy().AsCached().NonLazy();
-            Container.Bind<TileRaycaster>().FromComponentInHierarchy().AsCached().NonLazy();
+            // Container.Bind<MouseInput>().FromComponentInHierarchy().AsCached().NonLazy();
+            // Container.Bind<InputHandler>().FromComponentInHierarchy().AsCached().NonLazy();
+            // Container.Bind<TileRaycaster>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<InputUIBlocker>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<UiManager>().FromComponentInHierarchy().AsCached().NonLazy();
@@ -44,6 +44,7 @@ namespace Systems.DependencyInjection
             Container.Bind<AudioManager>().FromComponentInHierarchy().AsCached().NonLazy();
             
             Container.Bind<SettingsSyncHandler>().FromComponentInHierarchy().AsCached().NonLazy();
+            // Container.Bind<InputSystem>().FromComponentInHierarchy().AsCached().NonLazy();
         }
     }
 }

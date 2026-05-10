@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Coordinators;
 using Data;
-using Input;
 using Systems.Decoration.Components;
 using Systems.Grid;
 using Systems.Grid.Components;
@@ -28,7 +27,6 @@ namespace Systems.Decoration
         [Inject] private VanguardMover _vanguardMover;
         [Inject] private NpcManager _npcManager;
         [Inject] private PlayerSettings _playerSettings;
-        [Inject] private InputHandler _inputHandler;
 
         [Header("Performance")]
         [SerializeField] private float maxMsPerFrame = 3f; // Time budget for spawning visuals
@@ -45,14 +43,11 @@ namespace Systems.Decoration
         private HashSet<TileData> _activeDecorators = new();
         private HashSet<TileData> _currentVisionSet = new();
         private TileData _lastOrigin;
-        private InputLock _inputLock;
 
         private void Start()
         {
             _scheduler = new DecorationScheduler(_decoratorFactory, maxMsPerFrame);
             _scheduler.OnProcessingFinished += ReleaseInputLock;
-
-            _inputLock = _inputHandler.RegisterInputLock(this);
             
             InitializeStrategy();
             
@@ -126,7 +121,7 @@ namespace Systems.Decoration
 
         private void ExecuteStateTransition(HashSet<TileData> nextActiveSet, List<TileData> toShow, List<TileData> toHide)
         {
-            _inputLock.IsLocked = true;
+            Publish(new InputLockRequest(ToString()));
             _activeDecorators = nextActiveSet;
             
             StartCoroutine(_scheduler.ProcessQueues(toShow, toHide));
@@ -141,7 +136,7 @@ namespace Systems.Decoration
         private void ReleaseInputLock()
         {
             Publish(new WorldVisualsReadyEvent());
-            _inputLock.IsLocked = false;
+            Publish(new InputUnlockRequest(ToString()));
         }
         
         public int GetInitialWorkEstimate()

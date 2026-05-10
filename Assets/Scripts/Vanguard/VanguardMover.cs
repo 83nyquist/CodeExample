@@ -1,39 +1,24 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Input;
 using Systems.EventBus;
 using Systems.Grid.Components;
 using UnityEngine;
-using Zenject;
 
 namespace Vanguard
 {
     public class VanguardMover : EventBusSubscriber
     {
-        [Inject] private InputHandler _inputHandler;
-        [Inject] private VanguardController _vanguardController;
-     
         private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
         [SerializeField] private float moveSpeed = 4f;
         [SerializeField] private float rotationSpeed = 12f;
 
         public Animator Animator { get; set; }
-        public event Action<TileData> OnDestinationReached;
-        public event Action<TileData> OnPathNodeReached;
     
         private TileData _currentTile;
-        private InputLock _inputLock;
         private Coroutine _moveCoroutine;
-    
+
         public TileData CurrentTile => _currentTile;
-        
-        
-        private void Awake()
-        {
-            _inputLock = _inputHandler.RegisterInputLock(this);
-        }
 
         public void TraversePath(List<TileData> path)
         {
@@ -79,7 +64,7 @@ namespace Vanguard
             SetIsMoving(false);
             _moveCoroutine = null;
 
-            OnDestinationReached?.Invoke(_currentTile);
+            EventBusSystem.Publish(new PlayerDestinationReachedEvent(_currentTile));
         }
 
         private void FaceDestination(Vector3 destination)
@@ -122,13 +107,21 @@ namespace Vanguard
                 yield return null;
             }
             
-            OnPathNodeReached?.Invoke(tile);
+            Publish(new PlayerMovedEvent(tile));
             transform.position = destination;
         }
 
         private void SetIsMoving(bool isMoving)
         {
-            _inputLock.IsLocked = isMoving;
+            if (isMoving)
+            {
+                Publish(new InputLockRequest(ToString()));
+            }
+            else
+            {
+                Publish(new InputUnlockRequest(ToString()));
+            }
+            
             if (Animator != null)
             {
                 Animator.SetBool(IsMoving, isMoving);

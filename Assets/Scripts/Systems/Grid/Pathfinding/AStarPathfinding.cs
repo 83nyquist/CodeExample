@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Data;
 using Systems.Decoration.Components;
@@ -14,9 +13,6 @@ namespace Systems.Grid.Pathfinding
     {
         [Inject] private VanguardController _vanguardController;
         [Inject] private VanguardMover _vanguardMover;
-
-        // public event Action<List<TileData>> OnPathCreated;
-        // public event Action OnPathCleared;
 
         public List<TileData> CurrentPath { get; private set; }
         private TileData _playerTile;

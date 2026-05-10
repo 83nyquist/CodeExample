@@ -16,13 +16,16 @@ namespace UserInterface
         private void Start()
         {
             Subscribe<GameStateChangedEvent>(HandleStateChange);
+            
+            //Handle eventual race conditions
+            ShowLoadingScreen();
         }
 
         private void HandleStateChange(GameStateChangedEvent obj)
         {
             switch (obj.State)
             {
-                case GameState.Initializing:
+                case GameState.Loading:
                     ShowLoadingScreen();
                     break;
                 case GameState.Playing:
@@ -37,7 +40,7 @@ namespace UserInterface
             _uiController.SetVisible(true);
         }
 
-        public void ShowLoadingScreen()
+        private void ShowLoadingScreen()
         {
             _loadingPanelController.SetVisible(true);
             _uiController.SetVisible(false);

@@ -23,7 +23,6 @@ namespace NPC
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldDecorator _worldDecorator;
         [Inject] private PlayerSettings _playerSettings;
-        [Inject] private GenerationProgressTracker _progressTracker;
         
         [Header("Simulation Settings")]
         [SerializeField] private float minMoveInterval = 1f;
