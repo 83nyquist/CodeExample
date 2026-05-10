@@ -4,12 +4,12 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Systems.NPC.Structs
+namespace Systems.NonPlayerCharacters.Structs
 {
     [BurstCompile]
     public struct NpcJob : IJobParallelFor
     {
-        public NativeArray<NpcData> NPCs;
+        public NativeArray<NpcData> NpCs;
         public float DeltaTime;
         public float MinInterval;
         public float MaxInterval;
@@ -18,14 +18,15 @@ namespace Systems.NPC.Structs
         [ReadOnly] public NativeHexGrid Grid;
         [ReadOnly] public NativeHashSet<int2> VisibleTiles;  // Tiles within vision radius
         
+        /// <summary>
+        /// Executes the NPC simulation for a single index, handling visibility and movement.
+        /// </summary>
         public void Execute(int index)
         {
-            var npc = NPCs[index];
+            var npc = NpCs[index];
             
-            // Check visibility based on whether NPC position is in visible tiles set
             npc.IsVisible = VisibleTiles.Contains(npc.Position);
             
-            // Timer and movement logic (always runs, even when not visible)
             npc.Timer -= DeltaTime;
             
             if (npc.Timer <= 0f)
@@ -38,29 +39,30 @@ namespace Systems.NPC.Structs
                 {
                     npc.PreviousPosition = npc.Position;
                     npc.Position = newPos;
-                    npc.IsMoving = true;  // Start moving
+                    npc.IsMoving = true;
                 }
                 else
                 {
-                    npc.IsMoving = false; // Couldn't move
+                    npc.IsMoving = false;
                 }
             }
             else
             {
-                // Check if arrived at destination
                 if (npc.IsMoving && npc.Position.Equals(npc.PreviousPosition) == false)
                 {
-                    // Still moving, keep IsMoving true
                 }
                 else
                 {
-                    npc.IsMoving = false; // Not moving this frame
+                    npc.IsMoving = false;
                 }
             }
             
-            NPCs[index] = npc;
+            NpCs[index] = npc;
         }
         
+        /// <summary>
+        /// Finds a random adjacent walkable tile for the NPC to move to.
+        /// </summary>
         private int2 GetRandomWalkableNeighbor(int2 pos, int seed)
         {
             int startDir = (int)(GetRandom((uint)seed) % 6);
@@ -79,6 +81,9 @@ namespace Systems.NPC.Structs
             return pos;
         }
         
+        /// <summary>
+        /// Calculates the neighbor coordinate based on hex direction.
+        /// </summary>
         private int2 GetNeighbor(int2 pos, int direction)
         {
             switch (direction)
@@ -93,21 +98,24 @@ namespace Systems.NPC.Structs
             }
         }
         
+        /// <summary>
+        /// Calculates a world-space rotation angle between two hex coordinates.
+        /// </summary>
         private float GetRotationFromDirection(int2 from, int2 to)
         {
             int2 delta = new int2(to.x - from.x, to.y - from.y);
     
-            // Axial to world coordinates
             float worldX = delta.x + delta.y * 0.5f;
             float worldZ = delta.y * 0.8660254f;
     
-            // Calculate angle
             float angle = Mathf.Atan2(worldZ, worldX) * Mathf.Rad2Deg;
     
-            // Return normalized angle (0-360)
             return (angle + 360f) % 360f;
         }
         
+        /// <summary>
+        /// Determines if a specific hex coordinate is valid and walkable.
+        /// </summary>
         private bool IsWalkable(int2 coord)
         {
             if (!Grid.PositionToIndex.ContainsKey(coord))
@@ -117,6 +125,9 @@ namespace Systems.NPC.Structs
             return Grid.Tiles[idx].IsWalkable;
         }
         
+        /// <summary>
+        /// Generates a pseudo-random unsigned integer based on a seed and offset.
+        /// </summary>
         private uint GetRandom(uint offset)
         {
             uint state = RandomSeed + offset;

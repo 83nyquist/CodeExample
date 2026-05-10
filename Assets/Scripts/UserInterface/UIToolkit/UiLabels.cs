@@ -1,9 +1,8 @@
 using Coordinators;
-using NPC;
 using Systems.Decoration;
 using Systems.EventBus;
 using Systems.Grid;
-using Systems.Grid.Components;
+using Systems.NonPlayerCharacters;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Vanguard;
@@ -27,14 +26,14 @@ namespace UserInterface.UIToolkit
         private Label _lblVisibleTiles;
         private Label _lblTotalTiles;
         
+        /// <summary>
+        /// Hooks into system events and queries the root visual element for label references.
+        /// </summary>
         private void Start()
         {
             Subscribe<GridInitializationFinishedEvent>(OnGenerationComplete);
             Subscribe<PlayerDestinationReachedEvent>(OnDestinationReached);
             Subscribe<NpcVisibleAgentsCountChangedEvent>(OnVisibleAgentsCountChanged);
-            // _worldGeneratorCoordinator.OnGenerationComplete += OnGenerationComplete;
-            // _vanguardMover.OnDestinationReached += OnDestinationReached;
-            // _npcManager.OnVisibleAgentsCountChanged += OnVisibleAgentsCountChanged;
             
             _lblVisibleAgents = uiDocument.rootVisualElement.Q<Label>("VisibleAgents");
             _lblActiveAgents = uiDocument.rootVisualElement.Q<Label>("ActiveAgents");
@@ -42,21 +41,27 @@ namespace UserInterface.UIToolkit
             _lblTotalTiles = uiDocument.rootVisualElement.Q<Label>("TotalTiles");
         }
 
+        /// <summary> Refreshes static labels when generation completes. </summary>
         private void OnGenerationComplete(GridInitializationFinishedEvent obj)
         {
             UpdateStaticLabels();
         }
 
+        /// <summary> Refreshes static labels when the player moves. </summary>
         private void OnDestinationReached(PlayerDestinationReachedEvent obj)
         {
             UpdateStaticLabels();
         }
 
+        /// <summary> Updates the visible agent count label. </summary>
         private void OnVisibleAgentsCountChanged(NpcVisibleAgentsCountChangedEvent obj)
         {
             _lblVisibleAgents.text = $"Visible Agents: {obj.VisibleCount}";
         }
 
+        /// <summary>
+        /// Pulls current counts from the NPC and Grid systems to update static UI text.
+        /// </summary>
         public void UpdateStaticLabels()
         {
             _lblActiveAgents.text = $"Active Agents: {_npcManager.NpcCount}";

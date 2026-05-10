@@ -22,6 +22,9 @@ namespace Systems.Decoration.Components
         
         public TileSet TileSet => tileSet;
         
+        /// <summary>
+        /// Sets up default parents and initializes the object pools.
+        /// </summary>
         private void Awake()
         {
             if (poolParent == null)
@@ -33,13 +36,16 @@ namespace Systems.Decoration.Components
             InitializePools();
         }
         
+        /// <summary>
+        /// Triggers the initial pre-warming of the pools.
+        /// </summary>
         private void InitializePools()
         {
             PreWarmPools(preWarm);
         }
         
         /// <summary>
-        /// Get a TileDecorator for the given TileData (creates from pool or instantiates new)
+        /// Retrieves a TileDecorator for the given TileData, either from a pool or by instantiating a new one.
         /// </summary>
         public TileDecorator GetTileDecorator(TileData tileData)
         {
@@ -47,7 +53,6 @@ namespace Systems.Decoration.Components
                 
             GameObject prefab = null;
             
-            // Choose prefab based on visibility state
             if (tileData.IsInVision)
                 prefab = tileSet.GetTilePrefab(tileData.type, tileData.VariationIndex);
             else if (tileData.IsDiscovered)
@@ -76,7 +81,7 @@ namespace Systems.Decoration.Components
         }
         
         /// <summary>
-        /// Return a TileDecorator to the pool
+        /// Returns a TileDecorator to its respective pool and clears its association with tile data.
         /// </summary>
         public void ReturnTileDecorator(TileDecorator decorator)
         {
@@ -88,7 +93,6 @@ namespace Systems.Decoration.Components
             if (tileData != null)
             {
                 _activeTiles.Remove(tileData);
-                // Clear reference to avoid stale data
                 tileData.SetDecorator(null);
             }
             decorator.Return(poolParent);
@@ -101,6 +105,9 @@ namespace Systems.Decoration.Components
             }
         }
         
+        /// <summary>
+        /// Instantiates a new decorator instance and ensures it has the required component.
+        /// </summary>
         private TileDecorator CreateNewDecorator(GameObject prefab)
         {
             GameObject instance = Instantiate(prefab, activeParent);
@@ -113,7 +120,6 @@ namespace Systems.Decoration.Components
         /// </summary>
         public void CleanupActiveDecorators()
         {
-            // Create a copy to safely iterate while the original collection is modified by ReturnTileDecorator
             var active = new List<TileDecorator>(_activeTiles.Values);
             foreach (var decorator in active)
             {
@@ -122,13 +128,12 @@ namespace Systems.Decoration.Components
         }
 
         /// <summary>
-        /// Pre-warm pools by creating instances upfront
+        /// Populates pools with a set number of instances for all tile types and variations.
         /// </summary>
         public void PreWarmPools(int preWarmCount = 5)
         {
             foreach (Enumerations.TileType type in System.Enum.GetValues(typeof(Enumerations.TileType)))
             {
-                // Pre-warm variations
                 int variations = tileSet.GetVariationCount(type);
                 for (int v = 0; v < variations; v++)
                 {
@@ -136,12 +141,14 @@ namespace Systems.Decoration.Components
                     WarmSpecificPrefab(prefab, preWarmCount);
                 }
 
-                // Pre-warm shrouded version
                 GameObject shroud = tileSet.GetShroudedPrefab(type);
                 if (shroud != null) WarmSpecificPrefab(shroud, preWarmCount);
             }
         }
 
+        /// <summary>
+        /// Instantiates and pools a specific number of instances for a given prefab.
+        /// </summary>
         private void WarmSpecificPrefab(GameObject prefab, int count)
         {
             if (prefab == null) return;

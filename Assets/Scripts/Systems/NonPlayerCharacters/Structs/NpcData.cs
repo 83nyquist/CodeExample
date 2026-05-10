@@ -1,6 +1,6 @@
 using Unity.Mathematics;
 
-namespace Systems.NPC.Structs
+namespace Systems.NonPlayerCharacters.Structs
 {
     public struct NpcData
     {

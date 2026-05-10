@@ -1,21 +1,29 @@
 using System.Collections.Generic;
-using Systems.NPC.Structs;
+using Systems.NonPlayerCharacters.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Systems.NPC.Components
+namespace Systems.NonPlayerCharacters.Components
 {
     public class NpcSpawner
     {
         private readonly float _maxMoveInterval;
         
+        /// <summary>
+        /// Initializes the spawner with the maximum movement interval for NPCs.
+        /// </summary>
         public NpcSpawner(float maxMoveInterval)
         {
             _maxMoveInterval = maxMoveInterval;
         }
         
+        /// <summary>
+        /// Spawns a specified number of NPCs at random walkable positions on the grid.
+        /// </summary>
+        /// <param name="count">Number of NPCs to spawn.</param>
+        /// <param name="grid">The grid used to validate walkable positions.</param>
         public NativeArray<NpcData> Spawn(int count, NativeHexGrid grid)
         {
             var npcs = new NativeArray<NpcData>(count, Allocator.Persistent);
@@ -41,10 +49,12 @@ namespace Systems.NPC.Components
                 };
             }
             
-            // Debug.Log($"Spawned {count} NPCs on {walkableTiles.Count} walkable tiles");
             return npcs;
         }
         
+        /// <summary>
+        /// Scans the native grid to find all coordinates that are marked as walkable.
+        /// </summary>
         private List<int2> GetWalkableTiles(NativeHexGrid grid)
         {
             var walkableTiles = new List<int2>();

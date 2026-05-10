@@ -5,7 +5,6 @@ namespace Systems.Decoration.Components
 {
     public class TileDecoratorAnimator : MonoBehaviour
     {
-        [Header("Settings")]
         [SerializeField] private Vector3 spawnOffset = new Vector3(0, -5, 0);
         [SerializeField] private float transitionDuration = 0.5f;
 
@@ -19,6 +18,9 @@ namespace Systems.Decoration.Components
         private readonly Dictionary<Transform, AnimationTask> _activeAnimations = new();
         private readonly List<Transform> _completedTasks = new();
 
+        /// <summary>
+        /// Starts a movement animation from an offset position to the target position.
+        /// </summary>
         public void Register(Transform targetTransform, Vector3 targetPosition)
         {
             if (transitionDuration <= 0 || !Application.isPlaying)
@@ -37,11 +39,17 @@ namespace Systems.Decoration.Components
             targetTransform.position = targetPosition + spawnOffset;
         }
 
+        /// <summary>
+        /// Immediately stops tracking an animation for a specific transform.
+        /// </summary>
         public void Cancel(Transform targetTransform)
         {
             _activeAnimations.Remove(targetTransform);
         }
 
+        /// <summary>
+        /// Updates all active animations and cleans up completed tasks.
+        /// </summary>
         private void Update()
         {
             if (_activeAnimations.Count == 0) return;

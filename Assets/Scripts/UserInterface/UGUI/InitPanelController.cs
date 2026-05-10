@@ -9,16 +9,18 @@ namespace UserInterface.UGUI
     {
         [Inject] private GameFlowCoordinator _gameFlowCoordinator;
         
+        /// <summary>
+        /// Simulates a bootloader delay before initiating the game flow.
+        /// </summary>
         private IEnumerator Start()
         {
-            // I stripped out all backend integrations for this example demo. the game flow is initiated after all the bootloader systems have been initialized.
-            // Here this is simulated by waiting one frame, letting the game systems setup their dependencies to primarily the event system,
-            // and then starting the game flow. 
             yield return null;
-
             Initialize();
         }
 
+        /// <summary>
+        /// Triggers the initialization of the game flow coordinator.
+        /// </summary>
         private void Initialize()
         {
             _gameFlowCoordinator.Initialize();

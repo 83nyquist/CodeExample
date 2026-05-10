@@ -11,6 +11,9 @@ namespace Systems.Grid.Passes.Alteration
         [Header("MountainSmoothingAlterationPass")]
         public override string PassName => "Mountain Smoothing Pass";
     
+        /// <summary>
+        /// Updates mountain tile variations based on whether they are completely surrounded by other mountains.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
             foreach (var tile in grid.Tiles.Values)

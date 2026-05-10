@@ -28,28 +28,22 @@ namespace Coordinators.Editor
             new WaterDepthAlterationPass(),
         };
 
+        /// <summary>
+        /// Renders the custom inspector UI for adding and removing passes.
+        /// </summary>
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-
             WorldGeneratorCoordinator coordinator = (WorldGeneratorCoordinator)target;
-
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Pipeline Templates", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox("Use these buttons to quickly add new passes to the generation or alteration lists.", MessageType.Info);
-
-            // ============================================
-            // GENERATION PASSES SECTION
-            // ============================================
-            
             EditorGUILayout.Space(5);
             
-            // Header with Remove All button
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Available Generation Passes", EditorStyles.miniBoldLabel);
             GUILayout.FlexibleSpace();
             
-            // Remove All Generation Passes button
             GUI.backgroundColor = new Color(0.9f, 0.3f, 0.3f);
             if (GUILayout.Button("Remove All", GUILayout.Width(80), GUILayout.Height(18)))
             {
@@ -57,9 +51,6 @@ namespace Coordinators.Editor
             }
             GUI.backgroundColor = Color.white;
             EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Space(2);
-            
             foreach (var pass in _generationTemplates)
             {
                 EditorGUILayout.BeginHorizontal();
@@ -89,18 +80,11 @@ namespace Coordinators.Editor
                 EditorGUILayout.EndHorizontal();
             }
 
-            // ============================================
-            // ALTERATION PASSES SECTION
-            // ============================================
-            
             EditorGUILayout.Space(10);
-            
-            // Header with Remove All button
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Available Alteration Passes", EditorStyles.miniBoldLabel);
             GUILayout.FlexibleSpace();
             
-            // Remove All Alteration Passes button
             GUI.backgroundColor = new Color(0.9f, 0.3f, 0.3f);
             if (GUILayout.Button("Remove All", GUILayout.Width(80), GUILayout.Height(18)))
             {
@@ -108,9 +92,6 @@ namespace Coordinators.Editor
             }
             GUI.backgroundColor = Color.white;
             EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Space(2);
-            
             foreach (var pass in _alterationTemplates)
             {
                 EditorGUILayout.BeginHorizontal();
@@ -143,6 +124,9 @@ namespace Coordinators.Editor
             EditorGUILayout.Space(10);
         }
 
+        /// <summary>
+        /// Displays a confirmation dialog for bulk removal.
+        /// </summary>
         private void ShowRemoveAllConfirmation(WorldGeneratorCoordinator coord, bool isGeneration)
         {
             string passType = isGeneration ? "generation" : "alteration";
@@ -159,17 +143,15 @@ namespace Coordinators.Editor
             }
         }
 
+        /// <summary>
+        /// Executes the removal of all passes from the selected list.
+        /// </summary>
         private void ExecuteRemoveAll(WorldGeneratorCoordinator coord, bool isGeneration)
         {
             Undo.RecordObject(coord, $"Remove All {(isGeneration ? "Generation" : "Alteration")} Passes");
             
             if (isGeneration)
             {
-                // Get all generation passes and remove them
-                var passesToRemove = new List<System.Type>();
-                
-                // This requires a method to get all passes or clearing the list
-                // You'll need to add a ClearGenerationPasses() method to WorldGeneratorCoordinator
                 coord.ClearGenerationPasses();
             }
             else

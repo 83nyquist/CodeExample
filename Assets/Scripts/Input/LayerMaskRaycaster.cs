@@ -11,6 +11,9 @@ namespace Input
         [SerializeField] private Camera inputCamera;
         [SerializeField] private LayerMask layerMaskToHit = ~0;
 
+        /// <summary>
+        /// Initializes the camera reference to the main camera if not set.
+        /// </summary>
         private void Awake()
         {
             if (inputCamera == null)
@@ -28,14 +31,12 @@ namespace Input
             
             Ray ray = inputCamera.ScreenPointToRay(mousePosition);
             
-            // Try 3D first
             if (Physics.Raycast(ray, out RaycastHit hit3D, Mathf.Infinity, layerMaskToHit))
             {
                 hitData = new RaycastHitData(hit3D.collider, hit3D.point, hit3D.collider.gameObject);
                 return true;
             }
             
-            // Try 2D
             Vector2 origin = new Vector2(ray.origin.x, ray.origin.y);
             Vector2 direction = new Vector2(ray.direction.x, ray.direction.y);
             RaycastHit2D hit2D = Physics2D.Raycast(origin, direction, Mathf.Infinity, layerMaskToHit);
@@ -82,6 +83,9 @@ namespace Input
         public readonly Vector3 Point;
         public readonly GameObject GameObject;
         
+        /// <summary>
+        /// Initializes hit data from a 3D raycast.
+        /// </summary>
         public RaycastHitData(Collider collider, Vector3 point, GameObject gameObject)
         {
             Collider3D = collider;
@@ -90,6 +94,9 @@ namespace Input
             GameObject = gameObject;
         }
         
+        /// <summary>
+        /// Initializes hit data from a 2D raycast.
+        /// </summary>
         public RaycastHitData(Collider2D collider, Vector2 point, GameObject gameObject)
         {
             Collider3D = null;

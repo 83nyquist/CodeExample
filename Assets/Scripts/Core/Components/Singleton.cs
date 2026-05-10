@@ -29,6 +29,10 @@ namespace Core.Components
 
         public bool persistent = false;
         private static T _instance;
+
+        /// <summary>
+        /// Returns the static instance of the singleton, creating it if it doesn't exist.
+        /// </summary>
         public static T Instance
         {
             get
@@ -47,6 +51,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Configures persistence and ensures only one instance exists.
+        /// </summary>
         public virtual void Awake()
         {
             if (persistent)

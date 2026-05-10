@@ -14,6 +14,9 @@ namespace Systems.Grid.Passes.Generation
 
         public override string PassName => "Standard Biome Logic Pass";
 
+        /// <summary>
+        /// Assigns tile types across the grid based on elevation and moisture thresholds.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
             foreach (var tile in grid.Tiles.Values)
@@ -22,12 +25,14 @@ namespace Systems.Grid.Passes.Generation
             }
         }
 
+        /// <summary>
+        /// Evaluates a specific tile type based on provided elevation and moisture values.
+        /// </summary>
         private Enumerations.TileType DetermineType(float elevation, float moisture)
         {
             if (elevation < waterThreshold) return Enumerations.TileType.Water;
             if (elevation > mountainThreshold) return Enumerations.TileType.Mountain;
             
-            // Example: Simple split
             if (moisture > 0.5f) return Enumerations.TileType.Forest;
             return Enumerations.TileType.PrimaryGround;
         }

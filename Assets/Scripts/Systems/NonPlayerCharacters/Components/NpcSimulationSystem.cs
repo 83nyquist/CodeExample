@@ -2,16 +2,13 @@ using System;
 using System.Collections.Generic;
 using Systems.Decoration;
 using Systems.Grid.Components;
-using Systems.NPC.Structs;
+using Systems.NonPlayerCharacters.Structs;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace Systems.NPC.Components
+namespace Systems.NonPlayerCharacters.Components
 {
-    /// <summary>
-    /// SRP: Manages Native memory and Job System lifecycle.
-    /// </summary>
     public class NpcSimulationSystem : IDisposable
     {
         private NativeHexGrid _nativeGrid;
@@ -27,29 +24,43 @@ namespace Systems.NPC.Components
         public int NpcCount => _npcs.IsCreated ? _npcs.Length : 0;
         public bool IsActive { get; private set; }
 
+        /// <summary>
+        /// Initializes the simulation system with timing constraints.
+        /// </summary>
         public NpcSimulationSystem(float min, float max)
         {
             _minInterval = min;
             _maxInterval = max;
         }
 
+        /// <summary>
+        /// Resets the simulation by disposing existing native data and rebuilding the grid from tile data.
+        /// </summary>
         public void Reset(IReadOnlyDictionary<Vector2Int, TileData> tiles, WorldDecorator decorator)
         {
             IsActive = false;
-            // Dispose is safe to call even if already disposed by CleanupActiveSimulation
             Dispose(); 
             
             _visionManager = new VisionManager(decorator, tiles.Count);
             _nativeGrid = new NativeGridBuilder().BuildFromTileData(tiles, Allocator.Persistent);
         }
 
+        /// <summary>
+        /// Allocates and populates the native NPC data array.
+        /// </summary>
         public void InitializeData(int count)
         {
             _npcs = new NpcSpawner(_maxInterval).Spawn(count, _nativeGrid);
         }
 
+        /// <summary>
+        /// Enables the simulation logic.
+        /// </summary>
         public void Activate() => IsActive = true;
 
+        /// <summary>
+        /// Manages the job lifecycle, completing previous frames and scheduling new movement/visibility jobs.
+        /// </summary>
         public void Update()
         {
             if (!IsActive) return;
@@ -64,7 +75,7 @@ namespace Systems.NPC.Components
             {
                 var job = new NpcJob
                 {
-                    NPCs = _npcs,
+                    NpCs = _npcs,
                     DeltaTime = Time.deltaTime,
                     MinInterval = _minInterval,
                     MaxInterval = _maxInterval,
@@ -78,6 +89,9 @@ namespace Systems.NPC.Components
             }
         }
 
+        /// <summary>
+        /// Forces the completion of the currently running NPC simulation job.
+        /// </summary>
         public void CompleteCurrentJob()
         {
             if (_isJobScheduled)
@@ -87,6 +101,9 @@ namespace Systems.NPC.Components
             }
         }
 
+        /// <summary>
+        /// Disposes of all native arrays and unmanaged memory used by the simulation.
+        /// </summary>
         public void Dispose()
         {
             CompleteCurrentJob();

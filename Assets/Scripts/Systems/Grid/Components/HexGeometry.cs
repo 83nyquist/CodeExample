@@ -6,6 +6,10 @@ namespace Systems.Grid.Components
 {
     public static class HexGeometry
     {
+        /// <summary>
+        /// Generates axial coordinates in a spiral pattern within a specified ring range.
+        /// </summary>
+        /// <returns>An enumerable of Vector2Int coordinates (Q, R).</returns>
         public static IEnumerable<Vector2Int> GetCoordinatesInRingRange(int startRadius, int endRadius)
         {
             if (startRadius == 0)
@@ -18,12 +22,12 @@ namespace Systems.Grid.Components
             {
                 Vector2Int current = new Vector2Int(0, -k);
                 Vector2Int[] directions = {
-                    new Vector2Int(1, 0),   // East
-                    new Vector2Int(0, 1),   // SouthEast
-                    new Vector2Int(-1, 1),  // SouthWest
-                    new Vector2Int(-1, 0),  // West
-                    new Vector2Int(0, -1),  // NorthWest
-                    new Vector2Int(1, -1)   // NorthEast
+                    new Vector2Int(1, 0),
+                    new Vector2Int(0, 1),
+                    new Vector2Int(-1, 1),
+                    new Vector2Int(-1, 0),
+                    new Vector2Int(0, -1),
+                    new Vector2Int(1, -1)
                 };
 
                 foreach (var dir in directions)
@@ -37,6 +41,9 @@ namespace Systems.Grid.Components
             }
         }
 
+        /// <summary>
+        /// Calculates the coordinate of a neighbor in a specific axial direction.
+        /// </summary>
         public static Vector2Int GetNeighborCoordinate(int x, int z, Directions.Axial direction)
         {
             return direction switch

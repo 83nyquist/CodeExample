@@ -85,18 +85,6 @@ namespace Systems.EventBus
         public NpcSimulationCompleteEvent(int totalAgents) => TotalAgents = totalAgents;
     }
 
-    /// <summary>Request sent to update which NPCs are currently considered "visible" by the simulation.</summary>
-    public class NpcVisibilityUpdateRequest : GameEvent
-    {
-        public HashSet<TileData> VisionSet { get; }
-        public bool ForceVisible { get; }
-        public NpcVisibilityUpdateRequest(HashSet<TileData> visionSet, bool force)
-        {
-            VisionSet = visionSet;
-            ForceVisible = force;
-        }
-    }
-
     /// <summary>Published when the number of NPCs currently rendered on screen changes.</summary>
     public class NpcVisibleAgentsCountChangedEvent : GameEvent
     {
@@ -232,18 +220,6 @@ namespace Systems.EventBus
     /// <summary>Request to clear the current navigation path.</summary>
     public class ClearPathRequest : GameEvent { }
     
-    /// <summary>Request to lock or unlock player input (e.g., during UI focus).</summary>
-    // public class InputLockRequest : GameEvent
-    // { 
-    //     public bool IsLocked { get; set; }
-    //
-    //     public InputLockRequest(object s, bool l) 
-    //     { 
-    //         Source = s?.ToString() ?? "Unknown";
-    //         IsLocked = l; 
-    //     } 
-    // }
-
     /// <summary>Request to add a blocker to the game flow, preventing state transitions to 'Playing'.</summary>
     public class GameFlowInitLockRequest : GameEvent
     {
@@ -315,36 +291,6 @@ namespace Systems.EventBus
         public Character.CharacterAnimationEvents Events; 
         public CharacterAnimationEventsChangedEvent(Character.CharacterAnimationEvents e) => Events = e; 
     }
-#endregion
-
-#region Mouse Input Events
-    /// <summary>Published when the mouse scroll wheel is moved.</summary>
-    // public class MouseScrollEvent : GameEvent
-    // { 
-    //     public float Delta; 
-    //     public MouseScrollEvent(float delta) => Delta = delta; 
-    // }
-    
-    /// <summary>Published when a tile is clicked down.</summary>
-    // public class TilePointerDownEvent : GameEvent
-    // { 
-    //     public TileDecorator Decorator { get; } 
-    //     public TilePointerDownEvent(TileDecorator d) => Decorator = d; 
-    // }
-    //
-    // /// <summary>Published when the mouse button is released over a tile.</summary>
-    // public class TilePointerUpEvent : GameEvent
-    // { 
-    //     public TileDecorator Decorator; 
-    //     public TilePointerUpEvent(TileDecorator d) => Decorator = d; 
-    // }
-    //
-    // /// <summary>Published when the mouse is dragged across a tile.</summary>
-    // public class TileDragEvent : GameEvent
-    // { 
-    //     public TileDecorator Decorator; 
-    //     public TileDragEvent(TileDecorator d) => Decorator = d; 
-    // }
 #endregion
 
 #region Core Event Bus Engine

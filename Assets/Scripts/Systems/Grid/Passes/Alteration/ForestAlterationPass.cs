@@ -13,9 +13,11 @@ namespace Systems.Grid.Passes.Alteration
 
         public override string PassName => "Forest Variation Pass";
 
+        /// <summary>
+        /// Randomizes visual variation and rotation for all forest tiles.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
-            // Seeded random ensures deterministic map generation
             System.Random random = new System.Random(seed);
             int forestTilesProcessed = 0;
 
@@ -26,8 +28,6 @@ namespace Systems.Grid.Passes.Alteration
                     tile.VariationIndex = random.Next(0, variationCount);
                     forestTilesProcessed++;
                     
-                    // To retain "pointy side up" orientation, we rotate in 60-degree increments.
-                    // Since the grid uses X and Z coordinates, we rotate around the Y-axis.
                     float yRotation = random.Next(0, 6) * 60f;
                     tile.Rotation = new Vector3(0, yRotation, 0);
                 }

@@ -16,12 +16,20 @@ namespace Systems.Decoration.Components
         public bool IsProcessing { get; private set; }
         public event Action OnProcessingFinished;
 
+        /// <summary>
+        /// Initializes the scheduler with a factory and a millisecond-per-frame budget.
+        /// </summary>
         public DecorationScheduler(DecoratorFactory factory, float maxMsPerFrame)
         {
             _factory = factory;
             _maxMsPerFrame = maxMsPerFrame;
         }
 
+        /// <summary>
+        /// Processes the showing and hiding of decorators over multiple frames to maintain performance.
+        /// </summary>
+        /// <param name="toShow">Tiles that need visual decorators.</param>
+        /// <param name="toHide">Tiles whose decorators should be returned to the pool.</param>
         public IEnumerator ProcessQueues(IEnumerable<TileData> toShow, IEnumerable<TileData> toHide)
         {
             IsProcessing = true;
@@ -34,7 +42,6 @@ namespace Systems.Decoration.Components
             {
                 float startTime = Time.realtimeSinceStartup;
 
-                // 1. Process Hides (Priority: Free up resources)
                 while (hideQueue.Count > 0)
                 {
                     if (Time.realtimeSinceStartup - startTime > budgetSeconds) break;
@@ -47,14 +54,12 @@ namespace Systems.Decoration.Components
                     }
                 }
 
-                // 2. Process Shows
                 while (showQueue.Count > 0)
                 {
                     if (Time.realtimeSinceStartup - startTime > budgetSeconds) break;
 
                     TileData data = showQueue.Dequeue();
                     
-                    // Defensive check: don't double-spawn if already active
                     if (data != null && !_activeDecorators.ContainsKey(data))
                     {
                         TileDecorator decorator = _factory.GetTileDecorator(data);

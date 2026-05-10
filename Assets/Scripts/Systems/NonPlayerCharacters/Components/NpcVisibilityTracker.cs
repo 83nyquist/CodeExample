@@ -2,23 +2,30 @@ using System;
 using System.Collections.Generic;
 using Systems.Grid;
 using Systems.Grid.Components;
-using Systems.NPC.Structs;
+using Systems.NonPlayerCharacters.Structs;
 using Unity.Collections;
 
-namespace Systems.NPC.Components
+namespace Systems.NonPlayerCharacters.Components
 {
-    /// <summary>
-    /// SRP: Handles visibility logic and event throttling.
-    /// </summary>
     public class NpcVisibilityTracker
     {
         private float _timer;
         private readonly float _interval;
         private int _lastCount = -1;
+
+        /// <summary>
+        /// Event triggered when the number of visible NPCs changes.
+        /// </summary>
         public event Action<int> OnCountChanged;
 
+        /// <summary>
+        /// Initializes the tracker with a specific update interval to throttle visibility calculations.
+        /// </summary>
         public NpcVisibilityTracker(float interval) => _interval = interval;
 
+        /// <summary>
+        /// Processes NPC data against the current vision set and triggers events if the visible count changes.
+        /// </summary>
         public void Process(NativeArray<NpcData> npcs, AxialHexGrid grid, HashSet<TileData> visionSet, float dt)
         {
             if (!npcs.IsCreated) return;
@@ -30,8 +37,6 @@ namespace Systems.NPC.Components
             int count = 0;
             for (int i = 0; i < npcs.Length; i++)
             {
-                // We check the grid for the tile at the NPC's position.
-                // If that tile is in the vision set, the NPC is logically visible.
                 var tile = grid.GetTile(npcs[i].Position.x, npcs[i].Position.y);
                 if (tile != null && visionSet.Contains(tile)) 
                     count++;

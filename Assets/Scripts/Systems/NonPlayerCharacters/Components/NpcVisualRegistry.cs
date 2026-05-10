@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using Systems.Grid.Components;
-using Systems.NPC.Structs;
+using Systems.NonPlayerCharacters.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Systems.NPC.Components
+namespace Systems.NonPlayerCharacters.Components
 {
     public class NpcVisualRegistry
     {
@@ -19,8 +19,11 @@ namespace Systems.NPC.Components
 
         private GameObject[] _visuals;
         private Animator[] _animators;
-        private Vector3[] _lastPositions;  // Track last position to detect movement
+        private Vector3[] _lastPositions;
         
+        /// <summary>
+        /// Initializes the registry with prefab and movement settings.
+        /// </summary>
         public NpcVisualRegistry(GameObject prefab, float moveSpeed, float rotationSpeed, Transform parent)
         {
             _prefab = prefab;
@@ -29,6 +32,9 @@ namespace Systems.NPC.Components
             _parent = parent;
         }
         
+        /// <summary>
+        /// Prepares internal arrays based on the total population size.
+        /// </summary>
         public void PrepareRegistry(int totalCount)
         {
             _visuals = new GameObject[totalCount];
@@ -36,6 +42,9 @@ namespace Systems.NPC.Components
             _lastPositions = new Vector3[totalCount];
         }
 
+        /// <summary>
+        /// Instantiates GameObjects for a specific range of NPCs and caches their components.
+        /// </summary>
         public void CreateVisualsInRange(NativeSlice<NpcData> npcSlice, int startIndex, System.Func<int2, Vector3> hexToWorld)
         {
             if (_visuals == null) return;
@@ -69,6 +78,9 @@ namespace Systems.NPC.Components
             }
         }
 
+        /// <summary>
+        /// Updates all active NPC GameObjects, handling position interpolation, rotation, and visibility.
+        /// </summary>
         public void UpdateVisuals(NativeArray<NpcData> npcs, System.Func<int2, Vector3> hexToWorld, float deltaTime)
         {
             for (int i = 0; i < _visuals.Length; i++)
@@ -77,14 +89,16 @@ namespace Systems.NPC.Components
                 
                 UpdatePositionAndRotation(i, npcs[i].Position, hexToWorld, deltaTime);
 
-                // Overriding data visibility with the world vision set + debug toggle
                 bool isVisible = _forceVisible || _visibleCoords.Contains(npcs[i].Position);
                 UpdateVisibility(i, isVisible);
 
-                UpdateAnimatorState(i);  // Update based on actual movement, not NpcData.IsMoving
+                UpdateAnimatorState(i);
             }
         }
         
+        /// <summary>
+        /// Interpolates the GameObject transform towards the target hex position.
+        /// </summary>
         private void UpdatePositionAndRotation(int index, int2 targetPosition, System.Func<int2, Vector3> hexToWorld, float deltaTime)
         {
             Vector3 targetPos = hexToWorld(targetPosition);
@@ -92,7 +106,6 @@ namespace Systems.NPC.Components
             
             if (Vector3.Distance(currentPos, targetPos) > 0.01f)
             {
-                // Moving
                 _visuals[index].transform.position = Vector3.MoveTowards(currentPos, targetPos, _moveSpeed * deltaTime);
                 
                 Vector3 moveDirection = (targetPos - currentPos).normalized;
@@ -107,42 +120,50 @@ namespace Systems.NPC.Components
             }
             else
             {
-                // Arrived at destination
                 _visuals[index].transform.position = targetPos;
             }
         }
         
+        /// <summary>
+        /// Sets the active state of the NPC GameObject based on visibility calculations.
+        /// </summary>
         private void UpdateVisibility(int index, bool isVisible)
         {
             if (_visuals[index].activeSelf != isVisible)
                 _visuals[index].SetActive(isVisible);
         }
         
+        /// <summary>
+        /// Updates the animator's "IsMoving" parameter based on delta movement.
+        /// </summary>
         private void UpdateAnimatorState(int index)
         {
             if (_animators[index] == null) return;
             
-            // Check if position changed since last frame
             Vector3 currentPos = _visuals[index].transform.position;
             bool isMoving = Vector3.Distance(currentPos, _lastPositions[index]) > 0.001f;
             
-            // Only update animator if state changed
             bool currentAnimatorState = _animators[index].GetBool("IsMoving");
             if (currentAnimatorState != isMoving)
             {
                 _animators[index].SetBool("IsMoving", isMoving);
             }
             
-            // Store current position for next frame
             _lastPositions[index] = currentPos;
         }
         
+        /// <summary>
+        /// Directly updates the animator state using simulation data.
+        /// </summary>
         public void UpdateAnimatorStateFromData(int index, bool isMoving)
         {
             if (_animators[index] != null && _animators[index].GetBool("IsMoving") != isMoving)
                 _animators[index].SetBool("IsMoving", isMoving);
         }
         
+        /// <summary>
+        /// Attempts to retrieve the animator component for a specific NPC index.
+        /// </summary>
         public bool TryGetAnimator(int index, out Animator animator)
         {
             animator = null;
@@ -151,11 +172,13 @@ namespace Systems.NPC.Components
             return animator != null;
         }
         
+        /// <summary>
+        /// Destroys all NPC GameObjects and clears internal registries.
+        /// </summary>
         public void Dispose()
         {
             if (_visuals == null) return;
     
-            // Destroy all visual GameObjects
             for (int i = 0; i < _visuals.Length; i++)
             {
                 if (_visuals[i] != null)

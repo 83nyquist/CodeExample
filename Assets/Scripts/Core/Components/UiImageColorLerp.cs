@@ -15,6 +15,9 @@ namespace Core.Components
         public float Speed = 2;
         public float targetTime;
     
+        /// <summary>
+        /// Updates the image color based on active state or closing phase.
+        /// </summary>
         void Update ()
         {
             if (isActive)
@@ -40,6 +43,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Starts the color lerping animation.
+        /// </summary>
         public void StartLerp(float speed, float duration = 0)
         {
             Speed = speed;
@@ -53,6 +59,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Stops the color lerping and returns the image to its starting color.
+        /// </summary>
         public void StopLerp()
         {
             isActive = false;

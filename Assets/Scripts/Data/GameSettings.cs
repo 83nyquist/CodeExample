@@ -11,6 +11,7 @@ namespace Data
         [Range(0, 100)]
         [SerializeField] private int masterVolume = 100;
 
+        /// <summary> Gets or sets the master audio volume (0-100). </summary>
         public int MasterVolume
         {
             get => masterVolume;
@@ -22,6 +23,9 @@ namespace Data
             }
         }
 
+        /// <summary>
+        /// Loads settings from PlayerPrefs.
+        /// </summary>
         public void Load()
         {
             masterVolume = PlayerPrefs.GetInt(MasterVolumeKey, 100);

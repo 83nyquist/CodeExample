@@ -17,16 +17,9 @@ namespace UserInterface.UIToolkit
 
         public VisualElement Root => uiDocument.rootVisualElement;
 
-        // private void Start()
-        // {
-        //     Subscribe<WorldGenerationFinishedEvent>(OnGenerationComplete);
-        //     SetEnabled(false);
-        // }
-
-        // private void OnGenerationComplete(WorldGenerationFinishedEvent obj) => SetEnabled(true);
-
+        /// <summary>
+        /// Toggles the flex display style of the UI root.
+        /// </summary>
         public void SetVisible(bool isVisible) => Root.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
-
-        // public void SetEnabled(bool isEnabled) => Root.SetEnabled(isEnabled);
     }
 }

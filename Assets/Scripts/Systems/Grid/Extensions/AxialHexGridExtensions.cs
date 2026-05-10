@@ -7,7 +7,7 @@ namespace Systems.Grid.Extensions
     public static class AxialHexGridExtensions
     {
         /// <summary>
-        /// Given an origin and radius will return a list of coordinates in that radius 
+        /// Retrieves a list of TileData objects within a specified radius of a center coordinate.
         /// </summary>
         public static List<TileData> GetTilesInRadius(this AxialHexGrid grid, Vector2Int center, int radius)
         {
@@ -22,7 +22,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Given an origin and radius will return a list of coordinates in that radius 
+        /// Calculates all axial coordinates that fall within a given radius of a center point.
         /// </summary>
         public static List<Vector2Int> GetCoordinatesInRadius(this AxialHexGrid grid, Vector2Int center, int radius)
         {
@@ -52,7 +52,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Converts axial coordinates to world position (pointy-top hex grid)
+        /// Converts axial coordinates (q, r) to a 3D world position using the grid's hex size.
         /// </summary>
         public static Vector3 AxialToWorld(this AxialHexGrid grid, int q, int r)
         {
@@ -62,7 +62,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Calculates world position bounds for camera framing
+        /// Calculates the total world-space bounding box that encapsulates all tiles in the grid.
         /// </summary>
         public static Bounds GetGridBounds(this AxialHexGrid grid)
         {
@@ -80,7 +80,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Converts world position to axial coordinates
+        /// Converts a 3D world position back into the nearest axial hex coordinate.
         /// </summary>
         public static Vector2Int WorldToAxial(this AxialHexGrid grid, Vector3 worldPosition)
         {
@@ -90,7 +90,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Rounds fractional hex coordinates to the nearest axial coordinate
+        /// Performs hex-specific rounding to ensure coordinates maintain the q+r+s=0 cube constraint.
         /// </summary>
         private static Vector2Int HexRound(this AxialHexGrid grid, Vector2 fractional)
         {
@@ -111,7 +111,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Converts axial to cube coordinates
+        /// Converts axial (q, r) coordinates to cube (q, s, r) coordinates.
         /// </summary>
         public static Vector3Int AxialToCube(this AxialHexGrid grid, int q, int r)
         {
@@ -119,7 +119,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Gets neighbor coordinate in specified direction (0-5)
+        /// Calculates the coordinate of a neighbor in one of the six hex directions.
         /// </summary>
         public static Vector2Int GetNeighborCoordinate(this AxialHexGrid grid, Vector2Int axial, int directionIndex)
         {
@@ -138,7 +138,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Gets all neighboring coordinates for a given axial coordinate
+        /// Retrieves a list of all six neighboring coordinates for a given axial point.
         /// </summary>
         public static List<Vector2Int> GetNeighborCoordinates(this AxialHexGrid grid, int q, int r)
         {
@@ -151,7 +151,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Gets all tiles within a certain radius from center
+        /// Retrieves tiles within a radius using optimized axial coordinate iteration.
         /// </summary>
         public static List<TileData> GetTilesInRadius(this AxialHexGrid grid, int centerQ, int centerR, int radius)
         {
@@ -172,7 +172,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Gets distance between two hex tiles in axial coordinates
+        /// Calculates the Manhattan-style distance between two hex coordinates.
         /// </summary>
         public static int GetDistance(this AxialHexGrid grid, int q1, int r1, int q2, int r2)
         {
@@ -185,7 +185,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Calculates the distance between two axial coordinates
+        /// Extension for Vector2Int to calculate hex distance to another coordinate.
         /// </summary>
         public static int DistanceTo(this Vector2Int a, Vector2Int b)
         {
@@ -195,7 +195,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Gets tile count (for debugging)
+        /// Returns the total number of tiles stored in the grid.
         /// </summary>
         public static int GetTileCount(this AxialHexGrid grid)
         {
@@ -203,7 +203,7 @@ namespace Systems.Grid.Extensions
         }
         
         /// <summary>
-        /// Checks if the grid is empty
+        /// Returns true if the grid contains no tile data.
         /// </summary>
         public static bool IsEmpty(this AxialHexGrid grid)
         {

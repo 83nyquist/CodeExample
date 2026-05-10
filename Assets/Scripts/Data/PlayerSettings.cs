@@ -13,6 +13,7 @@ namespace Data
         [SerializeField] private int populationSize = 1000;
         [SerializeField] private bool showFPS = true;
 
+        /// <summary> Gets or sets the total radius of the hex grid. </summary>
         public int GridRadius
         {
             get => gridRadius;
@@ -24,6 +25,7 @@ namespace Data
             }
         }
 
+        /// <summary> Gets or sets the player's vision radius. </summary>
         public int VisionRadius
         {
             get => visionRadius;
@@ -35,6 +37,7 @@ namespace Data
             }
         }
 
+        /// <summary> Gets or sets the NPC population size. </summary>
         public int PopulationSize
         {
             get => populationSize;
@@ -46,6 +49,7 @@ namespace Data
             }
         }
 
+        /// <summary> Gets or sets whether the FPS counter should be displayed. </summary>
         public bool ShowFPS
         {
             get => showFPS;
@@ -57,6 +61,9 @@ namespace Data
             }
         }
 
+        /// <summary>
+        /// Loads settings from PlayerPrefs.
+        /// </summary>
         public void Load()
         {
             gridRadius = PlayerPrefs.GetInt(nameof(gridRadius), 100);

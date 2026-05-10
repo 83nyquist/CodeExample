@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Core.Enumerations
 {
+    /// <summary>
+    /// Central container for direction-related enums across various grid and movement systems.
+    /// </summary>
     public class Directions : MonoBehaviour
     {
         public enum CardinalDirection

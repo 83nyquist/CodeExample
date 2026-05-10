@@ -13,14 +13,18 @@ namespace UserInterface
         [Inject] private UIController _uiController;
         [Inject] private GameFlowCoordinator _gameFlow;
 
+        /// <summary>
+        /// Subscribes to state changes and sets the initial UI state.
+        /// </summary>
         private void Start()
         {
             Subscribe<GameStateChangedEvent>(HandleStateChange);
-            
-            //Handle eventual race conditions
             ShowLoadingScreen();
         }
 
+        /// <summary>
+        /// Routes UI visibility changes based on the global game state.
+        /// </summary>
         private void HandleStateChange(GameStateChangedEvent obj)
         {
             switch (obj.State)
@@ -34,12 +38,18 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Transitions visibility to active gameplay HUD.
+        /// </summary>
         private void ShowGameplayUI()
         {
             _loadingPanelController.SetVisible(false);
             _uiController.SetVisible(true);
         }
 
+        /// <summary>
+        /// Transitions visibility to the loading screen.
+        /// </summary>
         private void ShowLoadingScreen()
         {
             _loadingPanelController.SetVisible(true);
