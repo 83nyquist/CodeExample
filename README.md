@@ -1,5 +1,30 @@
 # CodeExample - Hex Grid Terrain Generation
 
+   
+## License
+
+This project is licensed under **CC BY-NC-ND 4.0** (see LICENSE file).
+
+© 2025 Cato Aleksander Goffeng
+
+### For recruiters, employers, and portfolio reviewers:
+
+**You MAY:**
+- View, clone, fork, and run this code to evaluate my technical skills
+- Share this repository link in interview contexts
+- Use this code for educational reference
+
+**You MAY NOT:**
+- Use this code for commercial purposes (including in employer products)
+- Modify this code and claim modified versions as your own
+- Remove my name, this license, or copyright notices
+- Submit this code as part of another person's job application or portfolio
+
+**Commercial use?**  
+Contact me at 83nyquist@gmail.com — I am open to negotiation.
+
+
+## Project Description
 A Unity demonstration project featuring a top-down axial hex grid system supporting 3,000,000 tiles with Perlin noise terrain generation and 10,000 independent agents with independent roaming.
 
 <img src="images/map.png" alt="Hex grid terrain map" width="300" height="300">
@@ -111,5 +136,4 @@ chmod +x CodeExample.x86_64
 ./CodeExample.x86_64
    ```
 
-   
 
