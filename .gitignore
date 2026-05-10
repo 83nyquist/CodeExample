@@ -76,3 +76,7 @@ crashlytics-build.properties
 
 # Assets merged from Asset Store
 /[Aa]ssets/AssetStoreTools*
+
+# Unity Performance Test files
+PerformanceTestRunInfo*
+PerformanceTestRunSettings*
