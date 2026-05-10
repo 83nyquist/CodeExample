@@ -135,9 +135,9 @@ namespace UserInterface.UGUI
             loadingSlider.value = e.CompletedTileWorkUnits + e.CompletedNpcWorkUnits;
             bool isFinished = loadingSlider.value >= loadingSlider.maxValue;
             
-            loadingSliderTilesLabel.text = $"Tiles: {e.CompletedTileWorkUnits} / {e.TotalTileWorkUnits}";
-            loadingSliderNpcLabel.text = $"NPCs: {e.CompletedNpcWorkUnits} / {e.TotalNpcWorkUnits}";
-
+            loadingSliderTilesLabel.text = $"Work Units, Tiles: {e.CompletedTileWorkUnits:N0} / {e.TotalTileWorkUnits:N0}";
+            loadingSliderNpcLabel.text = $"Work Units, NPCs: {e.CompletedNpcWorkUnits:N0} / {e.TotalNpcWorkUnits:N0}";
+            
             float displayPercentage = isFinished ? 100f : Mathf.Min(e.Progress, 99f);
             loadingSliderLabelPercentage.text = $"{displayPercentage:F0}%";
 
