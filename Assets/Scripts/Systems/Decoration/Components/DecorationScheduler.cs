@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Systems.Decoration.Interfaces;
+using Systems.EventBus;
 using Systems.Grid.Components;
 using UnityEngine;
 
@@ -30,23 +31,28 @@ namespace Systems.Decoration.Components
         /// </summary>
         /// <param name="toShow">Tiles that need visual decorators.</param>
         /// <param name="toHide">Tiles whose decorators should be returned to the pool.</param>
-        public IEnumerator ProcessQueues(IEnumerable<TileData> toShow, IEnumerable<TileData> toHide)
+        /// <param name="reportProgress">Reporting sent to the progress reporter only during initialization for the loading slider</param>
+        public IEnumerator ProcessQueues(IEnumerable<TileData> toShow, IEnumerable<TileData> toHide, bool reportProgress)
         {
             IsProcessing = true;
             float budgetSeconds = _maxMsPerFrame / 1000f;
 
             Queue<TileData> showQueue = new Queue<TileData>(toShow);
             Queue<TileData> hideQueue = new Queue<TileData>(toHide);
+            int workDoneInFrame = 0;
 
             while (showQueue.Count > 0 || hideQueue.Count > 0)
             {
                 float startTime = Time.realtimeSinceStartup;
+                workDoneInFrame = 0;
 
                 while (hideQueue.Count > 0)
                 {
                     if (Time.realtimeSinceStartup - startTime > budgetSeconds) break;
 
                     TileData data = hideQueue.Dequeue();
+                    workDoneInFrame++;
+                    
                     if (_activeDecorators.TryGetValue(data, out TileDecorator decorator))
                     {
                         _activeDecorators.Remove(data);
@@ -59,6 +65,7 @@ namespace Systems.Decoration.Components
                     if (Time.realtimeSinceStartup - startTime > budgetSeconds) break;
 
                     TileData data = showQueue.Dequeue();
+                    workDoneInFrame++;
                     
                     if (data != null && !_activeDecorators.ContainsKey(data))
                     {
@@ -71,6 +78,11 @@ namespace Systems.Decoration.Components
                     }
                 }
 
+                if (reportProgress && workDoneInFrame > 0)
+                {
+                    EventBusSystem.Publish(new ReportWorkProgressRequest(workDoneInFrame, 0));
+                }
+                
                 yield return null;
             }
 

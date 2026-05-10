@@ -9,6 +9,6 @@ namespace Systems.Decoration.Interfaces
     {
         bool IsProcessing { get; }
         event Action OnProcessingFinished;
-        IEnumerator ProcessQueues(IEnumerable<TileData> toShow, IEnumerable<TileData> toHide);
+        IEnumerator ProcessQueues(IEnumerable<TileData> toShow, IEnumerable<TileData> toHide, bool reportProgress);
     }
 }

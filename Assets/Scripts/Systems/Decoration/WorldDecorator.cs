@@ -40,6 +40,7 @@ namespace Systems.Decoration
         private HashSet<TileData> _activeDecorators = new();
         private HashSet<TileData> _currentVisionSet = new();
         private TileData _lastOrigin;
+        private bool _isInitialDecoration = true;
 
         /// <summary>
         /// Initializes the decoration scheduler, strategy, and event subscriptions.
@@ -93,6 +94,7 @@ namespace Systems.Decoration
         {
             _activeDecorators.Clear();
             _currentVisionSet.Clear();
+            _isInitialDecoration = true;
             _decoratorFactory.CleanupActiveDecorators();
             
             if (_npcManager != null)
@@ -143,7 +145,8 @@ namespace Systems.Decoration
         {
             Publish(new InputLockRequest(ToString()));
             _activeDecorators = nextActiveSet;
-            StartCoroutine(_scheduler.ProcessQueues(toShow, toHide));
+            StartCoroutine(_scheduler.ProcessQueues(toShow, toHide, _isInitialDecoration));
+            _isInitialDecoration = false;
         }
 
         /// <summary>
