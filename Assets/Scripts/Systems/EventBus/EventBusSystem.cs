@@ -58,16 +58,6 @@ namespace Systems.EventBus
     /// <summary>Published when all tile data has been purged from the repository.</summary>
     public class GridClearedEvent : GameEvent { }
 
-    /// <summary>Published when basic tile coordinate data is allocated and ready for structural queries.</summary>
-    // public class GridStructuralDataReadyEvent : GameEvent
-    // {
-    //     public IReadOnlyDictionary<Vector2Int, TileData> Tiles { get; }
-    //     public float HexSize { get; }
-    //
-    //     public GridStructuralDataReadyEvent(IReadOnlyDictionary<Vector2Int, TileData> tiles, float hexSize) 
-    //         => (Tiles, HexSize) = (tiles, hexSize);
-    // }
-
     /// <summary>Published when all generation and alteration passes are finished and the grid is "final".</summary>
     public class GridInitializationFinishedEvent : GameEvent
     { 
@@ -243,16 +233,16 @@ namespace Systems.EventBus
     public class ClearPathRequest : GameEvent { }
     
     /// <summary>Request to lock or unlock player input (e.g., during UI focus).</summary>
-    public class InputLockRequest : GameEvent
-    { 
-        public bool IsLocked { get; set; }
-    
-        public InputLockRequest(object s, bool l) 
-        { 
-            Source = s?.ToString() ?? "Unknown";
-            IsLocked = l; 
-        } 
-    }
+    // public class InputLockRequest : GameEvent
+    // { 
+    //     public bool IsLocked { get; set; }
+    //
+    //     public InputLockRequest(object s, bool l) 
+    //     { 
+    //         Source = s?.ToString() ?? "Unknown";
+    //         IsLocked = l; 
+    //     } 
+    // }
 
     /// <summary>Request to add a blocker to the game flow, preventing state transitions to 'Playing'.</summary>
     public class GameFlowInitLockRequest : GameEvent
@@ -266,6 +256,20 @@ namespace Systems.EventBus
     {
         public string BlockerId { get; }
         public GameFlowInitUnlockRequest(string blockerId) => BlockerId = blockerId;
+    }
+    
+    /// <summary>Request to add an input blocker to preventing world input.</summary>
+    public class InputLockRequest : GameEvent
+    {
+        public string BlockerId { get; }
+        public InputLockRequest(string blockerId) => BlockerId = blockerId;
+    }
+
+    /// <summary>Request to remove a input blocker.</summary>
+    public class InputUnlockRequest : GameEvent
+    {
+        public string BlockerId { get; }
+        public InputUnlockRequest(string blockerId) => BlockerId = blockerId;
     }
 #endregion
 
@@ -315,32 +319,32 @@ namespace Systems.EventBus
 
 #region Mouse Input Events
     /// <summary>Published when the mouse scroll wheel is moved.</summary>
-    public class MouseScrollEvent : GameEvent
-    { 
-        public float Delta; 
-        public MouseScrollEvent(float delta) => Delta = delta; 
-    }
+    // public class MouseScrollEvent : GameEvent
+    // { 
+    //     public float Delta; 
+    //     public MouseScrollEvent(float delta) => Delta = delta; 
+    // }
     
     /// <summary>Published when a tile is clicked down.</summary>
-    public class TilePointerDownEvent : GameEvent
-    { 
-        public TileDecorator Decorator { get; } 
-        public TilePointerDownEvent(TileDecorator d) => Decorator = d; 
-    }
-    
-    /// <summary>Published when the mouse button is released over a tile.</summary>
-    public class TilePointerUpEvent : GameEvent
-    { 
-        public TileDecorator Decorator; 
-        public TilePointerUpEvent(TileDecorator d) => Decorator = d; 
-    }
-    
-    /// <summary>Published when the mouse is dragged across a tile.</summary>
-    public class TileDragEvent : GameEvent
-    { 
-        public TileDecorator Decorator; 
-        public TileDragEvent(TileDecorator d) => Decorator = d; 
-    }
+    // public class TilePointerDownEvent : GameEvent
+    // { 
+    //     public TileDecorator Decorator { get; } 
+    //     public TilePointerDownEvent(TileDecorator d) => Decorator = d; 
+    // }
+    //
+    // /// <summary>Published when the mouse button is released over a tile.</summary>
+    // public class TilePointerUpEvent : GameEvent
+    // { 
+    //     public TileDecorator Decorator; 
+    //     public TilePointerUpEvent(TileDecorator d) => Decorator = d; 
+    // }
+    //
+    // /// <summary>Published when the mouse is dragged across a tile.</summary>
+    // public class TileDragEvent : GameEvent
+    // { 
+    //     public TileDecorator Decorator; 
+    //     public TileDragEvent(TileDecorator d) => Decorator = d; 
+    // }
 #endregion
 
 #region Core Event Bus Engine

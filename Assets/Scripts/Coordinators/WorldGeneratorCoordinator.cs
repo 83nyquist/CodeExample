@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Data;
-using Input;
 using NPC;
 using Systems.Decoration;
 using Systems.EventBus;
 using Systems.Grid;
 using Systems.Grid.Components;
 using Systems.Grid.Passes.Abstraction;
+using Systems.NPC.Components;
 using UnityEngine;
 using UserInterface;
 using Zenject;
@@ -20,12 +20,13 @@ namespace Coordinators
     {
         [Inject] private AxialHexGrid _grid;
         [Inject] private PlayerSettings _playerSettings;
-        [Inject] private InputHandler _inputHandler;
         [Inject] private UiManager _uiManager;
-        [Inject] private GenerationProgressTracker _progressTracker;
         [Inject] private NpcManager _npcManager;
         [Inject] private WorldDecorator _worldDecorator;
 
+        [Header("Generation Progress Tracker")]
+        [SerializeField] private GenerationProgressTracker progressTracker;
+        
         [Header("Async Settings")]
         [SerializeField] private float maxMsPerFrame = 5f;
         [SerializeField] private bool generateOnAwake = true;
@@ -38,7 +39,7 @@ namespace Coordinators
         [SerializeField] private List<AlterationPassWrapper> alterationPasses = new();
 
         private GridGenerator _internalGenerator;
-        private InputLock _inputLock;
+        // private InputLock _inputLock;
         
         private int _currentSeed;
         private int _tilesInGrid;
@@ -49,8 +50,9 @@ namespace Coordinators
         
         private void Start()
         {
+            progressTracker = new GenerationProgressTracker();
             _internalGenerator = new GridGenerator(maxMsPerFrame);
-            _inputLock = _inputHandler.RegisterInputLock(this);
+            // _inputLock = _inputHandler.RegisterInputLock(this);
 
             Subscribe<NpcSimulationCompleteEvent>(HandleNpcComplete);
             Subscribe<WorldVisualsReadyEvent>(HandleVisualsReady);
@@ -174,7 +176,7 @@ namespace Coordinators
 
         private void HandleGameStateChangedEvent(GameStateChangedEvent obj)
         {
-            if (obj.State == GameState.Initializing)
+            if (obj.State == GameState.Loading)
             {
                 Publish(new GameFlowInitLockRequest(ToString()));
                 GenerateWorld();

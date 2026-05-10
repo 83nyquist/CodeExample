@@ -69,7 +69,7 @@ namespace Vanguard
         private void OnGameStateChanged(GameStateChangedEvent e)
         {
             if (e.State == GameState.Playing) Spawn();
-            else if (e.State == GameState.Initializing)
+            else if (e.State == GameState.Loading)
             {
                 Stop();
                 DeSpawn();
