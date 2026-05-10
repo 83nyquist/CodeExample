@@ -1,6 +1,5 @@
 # CodeExample - Hex Grid Terrain Generation
 
-   
 ## License
 
 This project is licensed under **CC BY-NC-ND 4.0** (see LICENSE file).
@@ -20,12 +19,11 @@ This project is licensed under **CC BY-NC-ND 4.0** (see LICENSE file).
 - Remove my name, this license, or copyright notices
 - Submit this code as part of another person's job application or portfolio
 
-**Commercial use?**  
-Contact me at 83nyquist@gmail.com — I am open to negotiation.
-
+**Any questions?**  
+Contact me at 83nyquist@gmail.com.
 
 ## Project Description
-A Unity demonstration project featuring a top-down axial hex grid system supporting 3,000,000 tiles with Perlin noise terrain generation and 10,000 independent agents with independent roaming.
+This is a Unity demonstration project featuring a top-down axial hex grid system supporting 3,000,000 tiles with Perlin noise terrain generation and 10,000 independent agents with independent roaming.
 
 <img src="images/map.png" alt="Hex grid terrain map" width="300" height="300">
 
@@ -59,7 +57,7 @@ I could:
 
 ## AI-First Development
 
-**This project uses a Monolith-by-System architecture** - related classes live in single files, not scattered across dozens of small files, contrary to what we usually associate with well-written and manageable code. This is a conscious, defensible trade-off for AI-assisted development. The principles remain intact. Only the file boundaries have changed. In this demo I have only refactored the `EventBusSystem` as an example, but am transitioning more in this direction on my actual project.
+**This project uses a Monolith-by-System architecture** - related classes live in single files, not scattered across dozens of small files, contrary to what we usually associate with well-written and manageable code. This is a conscious, defensible trade-off for AI-assisted development. The principles remain intact. Only the file boundaries have changed. In this demo I have only refactored the `EventBusSystem`  and `InputSystem` as an example, but am transitioning more in this direction on my actual project.
 
 ### The Facade Pattern Inside
 The `EventBusSystem` monolith follows the **Facade pattern** - a single static class (`EventBusSystem`) acts as the public API, while supporting classes live in the same file but remain internally focused.
@@ -136,4 +134,5 @@ chmod +x CodeExample.x86_64
 ./CodeExample.x86_64
    ```
 
+   
 
