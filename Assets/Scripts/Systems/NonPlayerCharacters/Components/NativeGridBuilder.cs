@@ -1,15 +1,20 @@
 using System.Collections.Generic;
-using Systems.Grid;
 using Systems.Grid.Components;
-using Systems.NPC.Structs;
+using Systems.NonPlayerCharacters.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Systems.NPC.Components
+namespace Systems.NonPlayerCharacters.Components
 {
     public class NativeGridBuilder
     {
+        /// <summary>
+        /// Converts a managed dictionary of TileData into a NativeHexGrid for use in Burst-compiled jobs.
+        /// </summary>
+        /// <param name="tiles">The managed tile data dictionary.</param>
+        /// <param name="allocator">The allocation strategy for the native memory.</param>
+        /// <returns>A populated NativeHexGrid instance.</returns>
         public NativeHexGrid BuildFromTileData(IReadOnlyDictionary<Vector2Int, TileData> tiles, Allocator allocator)
         {
             var nativeGrid = new NativeHexGrid(tiles.Count, allocator);

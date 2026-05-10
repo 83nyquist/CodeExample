@@ -8,15 +8,16 @@ namespace Input
     {
         [SerializeField] private UIDocument[] blockingUIDocuments;
 
+        /// <summary>
+        /// Determines if the pointer is currently over a UGUI element or a specific UI Toolkit VisualElement.
+        /// </summary>
         public bool IsPointerOverUI(Vector2 mousePosition)
         {
-            // 1. Check UGUI (Standard EventSystem)
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             {
                 return true;
             }
 
-            // 2. Check UI Toolkit (UIDocuments)
             if (blockingUIDocuments == null)
             {
                 return false;
@@ -36,11 +37,9 @@ namespace Input
                     continue;
                 }
 
-                // Convert screen position to Panel-space for UI Toolkit hit testing
                 Vector2 panelPosition = RuntimePanelUtils.ScreenToPanel(root.panel, mousePosition);
                 VisualElement pickedElement = root.panel.Pick(panelPosition);
 
-                // If we picked an element that isn't the transparent root, the UI is blocking.
                 if (pickedElement != null && pickedElement != root)
                 {
                     return true;

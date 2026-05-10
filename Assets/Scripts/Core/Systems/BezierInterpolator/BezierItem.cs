@@ -23,7 +23,9 @@ namespace Core.Systems.BezierInterpolator
         private Vector3 _targetPos;
 
         public List<TimedAction> TimedActions = new List<TimedAction>();
-
+        /// <summary>
+        /// Updates the interpolation state every frame while active.
+        /// </summary>
         void Update()
         {
             if (IsActive)
@@ -32,6 +34,9 @@ namespace Core.Systems.BezierInterpolator
             }
         }
 
+        /// <summary>
+        /// Calculates the next position on the cubic bezier path and updates transform properties.
+        /// </summary>
         public void Interpolate()
         {
             _targetPos = Cube3(Start, HandleA, HandleB, End, BezierTime);
@@ -58,7 +63,9 @@ namespace Core.Systems.BezierInterpolator
                 EndInterpolation();
             }
         }
-
+        /// <summary>
+        /// Activates the item and starts the interpolation sequence.
+        /// </summary>
         public void Run(BezierController owner)
         {
             Owner = owner;
@@ -66,6 +73,9 @@ namespace Core.Systems.BezierInterpolator
             IsActive = true;
         }
 
+        /// <summary>
+        /// Iterates through defined timed actions and triggers them if the timestamp has passed.
+        /// </summary>
         public void CheckEvents(float time)
         {
             if (Owner.TimedActionsMode == BezierController.TimedActionsModes.Ignore)
@@ -88,7 +98,9 @@ namespace Core.Systems.BezierInterpolator
                 }
             }
         }
-
+        /// <summary>
+        /// Handles the end of the interpolation lifecycle, triggering completion events and cleanup.
+        /// </summary>
         public void EndInterpolation()
         {
             if (OnComplete != null)
@@ -108,16 +120,12 @@ namespace Core.Systems.BezierInterpolator
 
             IsActive = false;
         }
-
+        /// <summary>
+        /// Performs a Cubic Bezier calculation between four points.
+        /// </summary>
         public static Vector3 Cube3(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
         {
             return (((-p0 + 3 * (p1 - p2) + p3) * t + (3 * (p0 + p2) - 6 * p1)) * t + 3 * (p1 - p0)) * t + p0;
         }
-
-        //public static Vector3 Bezier2(Vector3 s, Vector3 p, Vector3 e, float t)
-        //{
-        //    float rt = 1 - t;
-        //    return rt * rt * s + 2 * rt * t * p + t * t * e;
-        //}
     }
 }

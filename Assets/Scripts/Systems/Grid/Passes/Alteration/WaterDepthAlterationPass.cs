@@ -12,23 +12,26 @@ namespace Systems.Grid.Passes.Alteration
         [Header("WaterDepthAlterationPass")]
         public override string PassName => "Water Depth Pass";
     
+        /// <summary>
+        /// Evaluates water tiles to determine if they should use a "deep water" variation based on neighbors.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
             foreach (var tile in grid.Tiles.Values)
             {
                 if (tile.type != Enumerations.TileType.Water) continue;
 
-                bool surroundedByMountains = true;
+                bool isDeep = true;
                 foreach (var neighbour in tile.Neighbours)
                 {
                     if (neighbour == null || neighbour.type != Enumerations.TileType.Water)
                     {
-                        surroundedByMountains = false;
+                        isDeep = false;
                         break;
                     }
                 }
 
-                tile.VariationIndex = surroundedByMountains ? 1 : 0;
+                tile.VariationIndex = isDeep ? 1 : 0;
             }
         }
     }

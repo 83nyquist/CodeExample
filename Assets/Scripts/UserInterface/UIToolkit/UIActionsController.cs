@@ -1,7 +1,6 @@
 using Coordinators;
 using Systems.Decoration;
 using Systems.EventBus;
-using UnityEngine;
 using UnityEngine.UIElements;
 using Vanguard;
 using Zenject;
@@ -18,6 +17,9 @@ namespace UserInterface.UIToolkit
 
         private bool _isProcessing;
 
+        /// <summary>
+        /// Binds UI buttons to local actions and system requests.
+        /// </summary>
         private void Start()
         {
             var root = _uiController.Root;
@@ -26,11 +28,15 @@ namespace UserInterface.UIToolkit
             root.Q<Button>("btn_exit").clicked += OnExitClicked;
         }
 
+        /// <summary> Publishes a world generation request. </summary>
         private void OnGenerateClicked()
         {
             Publish(new GenerateWorldRequest());
         }
 
+        /// <summary>
+        /// Exits the application or stops play mode in the editor.
+        /// </summary>
         private void OnExitClicked()
         {
 #if UNITY_EDITOR
@@ -40,6 +46,7 @@ namespace UserInterface.UIToolkit
 #endif
         }
 
+        /// <summary> Toggles NPC debug visibility. </summary>
         private void OnToggleAgentsClicked()
         {
             _worldDecorator.IsNpcVisibilityDebugEnabled = !_worldDecorator.IsNpcVisibilityDebugEnabled;

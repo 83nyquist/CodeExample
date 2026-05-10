@@ -1,4 +1,4 @@
-using NPC;
+using Systems.NonPlayerCharacters;
 using UnityEngine;
 using Zenject;
 
@@ -15,6 +15,9 @@ namespace UserInterface
         private float _fpsTimer = 0f;
         private int _displayedFPS = 0;
 
+        /// <summary>
+        /// Calculates smoothed FPS and updates the display timer.
+        /// </summary>
         void Update()
         {
             if (!showDebug)
@@ -22,11 +25,9 @@ namespace UserInterface
                 return;
             }
             
-            // Calculate smoothed FPS (exponential moving average)
             float currentFPS = 1f / Time.deltaTime;
             _fpsSmoothing = Mathf.Lerp(_fpsSmoothing, currentFPS, 0.1f);
     
-            // Update display on delay
             _fpsTimer += Time.deltaTime;
             if (_fpsTimer >= _fpsUpdateDelay)
             {
@@ -35,6 +36,9 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Renders the FPS debug box to the screen.
+        /// </summary>
         void OnGUI()
         {
             if (!showDebug)

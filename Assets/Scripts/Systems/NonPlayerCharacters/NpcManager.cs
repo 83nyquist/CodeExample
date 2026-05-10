@@ -2,23 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using Coordinators;
 using Data;
+using Systems.Decoration;
+using Systems.EventBus;
+using Systems.Grid;
+using Systems.Grid.Components;
+using Systems.Grid.Extensions;
+using Systems.NonPlayerCharacters.Components;
+using Systems.NonPlayerCharacters.Structs;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Zenject;
-using Systems.Grid;
-using Systems.Decoration;
-using Systems.EventBus;
-using Systems.Grid.Components;
-using Systems.Grid.Extensions;
-using Systems.NPC.Components;
-using Systems.NPC.Structs;
 
-namespace NPC
+namespace Systems.NonPlayerCharacters
 {
     public class NpcManager : EventBusSubscriber
     {
-        // Dependencies (DIP)
         [Inject] private WorldGeneratorCoordinator _worldGeneratorCoordinator;
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private WorldDecorator _worldDecorator;
@@ -34,7 +33,6 @@ namespace NPC
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float rotationSpeed = 15f;
         
-        // Sub-Systems (SRP)
         private NpcSimulationSystem _simulation;
         private NpcVisualRegistry _visuals;
         private NpcVisibilityTracker _visibilityTracker;
@@ -44,10 +42,18 @@ namespace NPC
         private int _lastShroudedCount;
         private Coroutine _spawnCoroutine;
 
-        // Properties
+        /// <summary>
+        /// Gets the total number of NPCs currently in the simulation.
+        /// </summary>
         public int NpcCount => _simulation?.NpcCount ?? 0;
+        /// <summary>
+        /// Gets whether the simulation system is currently active and initialized.
+        /// </summary>
         public bool IsInitialized => _simulation?.IsActive ?? false;
         
+        /// <summary>
+        /// Initializes sub-systems and subscribes to world generation events.
+        /// </summary>
         void Start()
         {
             InitializeComponents();
@@ -55,6 +61,9 @@ namespace NPC
             Subscribe<GridInitializationFinishedEvent>(InitializeNpcs);
         }
 
+        /// <summary>
+        /// Cleans up sub-systems and disposes of native memory.
+        /// </summary>
         protected override void OnDestroy()
         {
             _simulation?.Dispose();
@@ -63,12 +72,18 @@ namespace NPC
             base.OnDestroy();
         }
         
+        /// <summary>
+        /// Updates the NPC simulation logic.
+        /// </summary>
         void Update()
         {
             if (!IsInitialized) return;
             _simulation.Update();
         }
         
+        /// <summary>
+        /// Completes pending simulation jobs and updates visual representations and visibility.
+        /// </summary>
         void LateUpdate()
         {
             if (!IsInitialized) return;
@@ -78,6 +93,9 @@ namespace NPC
             _visibilityTracker.Process(_simulation.Data, _axialHexGrid, _currentVisionSet, Time.deltaTime);
         }
         
+        /// <summary>
+        /// Instantiates the core simulation, visual, and visibility sub-systems.
+        /// </summary>
         private void InitializeComponents()
         {
             _simulation = new NpcSimulationSystem(minMoveInterval, maxMoveInterval);
@@ -107,18 +125,13 @@ namespace NPC
         /// </summary>
         private void CleanupActiveSimulation(WorldGenerationStartedEvent obj)
         {
-            // 1. Stop any spawning currently in progress
             if (_spawnCoroutine != null)
             {
                 StopCoroutine(_spawnCoroutine);
                 _spawnCoroutine = null;
             }
 
-            // Stop simulation logic and free native memory immediately
             _simulation?.Dispose();
-
-            // 2. Clear visual GameObjects
-            // Note: We call Dispose to destroy objects, then we must re-prepare the registry
             _visuals?.Dispose();
             
             _lastShroudedCount = 0;
@@ -128,6 +141,9 @@ namespace NPC
             _visuals = new NpcVisualRegistry(npcVisualPrefab, moveSpeed, rotationSpeed, transform);
         }
 
+        /// <summary>
+        /// Coroutine that handles batched spawning of NPCs to maintain frame rate.
+        /// </summary>
         private IEnumerator SpawnNpcsRoutine(IReadOnlyDictionary<Vector2Int, TileData> tiles)
         {
             int count = _playerSettings.PopulationSize;
@@ -141,7 +157,6 @@ namespace NPC
                 var slice = new NativeSlice<NpcData>(_simulation.Data, i, batch);
                 
                 _visuals.CreateVisualsInRange(slice, i, HexToWorld);
-                // _progressTracker.UpdateProgress(GenerationProgressTracker.TaskAgents, batch);
                 Publish(new ReportWorkProgressRequest(0, batch));
                 yield return null;
             }
@@ -163,8 +178,6 @@ namespace NPC
 
             if (IsInitialized && _visuals != null)
             {
-                // We pass the visibility requirements down to the visual registry, 
-                // which handles the specific GameObject.SetActive calls.
                 _visuals.UpdateVisibilityStates(_simulation.Data, visionSet, forceVisible);
             }
 
@@ -185,6 +198,9 @@ namespace NPC
         /// </summary>
         private void InvokeVisibleCountChanged() => Publish(new NpcVisibleAgentsCountChangedEvent(_lastShroudedCount));
         
+        /// <summary>
+        /// Converts axial hex coordinates to world space coordinates.
+        /// </summary>
         private Vector3 HexToWorld(int2 coord)
         {
             return _axialHexGrid.AxialToWorld(coord.x, coord.y);

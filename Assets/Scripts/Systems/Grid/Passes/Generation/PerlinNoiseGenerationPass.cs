@@ -28,6 +28,9 @@ namespace Systems.Grid.Passes.Generation
         
         public override string PassName => "Perlin Noise Pass";
         
+        /// <summary>
+        /// Populates grid tiles with Perlin noise-based elevation and moisture, and determines initial tile types.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
             _seed = seed;
@@ -36,7 +39,6 @@ namespace Systems.Grid.Passes.Generation
             {
                 TileData tile = kvp.Value;
                 
-                // Using x,y as 2D coordinates (q = x, r = Z)
                 float elevation = GetElevationAt(tile.X, tile.Z);
                 float moisture = GetMoistureAt(tile.X, tile.Z);
                 
@@ -51,6 +53,9 @@ namespace Systems.Grid.Passes.Generation
             }
         }
         
+        /// <summary>
+        /// Calculates a multi-octave Perlin noise value for elevation at the given coordinates.
+        /// </summary>
         private float GetElevationAt(int x, int y)
         {
             float xf = x * elevationScale;
@@ -63,6 +68,9 @@ namespace Systems.Grid.Passes.Generation
             return elevation;
         }
         
+        /// <summary>
+        /// Calculates a Perlin noise value for moisture at the given coordinates using a seed offset.
+        /// </summary>
         private float GetMoistureAt(int x, int y)
         {
             float xf = x * moistureScale;
@@ -74,6 +82,9 @@ namespace Systems.Grid.Passes.Generation
             return moisture;
         }
         
+        /// <summary>
+        /// Maps elevation and moisture values to specific tile types based on defined thresholds.
+        /// </summary>
         private Enumerations.TileType DetermineTileType(float elevation, float moisture)
         {
             if (elevation < waterThreshold)

@@ -7,19 +7,15 @@ using UnityEngine.InputSystem;
 
 namespace Input
 {
-    // ============================================
-    // #region INPUT HANDLER (MAIN CLASS)
-    // ============================================
-
     /// <summary>
     /// Main input handler - processes input locking and routes tile interaction events.
     /// </summary>
     public class InputSystem : EventBusSubscriber
     {
         [SerializeField] private List<string> inputLocks;
+        /// <summary> Gets whether any system has currently locked player input. </summary>
         private bool IsInputLocked => inputLocks.Count > 0;
 
-        // Mouse input fields (merged from MouseInput)
         private LayerMaskRaycaster _layerMaskRaycaster;
         private InputUIBlocker _uiBlocker;
         [SerializeField] private float dragThresholdPixels = 5f;
@@ -28,7 +24,6 @@ namespace Input
         private Vector2 _pointerDownPosition;
         private TileDecorator _lastDraggedTileDecorator;
 
-        // Camera zoom fields (merged from CameraZoom)
         [Header("Zoom Settings")]
         [SerializeField] private CinemachineCamera cinemachineCamera;
         [SerializeField] private float zoomSpeed = 2f;
@@ -47,17 +42,14 @@ namespace Input
         private float _originalMagnitude;
         private Vector3 _normalizedDirection;
 
-        // ============================================
-        // #region UNITY LIFECYCLE
-        // ============================================
-
+        /// <summary>
+        /// Initializes dependencies for raycasting, UI blocking, and camera zoom.
+        /// </summary>
         private void Awake()
         {
-            // Initialize mouse input dependencies
             _layerMaskRaycaster = FindAnyObjectByType<LayerMaskRaycaster>();
             _uiBlocker = FindAnyObjectByType<InputUIBlocker>();
 
-            // Initialize camera zoom
             if (cinemachineCamera == null)
                 cinemachineCamera = GetComponent<CinemachineCamera>();
             
@@ -75,14 +67,15 @@ namespace Input
                 Debug.LogError("CinemachineFollow component not found on camera!");
             }
 
-            // Subscribe to events
             Subscribe<InputLockRequest>(HandleLockRequest);
             Subscribe<InputUnlockRequest>(HandleUnlockRequest);
         }
         
+        /// <summary>
+        /// Processes mouse clicks, drags, and scrolls every frame.
+        /// </summary>
         private void Update()
         {
-            // Mouse input update
             if (Mouse.current == null) return;
 
             Vector2 mousePosition = Mouse.current.position.ReadValue();
@@ -100,36 +93,30 @@ namespace Input
             if (!Mathf.Approximately(scrollDelta, 0f) && !_uiBlocker.IsPointerOverUI(mousePosition))
             {
                 OnMouseScroll(scrollDelta);
-                // Publish(new MouseScrollEvent(scrollDelta));
             }
 
-            // Camera zoom update
             ApplySmoothZoom();
         }
 
-        // protected override void OnDestroy()
-        // {
-        //     base.OnDestroy();
-        // }
-
-        // ============================================
-        // #region INPUT LOCKING
-        // ============================================
-       
+        /// <summary>
+        /// Adds a blocker ID to the input lock list.
+        /// </summary>
         private void HandleLockRequest(InputLockRequest e)
         {
             inputLocks.Add(e.BlockerId);
         }
 
+        /// <summary>
+        /// Removes a blocker ID from the input lock list.
+        /// </summary>
         private void HandleUnlockRequest(InputUnlockRequest e)
         {
             inputLocks.Remove(e.BlockerId);
         }
 
-        // ============================================
-        // #region MOUSE INPUT HANDLING
-        // ============================================
-
+        /// <summary>
+        /// Initiates tile interaction when the pointer is pressed.
+        /// </summary>
         private void HandlePointerDown(Vector2 mousePosition)
         {
             if (_uiBlocker.IsPointerOverUI(mousePosition)) return;
@@ -143,9 +130,11 @@ namespace Input
             _lastDraggedTileDecorator = null;
 
             DrawPath(tileDecorator);
-            // Publish(new TilePointerDownEvent(tileDecorator));
         }
 
+        /// <summary>
+        /// Updates path drawing as the pointer is dragged across tiles.
+        /// </summary>
         private void HandlePointerDrag(Vector2 mousePosition)
         {
             if (_uiBlocker.IsPointerOverUI(mousePosition))
@@ -172,9 +161,11 @@ namespace Input
 
             DrawPath(tileDecorator);
             _lastDraggedTileDecorator = tileDecorator;
-            // Publish(new TileDragEvent(tileDecorator));
         }
 
+        /// <summary>
+        /// Finalizes movement or interaction when the pointer is released.
+        /// </summary>
         private void HandlePointerUp(Vector2 mousePosition)
         {
             if (!_isPointerDown) return;
@@ -186,7 +177,6 @@ namespace Input
             if (tileDecorator != null)
             {
                 MoveTo(tileDecorator);
-                // Publish(new TilePointerUpEvent(tileDecorator));
             }
 
             _isPointerDown = false;
@@ -194,12 +184,18 @@ namespace Input
             _lastDraggedTileDecorator = null;
         }
 
+        /// <summary>
+        /// Publishes a movement request if the input is not locked.
+        /// </summary>
         private void MoveTo(TileDecorator tileDecorator)
         {
             if (tileDecorator == null || IsInputLocked) return;
             Publish(new PlayerMoveRequest());
         }
 
+        /// <summary>
+        /// Publishes a request to draw or clear the path.
+        /// </summary>
         private void DrawPath(TileDecorator tileDecorator)
         {
             if (IsInputLocked) return;
@@ -212,10 +208,9 @@ namespace Input
             Publish(new DrawPathRequest(tileDecorator));
         }
 
-        // ============================================
-        // #region CAMERA ZOOM HANDLING
-        // ============================================
-
+        /// <summary>
+        /// Adjusts the target zoom distance based on scroll input.
+        /// </summary>
         private void OnMouseScroll(float scrollDelta)
         {
             float zoomDelta = scrollDelta * zoomSpeed;
@@ -223,6 +218,9 @@ namespace Input
             _targetDistance = Mathf.Clamp(_targetDistance, minDistance, maxDistance);
         }
 
+        /// <summary>
+        /// Interpolates the Cinemachine camera offset towards the target zoom distance.
+        /// </summary>
         private void ApplySmoothZoom()
         {
             if (_follow == null) return;
@@ -244,12 +242,17 @@ namespace Input
             }
         }
 
-        // Public zoom methods
+        /// <summary>
+        /// Sets the camera zoom distance using a normalized 0-1 value.
+        /// </summary>
         public void SetZoomNormalized(float normalizedValue)
         {
             _targetDistance = Mathf.Lerp(minDistance, maxDistance, normalizedValue);
         }
 
+        /// <summary>
+        /// Returns the current camera zoom as a normalized 0-1 value.
+        /// </summary>
         public float GetZoomNormalized()
         {
             float currentDistance = _follow?.FollowOffset.magnitude ?? minDistance;

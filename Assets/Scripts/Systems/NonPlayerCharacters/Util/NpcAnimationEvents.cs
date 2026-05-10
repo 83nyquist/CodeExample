@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Systems.NPC.Util
+namespace Systems.NonPlayerCharacters.Util
 {
     public class NpcAnimationEvents : MonoBehaviour
     {

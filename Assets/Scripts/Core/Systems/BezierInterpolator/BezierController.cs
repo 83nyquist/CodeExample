@@ -10,83 +10,39 @@ namespace Core.Systems.BezierInterpolator
     [Serializable]
     public class BezierController : MonoBehaviour
     {
-        //public enum InterpolationTypes { Cube3, Bez2 }
         public enum Modes { PlayOnce, Repeate }
         public enum TimedActionsModes { Ignore, Controller, Item }
     
         [Header("Settings")]
-
-        [Tooltip("The speed in witch the prefab traverse the bezier path at any given point of the animation duration. (Time 0 -> 1)")]
         public AnimationCurve Speed;
-
-        [Tooltip("Scale of the prefab at any given point of the animation duration, (Time 0 -> 1)")]
         public AnimationCurve Scale;
-
-        [Tooltip("Rotate along the Z axis based on the time of the animation. (Time 0 -> 1, Scale 0 -> 360)")]
         public AnimationCurve RotationZ;
-
-        [Tooltip("Specify if each individual item will only play once or repeate when reacing their destination.")]
         public Modes Mode = Modes.PlayOnce;
-
-        //[Tooltip("The type of calculation used to determine the bezier path. Cube3 utilizes both handles to enable oscillating behavior, while Bez2 only use the StartHandle.")]
-        //public InterpolationTypes InterpolationType = InterpolationTypes.Cube3;
-
-        [Tooltip("Set the behaviour of the timed actions. Add a new action to the TimedActions list from code. " +
-                 "\nIgnore: Do nothing " +
-                 "\nController: Fire each action once the first time the first prefab hits its mark." +
-                 "\nItem: Fire each action everytime an item hits its mark.")]
         public TimedActionsModes TimedActionsMode = TimedActionsModes.Controller;
-
-        [Tooltip("Enable to Run the animation in the Controllers Start function.")]
         public bool AutoRun = false;
-
-        [Tooltip("Amount of prefabs to spawn for one given animation.")]
         public int SpawnAmount = 50;
-
-        [Tooltip("The interval at wich each item spawns.")]
         public float SpawnInterval = 0.1f;
-
-    
+        
         [Space]
         [Header("Gameobjects")]
-
-        [Tooltip("Show pretty lines. (Require select Gameobjects, check tooltips.)")]
         public bool ShowDebugging = true;
-
-        [Tooltip("Prefab to spawn along the path.")]
         public GameObject Prefab;
-
-        [Tooltip("Container to hold all spawned instances of the prefab. (OPTIONAL)")]
         public Transform ParentGameObject;
-
-        [Tooltip("Starting Gameobject that denotes the start of the path.")]
         public GameObject StartGameObject;
-
-        [Tooltip("Start node handle that dictates the arc of the prefab when exiting the start node.")]
         public GameObject StartHandleGameObject;
-
-        [Tooltip("End node handle that dictates the arc of the prefab when entering the end node. (NOT REQUIRED IN BEZ2 MODE)")]
         public GameObject EndHandleGameObject;
-
-        [Tooltip("Ending Gameobject that denotes the end of the path")]
         public GameObject EndGameObject;
-    
 
         [Space]
         [Header("Handles")]
-    
-        [Tooltip("Enables a variance in where the items are spawned and where they end up relative to the start and end object.")]
         public bool SpawnHandleVariance;
-    
         public Vector3 StartHandleVariance = new Vector3(0, 0, 0);
         public Vector3 EndHandleVariance = new Vector3(0, 0, 0);
-    
-        //Actions. Pref used from code
+
         public UnityAction OnRun;
         public UnityAction<BezierItem> OnItemComplete;
         public UnityAction OnSequenceComplete;
-
-        //Events. Pref used from inspector
+        
         public UnityEvent OnRunEvent;
         public UnityEvent OnSequenceCompleteEvent;
 
@@ -96,7 +52,9 @@ namespace Core.Systems.BezierInterpolator
         private Vector3 _startVector3;
         private Vector3 _endVector3;
         private List<BezierItem> _items = new List<BezierItem>();
-
+        /// <summary>
+        /// Executes AutoRun if enabled.
+        /// </summary>
         void Start()
         {
             if (AutoRun)
@@ -105,6 +63,9 @@ namespace Core.Systems.BezierInterpolator
             }
         }
 
+        /// <summary>
+        /// Starts the sequence from a specific GameObject position.
+        /// </summary>
         public void Run(GameObject startObject)
         {
             StartGameObject = startObject;
@@ -112,12 +73,18 @@ namespace Core.Systems.BezierInterpolator
             Run();
         }
 
+        /// <summary>
+        /// Starts the sequence from a specific world position.
+        /// </summary>
         public void Run(Vector3 startVector3)
         {
             _startVector3 = startVector3;
             Run();
         }
 
+        /// <summary>
+        /// Triggers the sequential initiation of Bezier items.
+        /// </summary>
         public void Run()
         {
             if (OnRun != null)
@@ -134,13 +101,15 @@ namespace Core.Systems.BezierInterpolator
             StartCoroutine(SequentialInitiation());
         }
 
+        /// <summary>
+        /// Spawns items over time at the defined spawn interval.
+        /// </summary>
         IEnumerator SequentialInitiation()
         {
             for (int i = 0; i < SpawnAmount; i++)
             {
                 GameObject tmp = Instantiate(Prefab, _startVector3, Quaternion.identity);
                 if (ParentGameObject != null) { tmp.transform.SetParent(ParentGameObject); }
-                ///tmp.transform.localScale = Vector3.one;
 
                 BezierItem item = tmp.AddComponent<BezierItem>();
                 item.Start = _startVector3;
@@ -151,7 +120,6 @@ namespace Core.Systems.BezierInterpolator
 
                 if (TimedActionsMode == TimedActionsModes.Item)
                 {
-                    //Copy the action to the item
                     foreach (TimedAction ev in TimedActions)
                     {
                         item.TimedActions.Add(new TimedAction(ev.Time, ev.GetAction()));
@@ -163,7 +131,6 @@ namespace Core.Systems.BezierInterpolator
 
                 item.HandleA = GenerateStartHandle();
                 item.HandleB = GenerateEndHandle();
-                //item.HandleB = (InterpolationType == InterpolationTypes.Cube3) ? GenerateEndHandle() : Vector3.zero;
 
                 item.Run(this);
                 yield return new WaitForSeconds(SpawnInterval);
@@ -171,7 +138,9 @@ namespace Core.Systems.BezierInterpolator
 
             yield return null;
         }
-    
+        /// <summary>
+        /// Removes destroyed items from tracking and signals sequence completion if empty.
+        /// </summary>
         public void ItemDestroyed(BezierItem item)
         {
             _items.Remove(item);
@@ -192,6 +161,9 @@ namespace Core.Systems.BezierInterpolator
             }
         }
 
+        /// <summary>
+        /// Generates a world position for the start handle including optional variance.
+        /// </summary>
         private Vector3 GenerateStartHandle()
         {
             if (!SpawnHandleVariance)
@@ -205,6 +177,9 @@ namespace Core.Systems.BezierInterpolator
                 Random.Range(-StartHandleVariance.z, StartHandleVariance.z));
         }
 
+        /// <summary>
+        /// Generates a world position for the end handle including optional variance.
+        /// </summary>
         private Vector3 GenerateEndHandle()
         {
             if (!SpawnHandleVariance)
@@ -218,6 +193,9 @@ namespace Core.Systems.BezierInterpolator
                 Random.Range(-EndHandleVariance.z, EndHandleVariance.z));
         }
 
+        /// <summary>
+        /// Draws the Bezier path and handle guides in the editor.
+        /// </summary>
         void OnDrawGizmos()
         {
             if (!ShowDebugging)
@@ -235,7 +213,6 @@ namespace Core.Systems.BezierInterpolator
                 return;
             }
 
-            //Draw Path
             Gizmos.color = Color.cyan;
             Vector3 old = BezierItem.Cube3(
                 StartGameObject.transform.position,
@@ -258,7 +235,6 @@ namespace Core.Systems.BezierInterpolator
                 old = next;
             }
 
-            //Draw Handle guides
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(StartGameObject.transform.position, StartHandleGameObject.transform.position);
             Gizmos.DrawLine(EndGameObject.transform.position, EndHandleGameObject.transform.position);
@@ -277,7 +253,9 @@ namespace Core.Systems.BezierInterpolator
         public bool Triggered;
 
         private UnityAction<BezierItem> _action;
-
+        /// <summary>
+        /// Initializes a new timed action for a Bezier sequence.
+        /// </summary>
         public TimedAction(float time, UnityAction<BezierItem> action)
         {
             Triggered = false;
@@ -285,11 +263,17 @@ namespace Core.Systems.BezierInterpolator
             _action = action;
         }
 
+        /// <summary>
+        /// Returns the action delegate.
+        /// </summary>
         public UnityAction<BezierItem> GetAction()
         {
             return _action;
         }
 
+        /// <summary>
+        /// Checks if the provided time exceeds the action threshold and triggers the action once.
+        /// </summary>
         public void CheckAction(float time, BezierItem item)
         {
             if (!Triggered)
@@ -310,7 +294,9 @@ namespace Core.Systems.BezierInterpolator
         public bool Triggered;
 
         private UnityEvent<BezierItem> _ev;
-
+        /// <summary>
+        /// Initializes a new timed event for a Bezier sequence.
+        /// </summary>
         public TimedEvent(float time, UnityEvent<BezierItem> ev)
         {
             Triggered = false;
@@ -318,11 +304,17 @@ namespace Core.Systems.BezierInterpolator
             _ev = ev;
         }
 
+        /// <summary>
+        /// Returns the event delegate.
+        /// </summary>
         public UnityEvent<BezierItem> GetEvent()
         {
             return _ev;
         }
 
+        /// <summary>
+        /// Checks if the provided time exceeds the event threshold and triggers the event once.
+        /// </summary>
         public void CheckEvent(float time, BezierItem item)
         {
             if (!Triggered)

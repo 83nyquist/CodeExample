@@ -33,25 +33,9 @@ namespace Core.Components
         public Text FadeText;
         public bool StartFadedOut = true;
 
-        //public static ScreenFade Instance = null;
-        //void Awake()
-        //{
-        //    //Check if instance already exists
-        //    if (Instance == null)
-        //    {
-        //        //if not, set instance to this
-        //        Instance = this;
-        //    }
-
-        //    //If instance already exists and it's not this:
-        //    else if (Instance != this)
-        //    {
-        //        //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance present.
-        //        Debug.LogError("Destroy GameObject: More than one Instance");
-        //        Destroy(gameObject);
-        //    }
-        //}
-
+        /// <summary>
+        /// Initializes the CanvasGroup and sets initial alpha based on settings.
+        /// </summary>
         void Awake()
         {
             _cg = FadeImage.GetComponent<CanvasGroup>();
@@ -76,6 +60,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Updates the fade progress if active.
+        /// </summary>
         void Update()
         {
             if (_isActive)
@@ -84,6 +71,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Interpolates the alpha value of the CanvasGroup towards the target.
+        /// </summary>
         void HandleFade()
         {
             _currentTime += Time.deltaTime / _duration;
@@ -92,6 +82,9 @@ namespace Core.Components
             HandleEnd();
         }
 
+        /// <summary>
+        /// Evaluates if the fade animation has reached its completion threshold.
+        /// </summary>
         public void HandleEnd()
         {
             if (Phase == Phases.Out)
@@ -110,6 +103,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Configures and starts the fade-out (to opaque) sequence.
+        /// </summary>
         public void FadeOut(float dur, string text, UnityAction action = null)
         {
             Phase = Phases.Out;
@@ -126,6 +122,9 @@ namespace Core.Components
             _isActive = true;
         }
 
+        /// <summary>
+        /// Finalizes the fade-out state and invokes the callback.
+        /// </summary>
         public void OnFadedOut()
         {
             print("OnFadedOut");
@@ -138,6 +137,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Configures and starts the fade-in (to transparent) sequence.
+        /// </summary>
         public void FadeInn(float dur, string text, UnityAction action = null)
         {
             Phase = Phases.Inn;
@@ -154,6 +156,9 @@ namespace Core.Components
             _isActive = true;
         }
 
+        /// <summary>
+        /// Finalizes the fade-in state and invokes the callback.
+        /// </summary>
         public void OnFadedInn()
         {
             print("OnFadedInn");
@@ -166,6 +171,9 @@ namespace Core.Components
             }
         }
 
+        /// <summary>
+        /// Performs a full screen transition: fading out, executing a mid-action, and fading in.
+        /// </summary>
         public void Transition(float dur, string text, UnityAction actionMid = null, UnityAction actionEnd = null)
         {
             if (FadeText != null)

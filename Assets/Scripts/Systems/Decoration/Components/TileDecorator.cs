@@ -15,6 +15,9 @@ namespace Systems.Decoration.Components
 
         private TileDecoratorAnimator _animator;
         
+        /// <summary>
+        /// Configures the decorator with grid data and triggers initial placement or animation.
+        /// </summary>
         public void Initialize(AxialHexGrid grid, TileData data, Transform parent, GameObject sourcePrefab, TileDecoratorAnimator animator)
         {
             axialHexGrid = grid;
@@ -42,6 +45,9 @@ namespace Systems.Decoration.Components
             enabled = true;
         }
         
+        /// <summary>
+        /// Cancels animations and prepares the decorator to return to the object pool.
+        /// </summary>
         public void Return(Transform parent)
         {
             if (_animator != null) _animator.Cancel(transform);

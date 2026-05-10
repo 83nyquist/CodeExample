@@ -6,6 +6,13 @@ namespace Systems.Grid.Pathfinding
 {
     public static class TilePathfinder
     {
+        /// <summary>
+        /// Performs an A* search to find the shortest path between origin and target.
+        /// </summary>
+        /// <param name="origin">Starting tile.</param>
+        /// <param name="target">Destination tile.</param>
+        /// <param name="canTraverse">A predicate determining if a tile is walkable.</param>
+        /// <returns>A list of tiles representing the path, or null if no path exists.</returns>
         public static List<TileData> FindPath(
             TileData origin,
             TileData target,
@@ -97,6 +104,9 @@ namespace Systems.Grid.Pathfinding
             return null;
         }
 
+        /// <summary>
+        /// Searches the open set for the tile with the lowest estimated total cost.
+        /// </summary>
         private static TileData GetLowestCostTile(List<TileData> openSet, Dictionary<TileData, PathRecord> records)
         {
             TileData bestTile = openSet[0];
@@ -118,6 +128,9 @@ namespace Systems.Grid.Pathfinding
             return bestTile;
         }
 
+        /// <summary>
+        /// Retraces the parent pointers from the target back to the origin to create the final path list.
+        /// </summary>
         private static List<TileData> BuildPath(
             TileData origin,
             TileData target,

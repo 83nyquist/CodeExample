@@ -7,6 +7,9 @@ namespace Systems.Grid.Editor
     [CustomEditor(typeof(AxialHexGrid))]
     public class AxialHexGridEditor : UnityEditor.Editor
     {
+        /// <summary>
+        /// Draws the custom inspector for the AxialHexGrid, displaying live tile counts and neighbor debug data.
+        /// </summary>
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
@@ -20,7 +23,6 @@ namespace Systems.Grid.Editor
             TileData origin = grid.GetTile(0, 0);
             if (origin != null)
             {
-                // Check if Neighbors logic is linked
                 int neighborCount = origin.Neighbours?.Length ?? 0;
                 EditorGUILayout.LabelField($"Origin (0,0) Neighbors: {neighborCount}");
             }

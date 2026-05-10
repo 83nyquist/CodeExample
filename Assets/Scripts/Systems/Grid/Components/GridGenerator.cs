@@ -10,11 +10,17 @@ namespace Systems.Grid.Components
     {
         private readonly float _maxMsPerFrame;
 
+        /// <summary>
+        /// Initializes the generator with a specified performance budget per frame.
+        /// </summary>
         public GridGenerator(float maxMsPerFrame)
         {
             _maxMsPerFrame = maxMsPerFrame;
         }
 
+        /// <summary>
+        /// Coroutine to create initial TileData structures for the grid in batches.
+        /// </summary>
         public IEnumerator CreateDataRoutine(AxialHexGrid grid, int radius, int totalTiles)
         {
             return ProcessInBatches(
@@ -24,6 +30,9 @@ namespace Systems.Grid.Components
             );
         }
 
+        /// <summary>
+        /// Coroutine to establish neighbor references for every tile in the grid in batches.
+        /// </summary>
         public IEnumerator BuildNeighborsRoutine(AxialHexGrid grid, int radius, int totalTiles)
         {
             return ProcessInBatches(
@@ -44,6 +53,9 @@ namespace Systems.Grid.Components
             );
         }
 
+        /// <summary>
+        /// Generic batch processor that executes an action over a collection while respecting a time budget.
+        /// </summary>
         private IEnumerator ProcessInBatches<T>(IEnumerable<T> items, int totalCount, Action<T> action)
         {
             float budgetSeconds = _maxMsPerFrame / 1000f;

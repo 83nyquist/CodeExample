@@ -12,13 +12,15 @@ namespace Systems.Grid.Passes.Alteration
         [SerializeField] private TileSet tileSet;
         public override string PassName => "Default Variation Pass";
 
+        /// <summary>
+        /// Ensures every tile has a valid variation index, utilizing a coordinate-based seed if no variation is set.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
             if (tileSet == null) return;
 
             foreach (var tile in grid.Tiles.Values)
             {
-                // If a previous pass (like Mountain Smoothing) already set a variation, skip it.
                 if (tile.VariationIndex != -1) continue;
 
                 int variationCount = tileSet.GetVariationCount(tile.type);
@@ -28,12 +30,14 @@ namespace Systems.Grid.Passes.Alteration
                     continue;
                 }
 
-                // Deterministic random based on coordinates and world seed
                 int tileSeed = GetSeed(tile.AxialCoordinates, seed);
                 tile.VariationIndex = Mathf.Abs(tileSeed % variationCount);
             }
         }
 
+        /// <summary>
+        /// Generates a deterministic integer seed based on axial coordinates and a global seed.
+        /// </summary>
         private int GetSeed(Vector2Int coords, int globalSeed)
         {
             unchecked {

@@ -10,6 +10,9 @@ namespace Systems.Grid.Passes.Alteration
         [Header("RotationAlterationPass")]
         public override string PassName => "Rotation Pass";
     
+        /// <summary>
+        /// Assigns a random 60-degree increment rotation to every tile in the grid.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
             System.Random random = new System.Random(seed);
@@ -18,8 +21,6 @@ namespace Systems.Grid.Passes.Alteration
             {
                 TileData tile = kvp.Value;
             
-                // To retain "pointy side up" orientation, we rotate in 60-degree increments.
-                // Since the grid uses X and Z coordinates, we rotate around the Y-axis.
                 float yRotation = random.Next(0, 6) * 60f;
                 tile.Rotation = new Vector3(0, yRotation, 0);
             }

@@ -11,11 +11,13 @@ namespace Systems.Grid.Editor
     {
         private bool _showNeighbors = false;
 
+        /// <summary>
+        /// Renders the property drawer in the inspector, including live data access via reflection for non-serialized properties.
+        /// </summary>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            // Draw the foldout for the TileData itself
             property.isExpanded = EditorGUI.Foldout(new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight), property.isExpanded, label);
 
             if (property.isExpanded)
@@ -23,14 +25,12 @@ namespace Systems.Grid.Editor
                 EditorGUI.indentLevel++;
                 float yOffset = EditorGUIUtility.singleLineHeight + 2;
 
-                // 1. Draw standard Serialized Fields
                 SerializedProperty xProp = property.FindPropertyRelative("x");
                 SerializedProperty zProp = property.FindPropertyRelative("z");
                 
                 EditorGUI.LabelField(new Rect(position.x, position.y + yOffset, position.width, EditorGUIUtility.singleLineHeight), $"Coordinates: ({xProp.intValue}, {zProp.intValue})");
                 yOffset += EditorGUIUtility.singleLineHeight;
 
-                // 2. Access the actual class instance to show NonSerialized data
                 TileData tileData = GetTargetObjectOfProperty(property) as TileData;
 
                 if (tileData != null)
@@ -38,7 +38,6 @@ namespace Systems.Grid.Editor
                     EditorGUI.LabelField(new Rect(position.x, position.y + yOffset, position.width, EditorGUIUtility.singleLineHeight), $"Type: {tileData.type} | Index: {tileData.VariationIndex}");
                     yOffset += EditorGUIUtility.singleLineHeight;
 
-                    // 3. Draw Neighbors (The non-serialized part)
                     _showNeighbors = EditorGUI.Foldout(new Rect(position.x, position.y + yOffset, position.width, EditorGUIUtility.singleLineHeight), _showNeighbors, "Neighbors (Live Data)");
                     yOffset += EditorGUIUtility.singleLineHeight;
 
@@ -61,15 +60,21 @@ namespace Systems.Grid.Editor
             EditorGUI.EndProperty();
         }
 
+        /// <summary>
+        /// Calculates the dynamic height of the property drawer based on whether foldouts are expanded.
+        /// </summary>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             if (!property.isExpanded) return EditorGUIUtility.singleLineHeight;
             
-            float height = EditorGUIUtility.singleLineHeight * 3 + 10; // Basic info
-            if (_showNeighbors) height += EditorGUIUtility.singleLineHeight * 7; // Neighbor list
+            float height = EditorGUIUtility.singleLineHeight * 3 + 10;
+            if (_showNeighbors) height += EditorGUIUtility.singleLineHeight * 7;
             return height;
         }
 
+        /// <summary>
+        /// Uses reflection to retrieve the actual object instance from a SerializedProperty path.
+        /// </summary>
         private object GetTargetObjectOfProperty(SerializedProperty prop)
         {
             var path = prop.propertyPath.Replace(".Array.data[", "[");
@@ -91,6 +96,9 @@ namespace Systems.Grid.Editor
             return obj;
         }
 
+        /// <summary>
+        /// Retrieves a field value from an object using reflection.
+        /// </summary>
         private object GetValue_Imp(object source, string name)
         {
             if (source == null) return null;
@@ -100,6 +108,9 @@ namespace Systems.Grid.Editor
             return f.GetValue(source);
         }
 
+        /// <summary>
+        /// Retrieves an indexed value from an enumerable field using reflection.
+        /// </summary>
         private object GetValue_Imp(object source, string name, int index)
         {
             var enumerable = GetValue_Imp(source, name) as System.Collections.IEnumerable;

@@ -13,15 +13,15 @@ namespace Systems.Grid.Passes.Alteration
         [Header("MassiveMountainAlterationPass")]
         public override string PassName => "Massive Mountain Pass";
 
+        /// <summary>
+        /// Promotes "Large" mountains to "Massive" status if they are entirely surrounded by other large mountains.
+        /// </summary>
         public override void Execute(AxialHexGrid grid, int seed)
         {
-            // We collect targets in a list to prevent "bleeding" logic errors 
-            // where a tile's neighbor changes state during the same loop.
             List<TileData> targets = new List<TileData>();
 
             foreach (var tile in grid.Tiles.Values)
             {
-                // Only consider mountains that are already "Large" (Index 1)
                 if (tile.type != Enumerations.TileType.Mountain || tile.VariationIndex != 1) continue;
 
                 bool surroundedByLarge = true;
@@ -41,7 +41,6 @@ namespace Systems.Grid.Passes.Alteration
                 }
             }
 
-            // Finalize the promotion to Index 2
             foreach (var tile in targets)
                 tile.VariationIndex = 2;
         }

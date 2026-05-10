@@ -14,8 +14,9 @@ namespace Core
     /// </summary>
     public static class Extensions
     {
-        #region Conditional Accessor
-
+        /// <summary>
+        /// Executes an action on the subject if it is not null. Handles Unity-specific null checks.
+        /// </summary>
         public static void IfNotNull<T>(this T subject, Action<T> method)
             where T : class
         {
@@ -26,7 +27,6 @@ namespace Core
 
             var subjectType = typeof(T);
 
-            // Support nullable types
             if (subjectType.IsValueType)
             {
                 if (Nullable.GetUnderlyingType(subjectType) == null)
@@ -39,20 +39,18 @@ namespace Core
             {
                 var s = subject as Object;
 
-                // ReSharper disable HeuristicUnreachableCode
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (s == null)
                 {
                     return;
                 }
-
-                // ReSharper restore HeuristicUnreachableCode
             }
 
             method.Invoke(subject);
         }
 
-        // also does chaining
+        /// <summary>
+        /// Executes a function on the subject and returns the result if not null; otherwise returns default.
+        /// </summary>
         public static TR IfNotNull<T, TR>(this T subject, Func<T, TR> method)
             where T : class
         {
@@ -63,7 +61,6 @@ namespace Core
 
             var subjectType = typeof(T);
 
-            // Support nullable types
             if (subjectType.IsValueType)
             {
                 if (Nullable.GetUnderlyingType(subjectType) == null)
@@ -75,26 +72,34 @@ namespace Core
             return method.Invoke(subject);
         }
 
+        /// <summary>
+        /// Performs a generic null check using the default equality comparer.
+        /// </summary>
         private static bool IsNull<T>(T obj)
             where T : class
         {
             return EqualityComparer<T>.Default.Equals(obj, default(T));
         }
 
-        #endregion
-
-        #region Delegate/EventHandler Extensions
-
+        /// <summary>
+        /// Invokes a Func and returns the result, or default if the Func is null.
+        /// </summary>
         public static T SafeInvoke<T>(this Func<T> funcT)
         {
             return funcT == null ? default(T) : funcT.Invoke();
         }
 
+        /// <summary>
+        /// Invokes a Func with input and returns the result, or default if the Func is null.
+        /// </summary>
         public static TR SafeInvoke<T, TR>(this Func<T, TR> funcT, T input)
         {
             return funcT == null ? default(TR) : funcT.Invoke(input);
         }
 
+        /// <summary>
+        /// Invokes an Action if it is not null.
+        /// </summary>
         public static void SafeInvoke(this Action action)
         {
             if (action == null)
@@ -105,6 +110,9 @@ namespace Core
             action.Invoke();
         }
 
+        /// <summary>
+        /// Invokes an Action with an argument if it is not null.
+        /// </summary>
         public static void SafeInvoke<T>(this Action<T> action, T argument)
         {
             if (action == null)
@@ -115,6 +123,9 @@ namespace Core
             action.Invoke(argument);
         }
 
+        /// <summary>
+        /// Invokes a UnityAction if it is not null.
+        /// </summary>
         public static void SafeInvoke(this UnityAction uAction)
         {
             if (uAction == null)
@@ -125,6 +136,9 @@ namespace Core
             uAction.Invoke();
         }
 
+        /// <summary>
+        /// Invokes a UnityAction with a parameter if it is not null.
+        /// </summary>
         public static void SafeInvoke<T>(this UnityAction<T> uAction, T eventParameter)
         {
             if (uAction == null)
@@ -135,6 +149,9 @@ namespace Core
             uAction.Invoke(eventParameter);
         }
 
+        /// <summary>
+        /// Invokes a UnityAction with two parameters if it is not null.
+        /// </summary>
         public static void SafeInvoke<T1, T2>(this UnityAction<T1, T2> uAction, T1 eventParameter1, T2 eventParameter2)
         {
             if (uAction == null)
@@ -145,6 +162,9 @@ namespace Core
             uAction.Invoke(eventParameter1, eventParameter2);
         }
     
+        /// <summary>
+        /// Invokes an Action with two parameters if it is not null.
+        /// </summary>
         public static void SafeInvoke<T1, T2>(this Action<T1, T2> action, T1 param1, T2 param2)
         {
             if (action == null)
@@ -155,6 +175,9 @@ namespace Core
             action.Invoke(param1, param2);
         }
 
+        /// <summary>
+        /// Invokes a UnityEvent if it is not null.
+        /// </summary>
         public static void SafeInvoke(this UnityEvent uEvent)
         {
             if (uEvent == null)
@@ -165,6 +188,9 @@ namespace Core
             uEvent.Invoke();
         }
 
+        /// <summary>
+        /// Invokes a generic UnityEvent with a parameter if it is not null.
+        /// </summary>
         public static void SafeInvoke<T>(this UnityEvent<T> uEvent, T eventParameter)
         {
             if (uEvent == null)
@@ -175,6 +201,9 @@ namespace Core
             uEvent.Invoke(eventParameter);
         }
 
+        /// <summary>
+        /// Invokes a UnityEvent with two parameters if it is not null.
+        /// </summary>
         public static void SafeInvoke<T1, T2>(this UnityEvent<T1, T2> uEvent, T1 eventParameter1, T2 eventParameter2)
         {
             if (uEvent == null)
@@ -185,6 +214,9 @@ namespace Core
             uEvent.Invoke(eventParameter1, eventParameter2);
         }
 
+        /// <summary>
+        /// Invokes an EventHandler if it is not null.
+        /// </summary>
         public static void SafeInvoke(this EventHandler eventHandler, object sender, EventArgs eventArgs)
         {
             if (eventHandler != null)
@@ -193,6 +225,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Unsubscribes and then subscribes an action to a UnityEvent to ensure a single subscription.
+        /// </summary>
         public static void SingleSubcribe(this UnityEvent uEvnt, UnityAction uAction)
         {
             if (uEvnt == null || uAction == null)
@@ -204,6 +239,9 @@ namespace Core
             uEvnt.AddListener(uAction);
         }
 
+        /// <summary>
+        /// Unsubscribes and then subscribes a generic action to a UnityEvent to ensure a single subscription.
+        /// </summary>
         public static void SingleSubcribe<T>(this UnityEvent<T> uEvnt, UnityAction<T> uAction)
         {
             if (uEvnt == null)
@@ -215,6 +253,9 @@ namespace Core
             uEvnt.AddListener(uAction);
         }
 
+        /// <summary>
+        /// Adds a listener to a UnityEvent that automatically removes itself after one invocation.
+        /// </summary>
         public static void AddOneTimeListener(this UnityEvent unityEvent, UnityAction unityAction)
         {
             if (unityEvent == null)
@@ -231,6 +272,9 @@ namespace Core
             unityEvent.AddListener(oneTimeListener);
         }
         
+        /// <summary>
+        /// Resets an EventHandler reference to null if the instance is valid.
+        /// </summary>
         public static void SafeUnsubscribe<T>(this object instance, ref EventHandler<T> eventHandler)
         {
             if (instance != null && eventHandler != null)
@@ -239,6 +283,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Resets an EventHandler reference to null if the instance is valid.
+        /// </summary>
         public static void SafeUnsubscribe(this object instance, ref EventHandler eventHandler)
         {
             if (instance != null && eventHandler != null)
@@ -247,6 +294,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Resets an Action reference to null if the instance is valid.
+        /// </summary>
         public static void SafeUnsubscribe<T>(this object instance, ref Action<T> eventHandler)
         {
             if (instance != null && eventHandler != null)
@@ -255,6 +305,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Resets an Action reference to null if the instance is valid.
+        /// </summary>
         public static void SafeUnsubscribe(this object instance, ref Action eventHandler)
         {
             if (instance != null && eventHandler != null)
@@ -263,11 +316,9 @@ namespace Core
             }
         }
 
-
-        #endregion / Delegate/EventHandler Extensions
-
-        #region Component and GameObject Extensions
-
+        /// <summary>
+        /// Safely attempts to get a component, logging an error if the GameObject is null.
+        /// </summary>
         public static TComponent GetComponentSafe<TComponent>(this GameObject @this)
             where TComponent : Component
         {
@@ -280,18 +331,27 @@ namespace Core
             return @this.GetComponent<TComponent>();
         }
 
+        /// <summary>
+        /// Returns an existing component or adds a new one if it doesn't exist.
+        /// </summary>
         public static TComponent GetOrAddComponent<TComponent>(this GameObject @this)
             where TComponent : Component
         {
             return @this.GetComponent<TComponent>().NullCoalesceAssign(@this.AddComponent<TComponent>);
         }
 
+        /// <summary>
+        /// Returns an existing component on the component's GameObject or adds a new one.
+        /// </summary>
         public static TComponent GetOrAddComponent<TComponent>(this Component @this)
             where TComponent : Component
         {
             return @this.GetComponent<TComponent>().NullCoalesceAssign(@this.gameObject.AddComponent<TComponent>);
         }
 
+        /// <summary>
+        /// Returns an existing component of a specific type or adds a new one.
+        /// </summary>
         public static Component GetOrAddComponent(this Component @this, Type componentType)
         {
             if (!componentType.IsSubclassOf(typeof(Component)))
@@ -301,89 +361,6 @@ namespace Core
 
             return @this.GetComponent(componentType).NullCoalesceAssign(@this.gameObject.AddComponent(componentType));
         }
-
-        //public static TComponent GetOrAddComponentWithDependencies<TComponent>(this Component @this)
-        //    where TComponent : Component
-        //{
-        //    var component = @this.GetComponent<TComponent>();
-
-        //    if (component != null)
-        //    {
-        //        return component;
-        //    }
-
-        //    var dependencyGraph = BuildTypeDependencyGraph<TComponent>();
-
-        //    Debug.Log("Has children?" + dependencyGraph.HasChildren);
-
-        //    // Add components from the leaf-ends, this ensures dependencies are added in the correct order
-        //    while (dependencyGraph.HasChildren)
-        //    {
-        //        var leafNodes = dependencyGraph.GetLeafNodes();
-
-        //        foreach (var leafNode in leafNodes)
-        //        {
-        //            if (@this.GetComponent(leafNode.Value) == null)
-        //            {
-        //                @this.gameObject.AddComponent(leafNode.Value);
-        //            }
-
-        //            dependencyGraph.RemoveNode(leafNode);
-        //        }
-        //    }
-
-        //    return @this.gameObject.AddComponent<TComponent>();
-        //}
-
-        //private static GraphNode<Type> BuildTypeDependencyGraph<TComponent>()
-        //    where TComponent : Component
-        //{
-        //    Debug.Log("Building Dependency Graph For Type: " + typeof(TComponent));
-        //    return BuildTypeDependencyGraph(typeof(TComponent), new GraphNode<Type>(typeof(TComponent), null));
-        //}
-
-        //private static GraphNode<Type> BuildTypeDependencyGraph(Type componentType, GraphNode<Type> currentParent)
-        //{
-        //    var requireComponentAttributes = componentType.GetCustomAttributes(typeof(RequireComponent), true);
-        //    Debug.Log("Attribute Count: " + requireComponentAttributes.Length);
-
-        //    var typedRequiredAttributes = requireComponentAttributes.OfType<RequireComponent>().ToList();
-        //    Debug.Log("Typed Attribute Count: " + typedRequiredAttributes.Count);
-
-        //    var actualRequirementTypes = typedRequiredAttributes.SelectMany(cr => new[] { cr.m_Type0, cr.m_Type1, cr.m_Type2 }).Where(t => t != null)
-        //        .Distinct().ToList();
-
-        //    Debug.Log("Actual Types Count: " + actualRequirementTypes.Count);
-
-        //    foreach (var actualRequirementType in actualRequirementTypes)
-        //    {
-        //        Debug.Log("Type: " + actualRequirementType);
-        //    }
-
-        //    var componentRequirements = actualRequirementTypes;
-
-        //    foreach (var componentRequirement in componentRequirements)
-        //    {
-        //        if (!currentParent.Root.ContainsValue(componentRequirement))
-        //        {
-        //            BuildTypeDependencyGraph(componentRequirement, new GraphNode<Type>(componentRequirement, currentParent));
-        //        }
-        //        else
-        //        {
-        //            if (currentParent.Ancestors.Any(gn => gn.Value == componentRequirement))
-        //            {
-        //                Debug.LogError("Circular dependency detected: " + componentType + " <-> " + componentRequirement);
-        //            }
-        //            else
-        //            {
-        //                // Move already built graph to deeper position in tree
-        //                currentParent.Root.GetNodeWithValue(componentRequirement).Parent = currentParent;
-        //            }
-        //        }
-        //    }
-
-        //    return currentParent;
-        //}
 
         /// <summary>
         /// Gets a component that is attached to a child of the component gameobject, guaranteed to not be attached to the component itself.
@@ -473,56 +450,11 @@ namespace Core
             return gameObject.transform.GetChildComponents<TComponent>(includeInactive);
         }
 
-        //public static TComponent GetParentComponent<TComponent>(this GameObject gameObject, bool includeInactive = false)
-        //    where TComponent : class // Cannot constrain to Component if we want to support interfaces
-        //{
-        //    if (gameObject == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    // The unity built-in method actually searches itself as well
-        //    return gameObject.transform.GetParentComponent<TComponent>(includeInactive);
-        //}
-
-        //public static TComponent GetParentComponent<TComponent>(this Component component, bool includeInactive = false)
-        //    where TComponent : class // Cannot constrain to Component if we want to support interfaces
-        //{
-        //    if (component == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    // The built-in method actually searches the object itself as well, thats why we need to search from the parent
-        //    return component.transform.GetParentComponents<TComponent>(includeInactive).FirstOrDefault();
-        //}
-
-        //public static IEnumerable<TComponent> GetParentComponents<TComponent>(this Component component, bool includeInactive = false)
-        //    where TComponent : class
-        //{
-        //    if (component.transform.IsRoot())
-        //    {
-        //        Debug.LogError("Object is root object and has no parents to get components from", component);
-        //        return null;
-        //    }
-
-        //    return component.transform.parent.GetComponentsInParent<TComponent>(includeInactive);
-        //}
-
-        //public static IEnumerable<TComponent> GetParentComponents<TComponent>(this GameObject gameObject, bool includeInactive = false)
-        //    where TComponent : class // Cannot constrain to Component if we want to support interfaces
-        //{
-        //    if (gameObject == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    return gameObject.transform.GetParentComponents<TComponent>(includeInactive);
-        //}
-
+        /// <summary>
+        /// Assigns a GameObject from a source if the current reference is null.
+        /// </summary>
         public static GameObject NullCoalesceAssign(this GameObject gameObject, Func<GameObject> gameObjectSource)
         {
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (gameObject == null)
             {
                 gameObject = gameObjectSource.SafeInvoke();
@@ -541,47 +473,10 @@ namespace Core
         public static TComponent NullCoalesceAssign<TComponent>(this TComponent component, Component componentSource)
             where TComponent : Component
         {
-            // Because UnityEngine.Object overloads the != and == operators, see link
-            // http://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
-            // http://forum.unity3d.com/threads/fun-with-null.148090/
-            // http://forum.unity3d.com/threads/null-check-inconsistency-c.220649/
-            // the null coalescing operator (??) does not work as expected in some cases in the editor
-            // (But should work fine in any code that is in a build)
-            // This is why resharper is complaining... a lot.
-
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-
-            // If the object has been "destroyed" but is not actually null, null coalescing will not work as intended because it compares actual references
-            if (component == null)
-            {
-                // Check if it really is null
-                ////if (!ReferenceEquals(component, null)) // we dont need to, because we would want to assign it anways
-                ////{
-                var potentialComponent = componentSource as TComponent;
-                if (potentialComponent != null)
-                {
-                    component = potentialComponent;
-                }
-                else
-                {
-                    component = componentSource.GetComponent<TComponent>();
-                }
-
-                ////}
-            }
-
-            // ReSharper restore HeuristicUnreachableCode
-            return component;
-        }
-
-        public static TComponent NullCoalesceAssign<TComponent, TOtherComponent>(this TComponent component, TOtherComponent componentSource)
-            where TComponent : Component
-            where TOtherComponent : Component
-        {
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (component == null)
             {
                 var potentialComponent = componentSource as TComponent;
+                
                 if (potentialComponent != null)
                 {
                     component = potentialComponent;
@@ -592,38 +487,48 @@ namespace Core
                 }
             }
 
-            // ReSharper restore HeuristicUnreachableCode
-            return component;
-        }
-
-        public static TComponent NullCoalesceAssign<TComponent>(this TComponent component, Func<TComponent> componentSource)
-            where TComponent : Component
-        {
-            // Because UnityEngine.Object overloads the != and == operators, see link
-            // http://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
-            // http://forum.unity3d.com/threads/fun-with-null.148090/
-            // http://forum.unity3d.com/threads/null-check-inconsistency-c.220649/
-            // the null coalescing operator does not work as expected in some cases in the editor
-            // (But should work fine in any code that is in a build
-            // This is why resharper is complaining... a lot.
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-
-            // If the object has been "destroyed" but is not actually null, null coalescing will not work as intended because it compares actual references
-            if (component == null)
-            {
-                // Check if it really is null
-                ////if (!ReferenceEquals(component, null)) // we dont need to, because we would want to assign it anways
-                ////{
-                component = componentSource.SafeInvoke();
-                ////}
-            }
-
-            // ReSharper restore HeuristicUnreachableCode
             return component;
         }
 
         /// <summary>
-        ///  Unity Editor-safe null coalescing operator subsitute, takes another gameobject as parameter to fetch the component from.
+        /// Assigns a component from another component source if the current reference is null.
+        /// </summary>
+        public static TComponent NullCoalesceAssign<TComponent, TOtherComponent>(this TComponent component, TOtherComponent componentSource)
+            where TComponent : Component
+            where TOtherComponent : Component
+        {
+            if (component == null)
+            {
+                var potentialComponent = componentSource as TComponent;
+                if (potentialComponent != null)
+                {
+                    component = potentialComponent;
+                }
+                else
+                {
+                    component = componentSource.GetComponent<TComponent>();
+                }
+            }
+
+            return component;
+        }
+
+        /// <summary>
+        /// Assigns a component from a Func source if the current reference is null.
+        /// </summary>
+        public static TComponent NullCoalesceAssign<TComponent>(this TComponent component, Func<TComponent> componentSource)
+            where TComponent : Component
+        {
+            if (component == null)
+            {
+                component = componentSource.SafeInvoke();
+            }
+
+            return component;
+        }
+
+        /// <summary>
+        /// Assigns a component from a GameObject source if the current reference is null.
         /// </summary>
         /// <typeparam name="TComponent">The type of the component, inferred.</typeparam>
         /// <param name="component">The component variable to null coalesce.</param>
@@ -632,43 +537,20 @@ namespace Core
         public static TComponent NullCoalesceAssign<TComponent>(this TComponent component, GameObject componentSource)
             where TComponent : Component
         {
-            // Because UnityEngine.Object overloads the != and == operators, see link
-            // http://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
-            // http://forum.unity3d.com/threads/fun-with-null.148090/
-            // http://forum.unity3d.com/threads/null-check-inconsistency-c.220649/
-            // the null coalescing operator does not work as expected in some cases in the editor
-            // (But should work fine in any code that is in a build)
-            // This is why resharper is complaining... a lot.
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (component == null)
             {
-                // ReSharper disable HeuristicUnreachableCode
-                // Check if it really is null
-                ////if (!ReferenceEquals(component, null)) // we dont need to, because we would want to assign it anways
-                ////{
                 component = componentSource.GetComponent<TComponent>();
-                ////}
             }
 
-            // ReSharper restore HeuristicUnreachableCode
             return component;
         }
 
+        /// <summary>
+        /// Returns the existing component or fetches it from a source if null.
+        /// </summary>
         public static TComponent NullCoalesce<TComponent>(this TComponent component, Component componentSource)
             where TComponent : Component
         {
-            // Because UnityEngine.Object overloads the != and == operators, see link
-            // http://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
-            // http://forum.unity3d.com/threads/fun-with-null.148090/
-            // http://forum.unity3d.com/threads/null-check-inconsistency-c.220649/
-            // the null coalescing operator (??) does not work as expected in some cases in the editor
-            // (But should work fine in any code that is in a build)
-            // This is why resharper is complaining... a lot.
-
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-
-            // If the object has been "destroyed" but is not actually null, null coalescing will not work as intended because it compares actual references
             if (component == null)
             {
                 return componentSource.GetComponent<TComponent>();
@@ -677,31 +559,22 @@ namespace Core
             return component;
         }
 
+        /// <summary>
+        /// Returns the existing component or fetches it from a Func source if null.
+        /// </summary>
         public static TComponent NullCoalesce<TComponent>(this TComponent component, Func<TComponent> componentSource)
             where TComponent : Component
         {
-            // Because UnityEngine.Object overloads the != and == operators, see link
-            // http://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
-            // http://forum.unity3d.com/threads/fun-with-null.148090/
-            // http://forum.unity3d.com/threads/null-check-inconsistency-c.220649/
-            // the null coalescing operator does not work as expected in some cases in the editor
-            // (But should work fine in any code that is in a build
-            // This is why resharper is complaining... a lot.
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-
-            // If the object has been "destroyed" but is not actually null, null coalescing will not work as intended because it compares actual references
             if (component == null)
             {
                 return componentSource.SafeInvoke();
             }
 
-            // ReSharper restore HeuristicUnreachableCode
             return component;
         }
 
         /// <summary>
-        ///  Unity Editor-safe null coalescing operator subsitute, takes another gameobject as parameter to fetch the component from.
+        /// Returns the existing component or fetches it from a GameObject source if null.
         /// </summary>
         /// <typeparam name="TComponent">The type of the component, inferred.</typeparam>
         /// <param name="component">The component variable to null coalesce.</param>
@@ -710,15 +583,6 @@ namespace Core
         public static TComponent NullCoalesce<TComponent>(this TComponent component, GameObject componentSource)
             where TComponent : Component
         {
-            // Because UnityEngine.Object overloads the != and == operators, see link
-            // http://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/
-            // http://forum.unity3d.com/threads/fun-with-null.148090/
-            // http://forum.unity3d.com/threads/null-check-inconsistency-c.220649/
-            // the null coalescing operator does not work as expected in some cases in the editor
-            // (But should work fine in any code that is in a build)
-            // This is why resharper is complaining... a lot.
-            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            // ReSharper disable once ConvertIfStatementToReturnStatement
             if (component == null)
             {
                 return componentSource.GetComponent<TComponent>();
@@ -727,6 +591,9 @@ namespace Core
             return component;
         }
 
+        /// <summary>
+        /// Calculates the number of steps up the parent chain to reach the root.
+        /// </summary>
         public static int GetHierarchyDepth(this Transform @this)
         {
             var ancestors = 0;
@@ -747,14 +614,7 @@ namespace Core
         /// <returns>If the game object has been marked as destroyed by UnityEngine</returns>
         public static bool IsDestroyed(this GameObject gameObject)
         {
-            // UnityEngine overloads the == operator for the GameObject type
-            // and returns null when the object has been destroyed, but
-            // actually the object might still be there but has not been cleaned up yet
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             return gameObject == null && !ReferenceEquals(gameObject, null);
-
-            // PS. Hans has sqeaky shoes.
         }
 
         /// <summary>
@@ -764,11 +624,6 @@ namespace Core
         /// <returns>If the game object has been marked as destroyed by UnityEngine</returns>
         public static bool IsDestroyed(this object component)
         {
-            // UnityEngine overloads the == opeator for the UnityEngine.Object/GameObject type
-            // and returns null when the object has been destroyed, but
-            // actually the object is still there but has not been cleaned up yet
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             return component == null || component.Equals(null);
         }
 
@@ -786,10 +641,9 @@ namespace Core
             }
         }
 
-        #endregion /GameObject Extensions
-
-        #region MonoBehavior Extensions
-
+        /// <summary>
+        /// Instantiates a prefab as a child of a parent, maintaining local transform state.
+        /// </summary>
         public static GameObject Instantiate(this MonoBehaviour @this, GameObject prefab, GameObject parent)
         {
 #if UNITY_5_4_OR_NEWER
@@ -802,33 +656,51 @@ namespace Core
             return newTextObject;
         }
 
+        /// <summary>
+        /// Starts a coroutine that waits for a specific duration before invoking an action.
+        /// </summary>
         public static void WaitSecondsThenInvoke(this MonoBehaviour @this, float delaySeconds, Action action)
         {
             @this.StartCoroutine(WaitSecondsThen(delaySeconds, action));
         }
 
+        /// <summary>
+        /// Starts a coroutine that executes an action at the end of the current frame.
+        /// </summary>
         public static void ExecuteOnEndOfFrame(this MonoBehaviour @this, Action action)
         {
             @this.StartCoroutine(WaitForEndOfFrameThen(action));
         }
 
+        /// <summary>
+        /// Starts a coroutine that executes an action after a specified number of frames.
+        /// </summary>
         public static void ExecuteAfterFrames(this MonoBehaviour @this, Action action, int frameFuture)
         {
             @this.StartCoroutine(ExecuteOnFrameIndex(action, Time.frameCount + Mathf.Abs(frameFuture)));
         }
 
+        /// <summary>
+        /// Coroutine that waits for a specified time and then executes an action.
+        /// </summary>
         private static IEnumerator WaitSecondsThen(float waitTime, Action action)
         {
             yield return new WaitForSeconds(waitTime);
             action();
         }
 
+        /// <summary>
+        /// Coroutine that waits for the end of the frame and then executes an action.
+        /// </summary>
         private static IEnumerator WaitForEndOfFrameThen(Action action)
         {
             yield return new WaitForEndOfFrame();
             action();
         }
 
+        /// <summary>
+        /// Coroutine that waits until a specific frame index is reached and then executes an action.
+        /// </summary>
         private static IEnumerator ExecuteOnFrameIndex(Action action, int frameIndex)
         {
             while (Time.frameCount < frameIndex)
@@ -838,10 +710,6 @@ namespace Core
 
             action();
         }
-
-        #endregion
-
-        #region Vector extensions
 
         /// <summary>
         /// Clamps both x and y values between 0 and 1.
@@ -886,10 +754,9 @@ namespace Core
                 Mathf.Clamp(vector3.z, min, max));
         }
 
-        #endregion
-
-        #region Readabilty
-
+        /// <summary>
+        /// Checks if a list is either null or has no elements.
+        /// </summary>
         public static bool IsNullOrEmpty<T>(this List<T> list)
         {
             return list == null || list.Count == 0;
@@ -927,16 +794,25 @@ namespace Core
             return values.Any(v => EqualityComparer<T>.Default.Equals(value, v));
         }
 
+        /// <summary>
+        /// Compares two floats for approximate equality using an epsilon.
+        /// </summary>
         public static bool Equals(this float floatValue, float other)
         {
             return NearlyEqual(floatValue, other, 0.0000001f);
         }
 
+        /// <summary>
+        /// Compares two doubles for approximate equality using an epsilon.
+        /// </summary>
         public static bool Equals(this double doubleValue, double other)
         {
             return NearlyEqual(doubleValue, other, 0.0000001);
         }
 
+        /// <summary>
+        /// Checks if two floats are nearly equal based on relative error.
+        /// </summary>
         private static bool NearlyEqual(float a, float b, float epsilon)
         {
             // http://stackoverflow.com/questions/3874627/floating-point-comparison-functions-for-c-sharp
@@ -961,6 +837,9 @@ namespace Core
             return diff / (absA + absB) < epsilon;
         }
 
+        /// <summary>
+        /// Checks if two doubles are nearly equal based on relative error.
+        /// </summary>
         private static bool NearlyEqual(double a, double b, double epsilon)
         {
             // http://stackoverflow.com/questions/3874627/floating-point-comparison-functions-for-c-sharp
@@ -994,6 +873,9 @@ namespace Core
             return array.Length - 1;
         }
 
+        /// <summary>
+        /// Removes the last element from a collection if it contains elements.
+        /// </summary>
         public static void RemoveLast<T>(this ICollection<T> list)
         {
             if (list.Count > 0)
@@ -1001,10 +883,6 @@ namespace Core
                 list.Remove(list.Last());
             }
         }
-
-        #endregion
-
-        #region Bug Workarounds
 
         /// <summary>
         ///  A no op method, designed to fake access to properties that trigger code
@@ -1014,21 +892,7 @@ namespace Core
         /// <param name="obj">The object to access but do nothing with it.</param>
         public static void NoOp(this object obj)
         {
-            /*
-        [http://docs.unity3d.com/Manual/DownloadingAssetBundles.html]
-         *
-            When you access the .assetBundle property, the downloaded data is extracted and the AssetBundle object is created.
-
-            At this point, you are ready to load the objects contained in the bundle.
-            The second parameter passed to LoadFromCacheOrDownload specifies which version of the AssetBundle to download.
-            If the AssetBundle doesn't exist in the cache or has a version lower than requested, LoadFromCacheOrDownload will download the AssetBundle.
-            Otherwise the AssetBundle will be loaded from cache.
-
-            Please note that only up to one AssetBundle download can finish per frame when they are downloaded with WWW.LoadFromCacheOrDownload.
-         */
         }
-
-        #endregion /Bug Workarounds
 
         /// <summary>
         /// Return signed angle between vectors on a plane, where left oriented angles are negative.
@@ -1064,6 +928,9 @@ namespace Core
             return lookAngle;
         }
 
+        /// <summary>
+        /// Attempts to parse a string into an enum value, returning a default value if it fails.
+        /// </summary>
         public static bool TryParseToEnum<TEnum>(string strEnumValue, out TEnum enumValue, TEnum defaultValue = default(TEnum))
         {
             if (!Enum.IsDefined(typeof(TEnum), strEnumValue))
@@ -1076,22 +943,22 @@ namespace Core
             return true;
         }
         
+        /// <summary>
+        /// Subscribes a listener to an Action that will unsubscribe itself after one execution.
+        /// </summary>
         public static void ListenOnce(Action action, Action listener)
         {
-            // Wrapped listener to automatically deregister itself
             void Wrapper()
             {
-                // Unsubscribe first to ensure this is only called once
                 action -= Wrapper;
-
-                // Invoke the original listener
                 listener?.Invoke();
             }
-
-            // Subscribe the wrapped listener
             action += Wrapper;
         }
         
+        /// <summary>
+        /// Subscribes a generic listener to an Action that will unsubscribe itself after one execution.
+        /// </summary>
         public static Action<T> ListenOnce<T>(Action<T> action, Action<T> listener)
         {
             void Wrapper(T param)
@@ -1107,15 +974,16 @@ namespace Core
             return action + Wrapper;
         }
 
+        /// <summary>
+        /// Recursively searches for a child transform with the specified name.
+        /// </summary>
         public static Transform FindChildByName(this Transform parent, string childName)
         {
-            // Base case: Check if current transform name matches
             if (parent.name == childName)
             {
                 return parent;
             }
 
-            // Recursively search all children
             foreach (Transform child in parent)
             {
                 Transform found = child.FindChildByName(childName);
@@ -1124,8 +992,6 @@ namespace Core
                     return found;
                 }
             }
-
-            // Return null if no match is found
             return null;
         }
         
@@ -1232,16 +1098,17 @@ namespace Core
             return string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
 
-        // public static bool Successful(this WWW request)
-        // {
-        //     return string.IsNullOrEmpty(request.error) && request.text.Contains("success");
-        // }
-
+        /// <summary>
+        /// Adds multiple field entries to a WWWForm from a dictionary.
+        /// </summary>
         public static void AddFields(this WWWForm form, Dictionary<string, object> keyValuePairs)
         {
             form.AddFields(keyValuePairs, fieldEntry => fieldEntry.Key, fieldEntry => fieldEntry.Value.ToString());
         }
 
+        /// <summary>
+        /// Adds multiple field entries to a WWWForm using provided selectors.
+        /// </summary>
         public static void AddFields<T>(this WWWForm form, IEnumerable<T> elements, Func<T, string> fieldNameSelector, Func<T, string> fieldValueSelector)
         {
             foreach (var element in elements)
@@ -1250,6 +1117,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Adds multiple field entries to a WWWForm using provided selectors.
+        /// </summary>
         public static void AddFields<T>(this WWWForm form, IEnumerable<T> elements, Func<T, string> fieldNameSelector, Func<T, int> fieldValueSelector)
         {
             foreach (var element in elements)
@@ -1258,42 +1128,30 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Searches through loaded assemblies to find a specific type by name.
+        /// </summary>
         public static Type GetType(string typeName)
         {
-            // Try Type.GetType() first. This will work with types defined
-            // by the Mono runtime, in the same assembly as the caller, etc.
             var type = Type.GetType(typeName);
-
-            // If it worked, then we're done here
+            
             if (type != null)
             {
                 return type;
             }
 
-            // If the TypeName is a full name, then we can try loading the defining assembly directly
             if (typeName.Contains("."))
             {
-                // Get the name of the assembly (Assumption is that we are using
-                // fully-qualified type names)
                 var assemblyName = typeName.Substring(0, typeName.IndexOf('.'));
-
-                // Attempt to load the indicated Assembly
                 var assembly = Assembly.Load(assemblyName);
-                if (assembly == null)
+                
+                if (assembly != null)
                 {
-                    return null;
-                }
-
-                // Ask that assembly to return the proper Type
-                type = assembly.GetType(typeName);
-                if (type != null)
-                {
-                    return type;
+                    type = assembly.GetType(typeName);
+                    if (type != null) return type;
                 }
             }
 
-            // If we still haven't found the proper type, we can enumerate all of the
-            // loaded assemblies and see if any of them define the type
             var currentAssembly = Assembly.GetExecutingAssembly();
             var referencedAssemblies = currentAssembly.GetReferencedAssemblies();
             foreach (var assemblyName in referencedAssemblies)

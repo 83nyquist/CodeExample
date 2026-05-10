@@ -10,7 +10,9 @@ namespace Core
     public static class Utilities
     {
         public enum Axis { x, y, z }
-
+        /// <summary>
+        /// Formats an integer value of seconds into a mm:ss timer string.
+        /// </summary>
         public static string ConvertSecondsToTimer(int sec)
         {
             string minutes = Mathf.Floor(sec / 60).ToString("00");
@@ -19,6 +21,9 @@ namespace Core
             return minutes + " :" + seconds;
         }
 
+        /// <summary>
+        /// Gets whether the current platform is a mobile device.
+        /// </summary>
         public static bool IsOnMobile
         {
             get
@@ -31,6 +36,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Gets whether the current platform is Android.
+        /// </summary>
         public static bool IsOnAndroid
         {
             get
@@ -43,6 +51,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Gets whether the current platform is iOS.
+        /// </summary>
         public static bool IsOnIos
         {
             get
@@ -55,11 +66,17 @@ namespace Core
             }
         }
         
+        /// <summary>
+        /// Performs a Unity-specific null check.
+        /// </summary>
         public static bool IsUnityNull(this UnityEngine.Object obj)
         {
             return obj == null;
         }
         
+        /// <summary>
+        /// Coroutine that waits for a specified time before executing an action.
+        /// </summary>
         public static IEnumerator WaitAndExecute(float sec, UnityAction action)
         {
             yield return new WaitForSeconds(sec);
@@ -67,6 +84,9 @@ namespace Core
             action();
         }
 
+        /// <summary>
+        /// Attempts to run an asynchronous task within a try-catch block to handle unobserved exceptions.
+        /// </summary>
         public static async Task TryRunAsync(Func<Task> asyncOperation)
         {
             try
@@ -75,39 +95,35 @@ namespace Core
             }
             catch (Exception ex)
             {
-                // Log the exception to avoid crashes due to unobserved exceptions
                 Debug.LogError($"Exception occurred during async operation: {ex}");
             }
         }
         
-        //Remove the clone part of a gameobject created by unity
+        /// <summary>
+        /// Strips the "(Clone)" suffix from a GameObject's name.
+        /// </summary>
         public static string TrimUnityCloneName(string s)
         {
             string[] stringArr = s.Split('(');
             return stringArr[0].Trim();
         }
 
+        /// <summary>
+        /// Projects a world position into the local space of a specific UI Canvas.
+        /// </summary>
         public static Vector3 WorldToUISpace(Canvas parentCanvas, Vector3 worldPos)
         {
-            //Convert the world for screen point so that it can be used with ScreenPointToLocalPointInRectangle function
             Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
             Vector2 movePos;
-
-            //Convert the screenpoint to ui rectangle local point
             RectTransformUtility.ScreenPointToLocalPointInRectangle(parentCanvas.transform as RectTransform, screenPos, parentCanvas.worldCamera, out movePos);
-            //Convert the local point to world point
             return parentCanvas.transform.TransformPoint(movePos);
         }
 
+        /// <summary>
+        /// Compares two Color32 values to see if any channel difference exceeds a threshold.
+        /// </summary>
         public static bool CompareColors(Color32 one, Color32 two, float threshold)
         {
-            //if (Mathf.Approximately(one.r, two.r) &&
-            //    Mathf.Approximately(one.g, two.g) &&
-            //    Mathf.Approximately(one.b, two.b) &&
-            //    Mathf.Approximately(one.a, two.a))
-            //{
-            //    return true;
-            //}
             if (Mathf.Abs(one.r - two.r) > threshold &&
                 Mathf.Abs(one.g - two.g) > threshold &&
                 Mathf.Abs(one.b - two.b) > threshold &&
@@ -119,6 +135,9 @@ namespace Core
             return false;
         }
 
+        /// <summary>
+        /// Shuffles the elements of an ArrayList.
+        /// </summary>
         public static void RandomizeArrayList(ArrayList list)
         {
             for (int i = 0; i < list.Count; i++)
@@ -130,6 +149,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Checks if a list contains any null elements.
+        /// </summary>
         public static bool HasNullValues<T>(List<T> list)
         {
             foreach (T item in list)
@@ -143,6 +165,9 @@ namespace Core
             return false;
         }
 
+        /// <summary>
+        /// Swaps an element at an index with the one before it in the list.
+        /// </summary>
         public static void MoveUp<T>(List<T> list, int indexToMove)
         {
             if (indexToMove == 0)
@@ -156,6 +181,9 @@ namespace Core
             list[indexToMove - 1] = originalIndex;
         }
 
+        /// <summary>
+        /// Swaps an element at an index with the one after it in the list.
+        /// </summary>
         public static void MoveDown<T>(List<T> list, int indexToMove)
         {
             if (indexToMove == list.Count - 1)
@@ -168,6 +196,9 @@ namespace Core
             list[indexToMove + 1] = temp;
         }
 
+        /// <summary>
+        /// Returns a new list containing only non-null values from the original.
+        /// </summary>
         public static List<T> RemoveNullValues<T>(List<T> list)
         {
             List<T> res = new List<T>();
@@ -183,6 +214,9 @@ namespace Core
             return res;
         }
 
+        /// <summary>
+        /// Strips square brackets from the start and end of a string.
+        /// </summary>
         public static string RemoveBrackets(string s)
         {
             if (s.Trim().StartsWith("[") && s.Trim().EndsWith("]"))
@@ -193,6 +227,9 @@ namespace Core
             return s;
         }
 
+        /// <summary>
+        /// Shuffles the elements of a generic list.
+        /// </summary>
         public static void RandomizeList<T>(List<T> list)
         {
             for (int i = 0; i < list.Count; i++)
@@ -204,6 +241,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Shuffles the elements of an array.
+        /// </summary>
         public static void RandomizeArray(object[] list)
         {
             for (int i = 0; i < list.Length; i++)
@@ -215,6 +255,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Destroys all child objects of a transform.
+        /// </summary>
         public static void DeleteChildren(Transform transform)
         {
             int ids = transform.childCount;
@@ -224,6 +267,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Immediately destroys all child objects of a transform.
+        /// </summary>
         public static void DeleteImmediateChildren(Transform transform)
         {
             int ids = transform.childCount;
@@ -233,6 +279,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Formats an integer score with spaces and a currency postfix.
+        /// </summary>
         public static string CashifyScore(int score)
         {
             string res = "";
@@ -256,6 +305,9 @@ namespace Core
             return ReverseString(res) + "kr";
         }
 
+        /// <summary>
+        /// Inserts spaces into a string to separate characters in chunks of three.
+        /// </summary>
         public static string SeparateChars(string s)
         {
             string value = "";
@@ -279,6 +331,9 @@ namespace Core
             return ReverseString(value);
         }
 
+        /// <summary>
+        /// Appends a currency postfix to a string.
+        /// </summary>
         public static string AppendCurrancyPostfix(string s, string currancy = "")
         {
             string res = "";
@@ -295,6 +350,9 @@ namespace Core
             return res;
         }
 
+        /// <summary>
+        /// Reverses the characters in a string.
+        /// </summary>
         public static string ReverseString(string s)
         {
             string res = "";
@@ -307,6 +365,9 @@ namespace Core
             return res;
         }
 
+        /// <summary>
+        /// Iteratively adds all elements from an append list to an original list.
+        /// </summary>
         public static void AppendToList<T>(List<T> OriginalList, List<T> AppendList)
         {
             foreach (T item in AppendList)
@@ -315,6 +376,9 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Copies all elements from a new list into an original list.
+        /// </summary>
         public static void CopyList<T>(List<T> originalList, List<T> newList)
         {
             for (int i = 0; i < newList.Count; i++)
@@ -323,12 +387,18 @@ namespace Core
             }
         }
 
+        /// <summary>
+        /// Converts a Color32 to a hexadecimal string.
+        /// </summary>
         public static string ColorToHex(Color32 color)
         {
             string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
             return hex;
         }
     
+        /// <summary>
+        /// Converts a hexadecimal string into a Unity Color.
+        /// </summary>
         public static Color HexToColor(string hex)
         {
             byte r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
@@ -337,21 +407,32 @@ namespace Core
             return new Color32(r, g, b, 255);
         }
 
+        /// <summary>
+        /// Returns the opening Rich Text color tag for a specific color.
+        /// </summary>
         public static string RichTextColorStartTag(Color color)
         {
             return "<color=#" + ColorToHex(color) + ">";
         }
 
+        /// <summary>
+        /// Returns the closing Rich Text color tag.
+        /// </summary>
         public static string RichTextColorEndTag()
         {
             return "</color>";
         }
 
+        /// <summary>
+        /// Logs a message to the console with a specific Rich Text color.
+        /// </summary>
         public static void Log(string s, Color c)
         {
             Debug.Log(RichTextColorStartTag(c) + s + RichTextColorEndTag());
         }
-
+        /// <summary>
+        /// Calculates the percentage of current value relative to max.
+        /// </summary>
         public static float GetPercentage(float currentValue, float maxValue)
         {
             if (currentValue == 0 || maxValue == 0) { return 0; }
@@ -360,13 +441,18 @@ namespace Core
             return finalValue;
         }
 
+        /// <summary>
+        /// Calculates the value of a specific percentage of the current value.
+        /// </summary>
         public static float GetPercentageOf(float currentValue, float percentageValue)
         {
             if (currentValue == 0 || percentageValue == 0) { return 0; }
 
             return currentValue * percentageValue / 100;
         }
-    
+        /// <summary>
+        /// Returns a new list with all null references removed.
+        /// </summary>
         public static List<T> ClearListNulls<T>(List<T> list)
         {
             List<T> newList = new List<T>();
@@ -382,12 +468,18 @@ namespace Core
             return newList;
         }
 
+        /// <summary>
+        /// Linear interpolation between two vectors based on a specific distance offset.
+        /// </summary>
         public static Vector3 LerpByDistance(Vector3 A, Vector3 B, float x)
         {
             Vector3 P = x * Vector3.Normalize(B - A) + A;
             return P;
         }
 
+        /// <summary>
+        /// Returns a new Vector3 with one specific axis value modified.
+        /// </summary>
         public static Vector3 OverwriteSingleVectorComponent(Vector3 orig, Axis a, float newValue)
         {
             if (a == Axis.x)
@@ -406,6 +498,9 @@ namespace Core
             return orig;
         }
 
+        /// <summary>
+        /// Returns a new Vector3 with one specific axis value replaced.
+        /// </summary>
         public static Vector3 ReplaceSingleVectorComponent(Vector3 orig, Axis a, float newValue)
         {
             Vector3 res;
@@ -426,11 +521,17 @@ namespace Core
             return res;
         }
 
+        /// <summary>
+        /// Returns a new Vector3 with additions applied to each component.
+        /// </summary>
         public static Vector3 AddToVectorComponent(Vector3 orig, float x, float y, float z)
         {
             return new Vector3(orig.x + x, orig.y + y, orig.z + z);
         }
 
+        /// <summary>
+        /// Returns a new Vector3 with subtractions applied to each component.
+        /// </summary>
         public static Vector3 SubtractFromVectorComponent(Vector3 orig, float x, float y, float z)
         {
             return new Vector3(orig.x - x, orig.y - y, orig.z - z);
@@ -449,12 +550,9 @@ namespace Core
                 return false;
             }
         }
-
         /// <summary>
         /// Get the first instance of the children where its name matches the given name.
         /// </summary>
-        /// <param name="ChildName">Name of gameobject to get</param>
-        /// <returns></returns>
         public static Transform GetChildByName(string ChildName, Transform parent)
         {
             foreach (Transform t in parent)
@@ -468,6 +566,9 @@ namespace Core
             return null;
         }
 
+        /// <summary>
+        /// Recursively searches for a child transform with a matching name.
+        /// </summary>
         public static Transform RecursiveFindChild(string childName, Transform parent)
         {
             Transform findedObject = null;
@@ -485,6 +586,9 @@ namespace Core
             return findedObject;
         }
 
+        /// <summary>
+        /// Recursively searches for a child GameObject with a matching name.
+        /// </summary>
         public static GameObject RecursiveFindChildGameobject(string childName, Transform parent)
         {
             GameObject findedObject = null;
@@ -503,12 +607,8 @@ namespace Core
         }
 
         /// <summary>
-        /// Clamp the angle between a given minimum and maximum rotation
+        /// Restricts an angle to stay within a specified range, handling 360-degree wrap.
         /// </summary>
-        /// <param name="angle">Current Angle</param>
-        /// <param name="min">Minimum Rotation</param>
-        /// <param name="max">Maximum Rotation</param>
-        /// <returns></returns>
         public static float ClampAngle(float angle, float min, float max)
         {
             if (angle < -360F)
@@ -524,6 +624,9 @@ namespace Core
             return Mathf.Clamp(angle, min, max);
         }
 
+        /// <summary>
+        /// Checks if a value transition has exceeded a defined limit.
+        /// </summary>
         public static bool HasExceededLimit(float preScore, float postScore, float limit)
         {
             if (preScore < limit && postScore >= limit)
@@ -534,6 +637,9 @@ namespace Core
             return false;
         }
 
+        /// <summary>
+        /// Checks if a value transition has dropped below a defined limit.
+        /// </summary>
         public static bool HasDeceededLimit(float preScore, float postScore, float limit)
         {
             if (preScore >= limit && postScore < limit)
@@ -544,11 +650,17 @@ namespace Core
             return false;
         }
 
+        /// <summary>
+        /// Pads a string to a specific column width.
+        /// </summary>
         public static string PadStringRight(string s, int colWidth = 40)
         {
             return s.PadRight(colWidth);
         }
 
+        /// <summary>
+        /// Overwrites the materials array of a MeshRenderer.
+        /// </summary>
         public static void SetMeshRendererMaterialsArray(MeshRenderer mr, Material[] newMaterials)
         {
             Material[] mats = new Material[newMaterials.Length];
@@ -561,6 +673,9 @@ namespace Core
             mr.materials = mats;
         }
 
+        /// <summary>
+        /// Performs a ping-pong interpolation between a minimum and maximum value.
+        /// </summary>
         public static float PingPong(float value, float min, float max)
         {
             return Mathf.PingPong(value, max - min) + min;
