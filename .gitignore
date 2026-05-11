@@ -80,3 +80,6 @@ crashlytics-build.properties
 # Unity Performance Test files
 PerformanceTestRunInfo*
 PerformanceTestRunSettings*
+
+# Unity Div
+UnityConnectSettings.asset
