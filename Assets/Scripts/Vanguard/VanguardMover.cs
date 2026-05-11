@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using Systems.EventBus;
+using Systems.Grid;
 using Systems.Grid.Components;
+using Systems.Grid.Extensions;
 using UnityEngine;
+using Zenject;
 
 namespace Vanguard
 {
     public class VanguardMover : EventBusSubscriber
     {
+        [Inject] private AxialHexGrid _axialHexGrid;
+        
         private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
         [SerializeField] private float moveSpeed = 4f;
@@ -102,13 +107,7 @@ namespace Vanguard
         /// </summary>
         private IEnumerator MoveToTile(TileData tile)
         {
-            if (tile.Decorator == null)
-            {
-                Debug.LogError($"Attempting to move to tile {tile.AxialCoordinates} but it has no Decorator!");
-                yield break;
-            }
-
-            Vector3 destination = tile.Decorator.transform.position;
+            Vector3 destination = _axialHexGrid.AxialToWorld(tile.X, tile.Z);
 
             while (Vector3.Distance(transform.position, destination) > 0.01f)
             {
