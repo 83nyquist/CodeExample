@@ -104,22 +104,14 @@ namespace Coordinators
             _tilesInGrid = CalculateTotalTiles(radius);
             _currentSeed = useRandomSeed ? UnityEngine.Random.Range(1, 999999) : customSeed;
             
-            Debug.Log($"CalculateTotalTiles: {_tilesInGrid}");
-            
             int totalTileWorkEstimate = 0;
             totalTileWorkEstimate += _tilesInGrid * 2;
-            
-            Debug.Log($"Total Tile Work Estimate: {totalTileWorkEstimate}");
             
             foreach (var pass in generationPasses)
                 if (pass.pass != null) totalTileWorkEstimate += pass.pass.EstimateWorkUnits(_tilesInGrid);
             
-            Debug.Log($"After gen passes: {totalTileWorkEstimate}");
-                
             foreach (var pass in alterationPasses)
                 if (pass.pass != null) totalTileWorkEstimate += pass.pass.EstimateWorkUnits(_tilesInGrid);
-            
-            Debug.Log($"After alt passes: {totalTileWorkEstimate}");
             
             Publish(new GenerationProgressInitializedEvent(
                 totalTileWorkEstimate + _worldDecorator.GetInitialWorkEstimate(), 
