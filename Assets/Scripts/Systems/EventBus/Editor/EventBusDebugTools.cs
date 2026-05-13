@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -14,28 +15,28 @@ namespace Systems.EventBus
             window.titleContent = new GUIContent("Event Bus Logging");
             window.Show();
         }
-    
+
         void OnGUI()
         {
             GUILayout.Label("Set Log Level for All EventBusSubscribers", EditorStyles.boldLabel);
-        
+
             if (GUILayout.Button("Set to None"))
                 SetAllLogLevel(EventBusLogLevel.None);
-            
+
             if (GUILayout.Button("Set to Warning"))
                 SetAllLogLevel(EventBusLogLevel.Warning);
-            
+
             if (GUILayout.Button("Set to Verbose"))
                 SetAllLogLevel(EventBusLogLevel.Verbose);
         }
-    
+
         void SetAllLogLevel(EventBusLogLevel level)
         {
             var subscribers = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             foreach (var sub in subscribers)
             {
-                var field = sub.GetType().GetField("_logLevel", 
-                    System.Reflection.BindingFlags.NonPublic | 
+                var field = sub.GetType().GetField("_logLevel",
+                    System.Reflection.BindingFlags.NonPublic |
                     System.Reflection.BindingFlags.Instance);
                 if (field != null && field.FieldType == typeof(EventBusLogLevel))
                 {
@@ -47,3 +48,4 @@ namespace Systems.EventBus
         }
     }
 }
+#endif

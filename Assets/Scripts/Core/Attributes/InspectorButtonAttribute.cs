@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿#if UNITY_EDITOR
 using UnityEditor;
+#endif
+using System.Reflection;
 using UnityEngine;
 
 namespace Core.Attributes

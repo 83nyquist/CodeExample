@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 namespace Core.Systems.BezierInterpolator.Editor
@@ -49,7 +50,7 @@ namespace Core.Systems.BezierInterpolator.Editor
 
         public void DrawRuntimeCommands()
         {
-            if (Application.isPlaying && GUILayout.Button("Spawn Test"))//, GUILayout.Width(150)))
+            if (Application.isPlaying && GUILayout.Button("Spawn Test"))
             {
                 Script.Run(Script.StartGameObject);
             }
@@ -59,7 +60,7 @@ namespace Core.Systems.BezierInterpolator.Editor
         {
             EditorGUILayout.Space();
             EditorGUILayout.BeginVertical(EditorStyles.miniButton);
-        
+
             EditorGUILayout.BeginHorizontal();
 
             GUILayout.Label("Callback List", EditorStyles.boldLabel);
@@ -88,3 +89,4 @@ namespace Core.Systems.BezierInterpolator.Editor
         }
     }
 }
+#endif

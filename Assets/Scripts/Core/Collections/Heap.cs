@@ -43,7 +43,8 @@ namespace Core.Collections
 
         public bool Contains(T item)
         {
-            return Equals(items[item.HeapIndex], item);
+            int index = item.HeapIndex;
+            return index >= 0 && index < currentItemCount && Equals(items[index], item);
         }
 
         void SortDown(T item)
@@ -60,13 +61,13 @@ namespace Core.Collections
 
                     if (childIndexRight < currentItemCount)
                     {
-                        if (items[childIndexLeft].CompareTo(items[childIndexRight]) < 0)
+                        if (items[childIndexLeft].CompareTo(items[childIndexRight]) > 0)
                         {
                             swapIndex = childIndexRight;
                         }
                     }
 
-                    if (item.CompareTo(items[swapIndex]) < 0)
+                    if (item.CompareTo(items[swapIndex]) > 0)
                     {
                         Swap(item, items[swapIndex]);
                     }
@@ -89,7 +90,7 @@ namespace Core.Collections
             while (true)
             {
                 T parentItem = items[parentIndex];
-                if (item.CompareTo(parentItem) > 0)
+                if (item.CompareTo(parentItem) < 0)
                 {
                     Swap(item, parentItem);
                 }

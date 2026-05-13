@@ -350,7 +350,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 31.3
+  m_fontSize: 19.95
   m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1316,7 +1316,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.15
+  m_fontSize: 18
   m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1381,6 +1381,7 @@ GameObject:
   - component: {fileID: 583918623}
   - component: {fileID: 583918627}
   - component: {fileID: 583918628}
+  - component: {fileID: 583918629}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -1418,14 +1419,7 @@ MonoBehaviour:
   logLevel: 1
   inputLocks: []
   dragThresholdPixels: 5
-  cinemachineCamera: {fileID: 1778644304}
-  zoomSpeed: 10
-  minDistance: 5
-  maxDistance: 60
-  zoomSmoothing: 0.1
-  defaultY: 30
-  defaultZ: -20
-  maintainAngle: 1
+  _zoomController: {fileID: 0}
 --- !u!114 &583918627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1456,6 +1450,26 @@ MonoBehaviour:
   layerMaskToHit:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &583918629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583918621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78d32516b1593f5aca5a0cd02451eb87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Runtime::Core.Components.CameraZoomController
+  cinemachineCamera: {fileID: 0}
+  zoomSpeed: 5
+  minDistance: 5
+  maxDistance: 60
+  zoomSmoothing: 0.1
+  defaultY: 30
+  defaultZ: -20
+  maintainAngle: 1
 --- !u!1 &663264069
 GameObject:
   m_ObjectHideFlags: 0
@@ -2201,6 +2215,7 @@ MonoBehaviour:
   minMoveInterval: 1
   maxMoveInterval: 3
   visibilityUpdateInterval: 0.2
+  debugShowNpcsOutsideVision: 0
   npcVisualPrefab: {fileID: 8794614267443648548, guid: a4c860ce2bce89dde83e675fe00d7d2d, type: 3}
   moveSpeed: 3
   rotationSpeed: 15
@@ -2400,7 +2415,6 @@ MonoBehaviour:
   maxMsPerFrame: 3
   shroudMode: 1
   secondaryShroudRadius: 50
-  debugShowNpcsOutsideVision: 0
 --- !u!1 &1063868507
 GameObject:
   m_ObjectHideFlags: 0
@@ -3308,7 +3322,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.15
+  m_fontSize: 18
   m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3593,6 +3607,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Systems.Grid.WorldGeneratorCoordinator
   logLevel: 1
+  pipeline:
+    generationPasses:
+    - pass:
+        rid: 863678790527090992
+    alterationPasses:
+    - pass:
+        rid: 863678790527090993
+    - pass:
+        rid: 863678790527090994
+    - pass:
+        rid: 863678790527090995
   progressTracker:
     totalTileWorkUnits: 0
     totalNpcWorkUnits: 0
@@ -3602,23 +3627,11 @@ MonoBehaviour:
   generateOnAwake: 0
   useRandomSeed: 1
   customSeed: 42
-  generationPasses:
-  - pass:
-      rid: 863678564487135310
-  alterationPasses:
-  - pass:
-      rid: 863678564487135311
-  - pass:
-      rid: 863678564487135312
-  - pass:
-      rid: 863678564487135314
-  - pass:
-      rid: 863678566035357767
   references:
     version: 2
     RefIds:
-    - rid: 863678564487135310
-      type: {class: PerlinNoiseGenerationPass, ns: Systems.Grid.Passes.Generation, asm: Assembly-CSharp}
+    - rid: 863678790527090992
+      type: {class: PerlinNoiseGenerationPass, ns: Systems.Grid.Passes.Generation, asm: Runtime}
       data:
         debugLog: 0
         elevationScale: 0.1
@@ -3628,21 +3641,16 @@ MonoBehaviour:
         mountainThreshold: 0.8
         forestMoisture: 0.6
         fieldMoisture: 0.3
-    - rid: 863678564487135311
-      type: {class: MountainSmoothingAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
+    - rid: 863678790527090993
+      type: {class: MountainSmoothingAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Runtime}
       data:
         debugLog: 0
-    - rid: 863678564487135312
-      type: {class: MassiveMountainAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
+    - rid: 863678790527090994
+      type: {class: MassiveMountainAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Runtime}
       data:
         debugLog: 0
-    - rid: 863678564487135314
-      type: {class: ForestAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
-      data:
-        debugLog: 0
-        variationCount: 3
-    - rid: 863678566035357767
-      type: {class: WaterDepthAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Assembly-CSharp}
+    - rid: 863678790527090995
+      type: {class: WaterDepthAlterationPass, ns: Systems.Grid.Passes.Alteration, asm: Runtime}
       data:
         debugLog: 0
 --- !u!1 &1778644301

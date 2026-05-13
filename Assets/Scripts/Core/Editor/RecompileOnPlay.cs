@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 
 namespace Core.Editor
@@ -9,9 +10,7 @@ namespace Core.Editor
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         }
-        /// <summary>
-        /// Refreshes the asset database when the editor is about to exit edit mode to ensure code is recompiled.
-        /// </summary>
+
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.ExitingEditMode)
@@ -21,3 +20,4 @@ namespace Core.Editor
         }
     }
 }
+#endif

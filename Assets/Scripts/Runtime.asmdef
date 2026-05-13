@@ -1,0 +1,16 @@
+{
+    "name": "Runtime",
+    "rootNamespace": "",
+    "autoReferenced": true,
+    "noEngineReferences": false,
+    "references": [
+        "Unity.Burst",
+        "Unity.Cinemachine",
+        "Unity.Collections",
+        "Unity.InputSystem",
+        "Unity.Jobs",
+        "Unity.Mathematics",
+        "Unity.TextMeshPro",
+        "Zenject"
+    ]
+}

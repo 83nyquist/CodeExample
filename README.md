@@ -39,6 +39,7 @@ Contact me at 83nyquist@gmail.com.
 - **Event-Driven Architecture** - Centralized `GameEventBus` with source tracking for debugging (Systems/EventBus)
 - **UI Toolkit and UGUI Integration** - Hybrid UI system combining modern Toolkit with legacy UGUI for maximum compatibility and flexibility (UserInterface)
 - **AI-Assisted Development Workflow** - Integration of AI coding assistant with version-controlled agent configuration (`.aiassistant/`)
+- **74 EditMode Unit Tests** - Pure logic tests for `Heap<T>`, `HexGeometry`, `EventBusEngine`, `PassPipeline`, and `TilePathfinder` using NUnit (`Assets/Scripts/Tests/Editor/`)
 
 ### AI-Assisted Development Workflow
 
@@ -93,6 +94,25 @@ This project uses a structured AI-assisted development workflow where the AI ass
 - **Team Collaboration** - Everyone uses the same agent rules and design docs
 - **Observability** - Design decisions and agent memories are human-readable markdown
 - **Tool-Agnostic** - Same files work with Rider AI Assistant, Claude, or any markdown-capable AI tool
+
+## How to Run Tests
+
+1. Open the project in Unity
+2. Open the Test Runner: `Window > General > Test Runner`
+3. Select the `EditMode` tab
+4. Click `Run All` (or expand to run individual test suites)
+
+All 74 tests are EditMode tests with no Play Mode / scene dependencies. Tests are located in `Assets/Scripts/Tests/Editor/` across 5 files:
+
+| Test File | Class Under Test | Tests |
+|-----------|-----------------|-------|
+| `Core/HeapTests.cs` | `Heap<T>` | 14 |
+| `Systems/Grid/HexGeometryTests.cs` | `HexGeometry` | 15 |
+| `Systems/Grid/PassPipelineTests.cs` | `PassPipeline` | 18 |
+| `Systems/Grid/TilePathfinderTests.cs` | `TilePathfinder` | 14 |
+| `Systems/EventBus/EventBusEngineTests.cs` | `EventBusEngine` | 13 |
+
+The assembly setup uses `Runtime.asmdef` for game code and `Tests.asmdef` (Editor-only, references Runtime) for test code. Editor-only files are guarded with `#if UNITY_EDITOR`.
 
 ## How to Run the Build
 

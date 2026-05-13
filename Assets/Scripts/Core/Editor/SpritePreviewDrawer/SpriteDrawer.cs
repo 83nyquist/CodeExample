@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,9 +9,6 @@ namespace Core.Editor.SpritePreviewDrawer
     {
         const float ImageHeight = 100;
 
-        /// <summary>
-        /// Calculates the height of the property based on whether a sprite preview is displayed.
-        /// </summary>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             if (property.propertyType == SerializedPropertyType.ObjectReference &&
@@ -21,9 +19,6 @@ namespace Core.Editor.SpritePreviewDrawer
             return EditorGUI.GetPropertyHeight(property, label, true);
         }
 
-        /// <summary>
-        /// Retrieves the path of the property for internal use.
-        /// </summary>
         static string GetPath(SerializedProperty property)
         {
             string path = property.propertyPath;
@@ -31,9 +26,6 @@ namespace Core.Editor.SpritePreviewDrawer
             return path.Substring(0, index + 1);
         }
 
-        /// <summary>
-        /// Renders the property field and an optional sprite preview in the Inspector.
-        /// </summary>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.PropertyField(position, property, label, true);
@@ -50,9 +42,6 @@ namespace Core.Editor.SpritePreviewDrawer
             }
         }
 
-        /// <summary>
-        /// Draws a preview of the sprite correctly mapped from its atlas texture.
-        /// </summary>
         private void DrawTexturePreview(Rect position, Sprite sprite)
         {
             Vector2 fullSize = new Vector2(sprite.texture.width, sprite.texture.height);
@@ -78,3 +67,4 @@ namespace Core.Editor.SpritePreviewDrawer
         }
     }
 }
+#endif
