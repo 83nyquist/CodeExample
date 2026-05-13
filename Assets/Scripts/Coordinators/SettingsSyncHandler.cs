@@ -1,6 +1,7 @@
 using Data;
 using Systems.EventBus.BaseClasses;
 using Systems.EventBus.Events;
+using UserInterface;
 using Zenject;
 
 namespace Coordinators
@@ -9,6 +10,7 @@ namespace Coordinators
     {
         [Inject] private PlayerSettings _playerSettings;
         [Inject] private GameSettings _gameSettings;
+        [Inject] private DebugDrawer _debugDrawer;
 
         private SettingsPersistenceService _persistence = new();
 
@@ -24,6 +26,7 @@ namespace Coordinators
         public void Initialize()
         {
             _persistence.LoadAll(_playerSettings, _gameSettings);
+            _debugDrawer.showDebug = _playerSettings.ShowFPS;
         }
 
         private void OnGridRadiusChanged(GridRadiusChangedRequest e)
@@ -51,6 +54,7 @@ namespace Coordinators
         {
             if (_playerSettings == null) return;
             _playerSettings.ShowFPS = e.Value;
+            _debugDrawer.showDebug = e.Value;
             _persistence.SavePlayerSettings(_playerSettings);
         }
 

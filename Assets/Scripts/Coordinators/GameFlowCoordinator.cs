@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Data;
 using Systems.EventBus.BaseClasses;
 using Systems.EventBus.Events;
 using UnityEngine;
@@ -14,10 +13,10 @@ namespace Coordinators
         Playing
     }
 
+    [DefaultExecutionOrder(-100)]
     public class GameFlowCoordinator : EventBusSubscriber
     {
         [Inject] private SettingsSyncHandler _settingsSyncHandler;
-        [Inject] private PlayerSettings _playerSettings;
         
         [Header("Debugging")]
         [SerializeField] private GameState currentState = GameState.Initializing;
