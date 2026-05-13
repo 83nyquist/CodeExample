@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Systems.Decoration.Interfaces;
-using Systems.EventBus.Components;
+using Systems.EventBus.Interfaces;
 using Systems.EventBus.Events;
 using Systems.Grid.Components;
 using UnityEngine;
@@ -13,26 +13,19 @@ namespace Systems.Decoration.Components
     {
         private readonly DecoratorFactory _factory;
         private readonly float _maxMsPerFrame;
+        private readonly IEventBus _eventBus;
         private readonly Dictionary<TileData, TileDecorator> _activeDecorators = new();
 
         public bool IsProcessing { get; private set; }
         public event Action OnProcessingFinished;
 
-        /// <summary>
-        /// Initializes the scheduler with a factory and a millisecond-per-frame budget.
-        /// </summary>
-        public DecorationScheduler(DecoratorFactory factory, float maxMsPerFrame)
+        public DecorationScheduler(DecoratorFactory factory, float maxMsPerFrame, IEventBus eventBus)
         {
             _factory = factory;
             _maxMsPerFrame = maxMsPerFrame;
+            _eventBus = eventBus;
         }
 
-        /// <summary>
-        /// Processes the showing and hiding of decorators over multiple frames to maintain performance.
-        /// </summary>
-        /// <param name="toShow">Tiles that need visual decorators.</param>
-        /// <param name="toHide">Tiles whose decorators should be returned to the pool.</param>
-        /// <param name="reportProgress">Reporting sent to the progress reporter only during initialization for the loading slider</param>
         public IEnumerator ProcessQueues(IEnumerable<TileData> toShow, IEnumerable<TileData> toHide, bool reportProgress)
         {
             IsProcessing = true;
@@ -81,7 +74,7 @@ namespace Systems.Decoration.Components
 
                 if (reportProgress && workDoneInFrame > 0)
                 {
-                    EventBusSystem.Publish(new ReportWorkProgressRequest(workDoneInFrame, 0));
+                    _eventBus.Publish(new ReportWorkProgressRequest(workDoneInFrame, 0));
                 }
                 
                 yield return null;

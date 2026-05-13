@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Systems.EventBus.BaseClasses;
-using Systems.EventBus.Components;
 using Systems.EventBus.Events;
 using Systems.Grid;
 using Systems.Grid.Components;
@@ -27,9 +26,6 @@ namespace Vanguard
 
         public TileData CurrentTile => _currentTile;
 
-        /// <summary>
-        /// Initiates the coroutine to traverse a provided list of tiles.
-        /// </summary>
         public void TraversePath(List<TileData> path)
         {
             if (path == null || path.Count == 0)
@@ -45,9 +41,6 @@ namespace Vanguard
             _moveCoroutine = StartCoroutine(TraversePathRoutine(path));
         }
 
-        /// <summary>
-        /// Stops current movement and resets moving flags.
-        /// </summary>
         public void StopMoving()
         {
             if (_moveCoroutine != null)
@@ -59,9 +52,6 @@ namespace Vanguard
             SetIsMoving(false);
         }
 
-        /// <summary>
-        /// Coroutine that iterates through the path tiles and signals completion.
-        /// </summary>
         private IEnumerator TraversePathRoutine(List<TileData> path)
         {
             SetIsMoving(true);
@@ -80,12 +70,9 @@ namespace Vanguard
             SetIsMoving(false);
             _moveCoroutine = null;
 
-            EventBusSystem.Publish(new PlayerDestinationReachedEvent(_currentTile));
+            Publish(new PlayerDestinationReachedEvent(_currentTile));
         }
 
-        /// <summary>
-        /// Rotates the transform to face the next destination point.
-        /// </summary>
         private void FaceDestination(Vector3 destination)
         {
             Vector3 direction = destination - transform.position;
@@ -104,9 +91,6 @@ namespace Vanguard
                 rotationSpeed * Time.deltaTime);
         }
 
-        /// <summary>
-        /// Coroutine that interpolates the position towards a specific tile.
-        /// </summary>
         private IEnumerator MoveToTile(TileData tile)
         {
             Vector3 destination = _axialHexGrid.AxialToWorld(tile.X, tile.Z);
@@ -127,9 +111,6 @@ namespace Vanguard
             transform.position = destination;
         }
 
-        /// <summary>
-        /// Sets animator parameters and manages input lock requests based on movement state.
-        /// </summary>
         private void SetIsMoving(bool isMoving)
         {
             if (isMoving)

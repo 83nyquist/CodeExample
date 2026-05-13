@@ -5,6 +5,7 @@ using System.Linq;
 using Data;
 using Systems.Decoration;
 using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Interfaces;
 using Systems.EventBus.Events;
 using Systems.Grid;
 using Systems.Grid.Components;
@@ -24,6 +25,7 @@ namespace Coordinators
         [Inject] private UiManager _uiManager;
         [Inject] private NpcManager _npcManager;
         [Inject] private WorldDecorator _worldDecorator;
+        [Inject] private IEventBus _eventBus;
 
         [Header("Generation Progress Tracker")]
         [SerializeField] private GenerationProgressTracker progressTracker;
@@ -48,13 +50,10 @@ namespace Coordinators
 
         private Coroutine _generationRoutine;
         
-        /// <summary>
-        /// Initializes the generation system, progress tracker, and event subscriptions.
-        /// </summary>
         private void Start()
         {
-            progressTracker = new GenerationProgressTracker();
-            _internalGenerator = new GridGenerator(maxMsPerFrame);
+            progressTracker = new GenerationProgressTracker(_eventBus);
+            _internalGenerator = new GridGenerator(maxMsPerFrame, _eventBus);
 
             Subscribe<NpcSimulationCompleteEvent>(HandleNpcComplete);
             Subscribe<WorldVisualsReadyEvent>(HandleVisualsReady);
@@ -66,9 +65,6 @@ namespace Coordinators
             }
         }
 
-        /// <summary>
-        /// Initiates the world generation process.
-        /// </summary>
         public void GenerateWorld()
         {
             Cleanup();
@@ -76,9 +72,6 @@ namespace Coordinators
             _generationRoutine = StartCoroutine(WorldGenerationFlow());
         }
 
-        /// <summary>
-        /// Resets the generation state and stops any active generation routines.
-        /// </summary>
         private void Cleanup()
         {
             if (_generationRoutine != null)
@@ -96,9 +89,6 @@ namespace Coordinators
             _currentSeed = 0;
         }
 
-        /// <summary>
-        /// Orchestrates the sequence of world generation steps.
-        /// </summary>
         private IEnumerator WorldGenerationFlow()
         {
             int radius = _playerSettings.GridRadius;
@@ -133,9 +123,6 @@ namespace Coordinators
             _generationRoutine = null;
         }
 
-        /// <summary>
-        /// Executes the generation passes.
-        /// </summary>
         private IEnumerator RunGenerationPassesRoutine() =>
             ProcessPassesRoutine(
                 generationPasses.Select(w => w.pass).Where(p => p != null),
@@ -143,9 +130,6 @@ namespace Coordinators
                 pass => pass.EstimateWorkUnits(_tilesInGrid)
             );
 
-        /// <summary>
-        /// Executes the alteration passes.
-        /// </summary>
         private IEnumerator RunAlterationPassesRoutine() =>
             ProcessPassesRoutine(
                 alterationPasses.Select(w => w.pass).Where(p => p != null),
@@ -153,9 +137,6 @@ namespace Coordinators
                 pass => pass.EstimateWorkUnits(_tilesInGrid)
             );
 
-        /// <summary>
-        /// Generic routine to process a collection of passes within a time budget.
-        /// </summary>
         private IEnumerator ProcessPassesRoutine<T>(
             IEnumerable<T> passes,
             Action<T> executeAction,
@@ -187,9 +168,6 @@ namespace Coordinators
             }
         }
 
-        /// <summary>
-        /// Handles changes to the game state.
-        /// </summary>
         private void HandleGameStateChangedEvent(GameStateChangedEvent obj)
         {
             if (obj.State == GameState.Loading)
@@ -199,89 +177,56 @@ namespace Coordinators
             }
         }
 
-        /// <summary>
-        /// Handles the completion of NPC simulation.
-        /// </summary>
         private void HandleNpcComplete(NpcSimulationCompleteEvent e)
         {
             _npcsComplete = true;
         }
         
-        /// <summary>
-        /// Handles the completion of world visual decoration.
-        /// </summary>
         private void HandleVisualsReady(WorldVisualsReadyEvent e)
         {
             _visualsComplete = true;
         }
         
-        /// <summary>
-        /// Calculates total tiles for a hex grid of a given radius.
-        /// </summary>
         private int CalculateTotalTiles(int radius)
         {
             return 3 * radius * radius + 3 * radius + 1;
         }
         
-        /// <summary>
-        /// Adds a generation pass to the pipeline.
-        /// </summary>
         public void AddGenerationPass(IGridGenerationPass pass)
         {
             generationPasses.Add(new GenerationPassWrapper { pass = pass });
         }
         
-        /// <summary>
-        /// Removes a generation pass of a specific type.
-        /// </summary>
         public void RemoveGenerationPass(Type type)
         {
             generationPasses.RemoveAll(w => w.pass?.GetType() == type);
         }
         
-        /// <summary>
-        /// Adds an alteration pass to the pipeline.
-        /// </summary>
         public void AddAlterationPass(IGridAlterationPass pass)
         {
             alterationPasses.Add(new AlterationPassWrapper { pass = pass });
         }
         
-        /// <summary>
-        /// Removes an alteration pass of a specific type.
-        /// </summary>
         public void RemoveAlterationPass(Type type)
         {
             alterationPasses.RemoveAll(w => w.pass?.GetType() == type);
         }
         
-        /// <summary>
-        /// Checks if a specific generation pass type exists.
-        /// </summary>
         public bool HasGenerationPass(Type type)
         {
             return generationPasses.Any(w => w.pass?.GetType() == type);
         }
 
-        /// <summary>
-        /// Checks if a specific alteration pass type exists.
-        /// </summary>
         public bool HasAlterationPass(Type type)
         {
             return alterationPasses.Any(w => w.pass?.GetType() == type);
         }
         
-        /// <summary>
-        /// Clears all generation passes.
-        /// </summary>
         public void ClearGenerationPasses()
         {
             generationPasses.Clear();
         }
 
-        /// <summary>
-        /// Clears all alteration passes.
-        /// </summary>
         public void ClearAlterationPasses()
         {
             alterationPasses.Clear();

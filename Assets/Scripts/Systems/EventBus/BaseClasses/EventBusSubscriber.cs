@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Systems.EventBus.Components;
 using Systems.EventBus.Enums;
 using Systems.EventBus.Events;
+using Systems.EventBus.Interfaces;
 using UnityEngine;
+using Zenject;
 
 namespace Systems.EventBus.BaseClasses
 {
     public abstract class EventBusSubscriber : MonoBehaviour
     {
+        [Inject] private IEventBus _eventBus;
+
         [Header("Event Bus Settings")]
         [SerializeField] protected EventBusLogLevel logLevel = EventBusLogLevel.Warning;
 
@@ -24,7 +27,7 @@ namespace Systems.EventBus.BaseClasses
             Type eventType = typeof(TEvent);
             if (IsSubscribed(handler)) return;
 
-            EventBusSystem.Subscribe(handler);
+            _eventBus.Subscribe(handler);
             _subscriptions.Add((eventType, handler));
         }
 
@@ -41,7 +44,7 @@ namespace Systems.EventBus.BaseClasses
                     break;
                 }
             }
-            EventBusSystem.Unsubscribe(handler);
+            _eventBus.Unsubscribe(handler);
         }
 
         protected void Publish<TEvent>(TEvent eventToPublish,
@@ -60,7 +63,7 @@ namespace Systems.EventBus.BaseClasses
                 Debug.Log($"[EventBus] {Path.GetFileNameWithoutExtension(file)}.{caller} published {typeof(TEvent).Name}");
             }
 
-            EventBusSystem.Publish(eventToPublish);
+            _eventBus.Publish(eventToPublish);
         }
 
         private bool IsSubscribed<TEvent>(Action<TEvent> handler) where TEvent : class
@@ -78,7 +81,7 @@ namespace Systems.EventBus.BaseClasses
             foreach (var (type, handler) in _subscriptions)
             {
                 if (handler == null) continue;
-                typeof(EventBusSystem).GetMethod("Unsubscribe")?.MakeGenericMethod(type).Invoke(null, new object[] { handler });
+                _eventBus.Unsubscribe(type, handler);
             }
             _subscriptions.Clear();
         }
@@ -88,7 +91,7 @@ namespace Systems.EventBus.BaseClasses
             foreach (var (type, handler) in _subscriptions)
             {
                 if (handler == null) continue;
-                typeof(EventBusSystem).GetMethod("Subscribe")?.MakeGenericMethod(type).Invoke(null, new object[] { handler });
+                _eventBus.Subscribe(type, handler);
             }
         }
 

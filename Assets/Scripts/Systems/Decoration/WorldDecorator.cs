@@ -7,6 +7,7 @@ using Systems.Grid.Components;
 using UnityEngine;
 using Systems.Decoration.Interfaces;
 using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Interfaces;
 using Systems.EventBus.Events;
 using Systems.NonPlayerCharacters;
 using Vanguard;
@@ -28,6 +29,7 @@ namespace Systems.Decoration
         [Inject] private VanguardMover _vanguardMover;
         [Inject] private NpcManager _npcManager;
         [Inject] private PlayerSettings _playerSettings;
+        [Inject] private IEventBus _eventBus;
 
         [SerializeField] private float maxMsPerFrame = 3f;
 
@@ -43,12 +45,9 @@ namespace Systems.Decoration
         private TileData _lastOrigin;
         private bool _isInitialDecoration = true;
 
-        /// <summary>
-        /// Initializes the decoration scheduler, strategy, and event subscriptions.
-        /// </summary>
         private void Start()
         {
-            _scheduler = new DecorationScheduler(_decoratorFactory, maxMsPerFrame);
+            _scheduler = new DecorationScheduler(_decoratorFactory, maxMsPerFrame, _eventBus);
             _scheduler.OnProcessingFinished += ReleaseInputLock;
             
             InitializeStrategy();
@@ -58,9 +57,6 @@ namespace Systems.Decoration
             Subscribe<PlayerMovedEvent>(OnPathNodeReached);
         }
 
-        /// <summary>
-        /// Instantiates the vision strategy based on the current shrouding mode.
-        /// </summary>
         private void InitializeStrategy()
         {
             _visionStrategy = shroudMode == ShroudMode.DiscoveryBased 
@@ -68,18 +64,12 @@ namespace Systems.Decoration
                 : new RadiusVisionStrategy(_axialHexGrid, _playerSettings, secondaryShroudRadius);
         }
 
-        /// <summary>
-        /// Unsubscribes from scheduler events before destruction.
-        /// </summary>
         protected override void OnDestroy()
         {
             _scheduler.OnProcessingFinished -= ReleaseInputLock;
             base.OnDestroy();
         }
 
-        /// <summary>
-        /// Updates NPC visibility in response to inspector changes during play mode.
-        /// </summary>
         private void OnValidate()
         {
             if (Application.isPlaying && _lastOrigin != null)
@@ -88,9 +78,6 @@ namespace Systems.Decoration
             }
         }
 
-        /// <summary>
-        /// Clears all existing visual state when world generation begins.
-        /// </summary>
         private void OnGenerationStarted(WorldGenerationStartedEvent obj)
         {
             _activeDecorators.Clear();
@@ -102,26 +89,17 @@ namespace Systems.Decoration
                 _npcManager.CleanupNpcs();
         }
 
-        /// <summary>
-        /// Triggers initial decoration placement once the grid is ready.
-        /// </summary>
         private void OnGenerationComplete(GridInitializationFinishedEvent obj)
         {
             TileData origin = _axialHexGrid.Tiles.GetValueOrDefault(Vector2Int.zero);
             UpdateDecorations(origin);
         }
 
-        /// <summary>
-        /// Triggers decoration updates when the player enters a new tile.
-        /// </summary>
         private void OnPathNodeReached(PlayerMovedEvent obj)
         {
             UpdateDecorations(obj.NewTile);
         }
 
-        /// <summary>
-        /// Calculates vision changes and initiates the visual state transition.
-        /// </summary>
         public void UpdateDecorations(TileData origin)
         {
             if (origin == null || _scheduler.IsProcessing) return;
@@ -139,9 +117,6 @@ namespace Systems.Decoration
             }
         }
 
-        /// <summary>
-        /// Requests an input lock and starts the batched processing of spawning/hiding visuals.
-        /// </summary>
         private void ExecuteStateTransition(HashSet<TileData> nextActiveSet, List<TileData> toShow, List<TileData> toHide)
         {
             Publish(new InputLockRequest(ToString()));
@@ -150,27 +125,18 @@ namespace Systems.Decoration
             _isInitialDecoration = false;
         }
 
-        /// <summary>
-        /// Updates NPC visibility state based on the current vision set.
-        /// </summary>
         private void UpdateNpcVisibility()
         {
             if (_npcManager == null) return;
             _npcManager.UpdateNpcVisibility(_currentVisionSet, debugShowNpcsOutsideVision);
         }
 
-        /// <summary>
-        /// Publishes events to signal that visuals are ready and unlocks input.
-        /// </summary>
         private void ReleaseInputLock()
         {
             Publish(new WorldVisualsReadyEvent());
             Publish(new InputUnlockRequest(ToString()));
         }
         
-        /// <summary>
-        /// Provides an estimate of the total work units for the progress tracker.
-        /// </summary>
         public int GetInitialWorkEstimate()
         {
             if (_decoratorFactory.TileSet == null)
@@ -182,19 +148,10 @@ namespace Systems.Decoration
             return 3 * radius * radius + 3 * radius + 1;
         }
         
-        /// <summary>
-        /// Gets the set of tiles that currently have active decorators.
-        /// </summary>
         public HashSet<TileData> GetVisibleTiles() => _activeDecorators;
         
-        /// <summary>
-        /// Gets tiles strictly within the player's vision radius.
-        /// </summary>
         public HashSet<TileData> GetTilesInVision() => _currentVisionSet;
         
-        /// <summary>
-        /// Gets or sets whether NPCs should be visible regardless of vision radius for debugging.
-        /// </summary>
         public bool IsNpcVisibilityDebugEnabled
         {
             get => debugShowNpcsOutsideVision;

@@ -1,13 +1,20 @@
 using System;
 using System.Collections.Generic;
-using Systems.EventBus.Components;
+using Systems.EventBus.Interfaces;
 using UnityEngine;
 
 namespace Systems.EventBus.BaseClasses
 {
     public abstract class EventBusSubscriberPure : IDisposable
     {
+        protected readonly IEventBus EventBus;
+
         private List<(Type type, Delegate handler)> _subscriptions = new();
+
+        protected EventBusSubscriberPure(IEventBus eventBus)
+        {
+            EventBus = eventBus;
+        }
 
         protected void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : class
         {
@@ -20,7 +27,7 @@ namespace Systems.EventBus.BaseClasses
                 return;
             }
 
-            EventBusSystem.Subscribe(handler);
+            EventBus.Subscribe(handler);
             _subscriptions.Add((eventType, handler));
         }
 
@@ -37,12 +44,12 @@ namespace Systems.EventBus.BaseClasses
                     break;
                 }
             }
-            EventBusSystem.Unsubscribe(handler);
+            EventBus.Unsubscribe(handler);
         }
 
         protected void Publish<TEvent>(TEvent eventToPublish) where TEvent : class
         {
-            EventBusSystem.Publish(eventToPublish);
+            EventBus.Publish(eventToPublish);
         }
 
         private bool IsSubscribed<TEvent>(Action<TEvent> handler) where TEvent : class
@@ -60,7 +67,7 @@ namespace Systems.EventBus.BaseClasses
             foreach (var (type, handler) in _subscriptions)
             {
                 if (handler == null) continue;
-                typeof(EventBusSystem).GetMethod("Unsubscribe")?.MakeGenericMethod(type).Invoke(null, new object[] { handler });
+                EventBus.Unsubscribe(type, handler);
             }
             _subscriptions.Clear();
         }

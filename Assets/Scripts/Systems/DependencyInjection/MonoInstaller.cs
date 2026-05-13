@@ -3,6 +3,8 @@ using Coordinators;
 using Input;
 using Systems.Decoration;
 using Systems.Decoration.Components;
+using Systems.EventBus.Components;
+using Systems.EventBus.Interfaces;
 using Systems.Grid;
 using Systems.Grid.Pathfinding;
 using Systems.NonPlayerCharacters;
@@ -16,7 +18,9 @@ namespace Systems.DependencyInjection
     public class MonoInstaller : Zenject.MonoInstaller
     {
         public override void InstallBindings()
-        { 
+        {
+            Container.Bind<IEventBus>().FromInstance(EventBusSystem.Instance).AsSingle();
+            
             Container.Bind<GameFlowCoordinator>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<AxialHexGrid>().FromComponentInHierarchy().AsCached().NonLazy();
             Container.Bind<WorldDecorator>().FromComponentInHierarchy().AsCached().NonLazy();

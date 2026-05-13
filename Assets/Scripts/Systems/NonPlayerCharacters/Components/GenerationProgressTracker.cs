@@ -1,5 +1,6 @@
 using System;
 using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Interfaces;
 using Systems.EventBus.Events;
 using UnityEngine;
 
@@ -13,18 +14,12 @@ namespace Systems.NonPlayerCharacters.Components
         [SerializeField] private int completedTileWorkUnits;
         [SerializeField] private int completedNpcWorkUnits;
 
-        /// <summary>
-        /// Initializes the tracker and subscribes to progress-related events.
-        /// </summary>
-        public GenerationProgressTracker()
+        public GenerationProgressTracker(IEventBus eventBus) : base(eventBus)
         {
             Subscribe<GenerationProgressInitializedEvent>(OnInitialize);
             Subscribe<ReportWorkProgressRequest>(OnReportProgress);
         }
 
-        /// <summary>
-        /// Sets up total work units for a new generation cycle.
-        /// </summary>
         private void OnInitialize(GenerationProgressInitializedEvent e)
         {
             totalTileWorkUnits = e.TotalTileWorkUnits;
@@ -34,9 +29,6 @@ namespace Systems.NonPlayerCharacters.Components
             PublishProgress();
         }
 
-        /// <summary>
-        /// Updates completed work units based on incoming progress reports.
-        /// </summary>
         private void OnReportProgress(ReportWorkProgressRequest e)
         {
             completedTileWorkUnits += e.AmountTiles;
@@ -44,9 +36,6 @@ namespace Systems.NonPlayerCharacters.Components
             PublishProgress();
         }
 
-        /// <summary>
-        /// Calculates the percentage of total progress and publishes an update event.
-        /// </summary>
         private void PublishProgress()
         {
             int completedWorkUnits = completedTileWorkUnits + completedNpcWorkUnits;
