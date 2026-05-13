@@ -1,6 +1,7 @@
 using Coordinators;
 using Systems.Decoration;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using Systems.Grid;
 using Systems.NonPlayerCharacters;
 using UnityEngine;

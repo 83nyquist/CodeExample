@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Systems.Decoration.Components;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;

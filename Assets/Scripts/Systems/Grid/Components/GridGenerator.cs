@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Systems.EventBus;
+using Systems.EventBus.Components;
+using Systems.EventBus.Events;
 using UnityEngine;
 
 namespace Systems.Grid.Components

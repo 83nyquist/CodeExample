@@ -1,5 +1,6 @@
 using Data;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using Zenject;
 
 namespace Coordinators

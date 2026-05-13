@@ -1,5 +1,6 @@
 using System;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using UnityEngine;
 
 namespace Systems.NonPlayerCharacters.Components

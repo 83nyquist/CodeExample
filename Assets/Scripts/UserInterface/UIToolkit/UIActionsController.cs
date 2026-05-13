@@ -1,7 +1,8 @@
 using UnityEngine; // KEEP IN FOR THE UNITY CONDITION IN OnExitClicked()
 using Coordinators;
 using Systems.Decoration;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using UnityEngine.UIElements;
 using Vanguard;
 using Zenject;

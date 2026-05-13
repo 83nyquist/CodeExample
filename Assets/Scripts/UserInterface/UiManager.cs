@@ -1,5 +1,6 @@
 using Coordinators;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using UnityEngine;
 using UserInterface.UGUI;
 using UserInterface.UIToolkit;

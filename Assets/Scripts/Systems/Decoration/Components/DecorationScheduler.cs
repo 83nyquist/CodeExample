@@ -2,7 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Systems.Decoration.Interfaces;
-using Systems.EventBus;
+using Systems.EventBus.Components;
+using Systems.EventBus.Events;
 using Systems.Grid.Components;
 using UnityEngine;
 

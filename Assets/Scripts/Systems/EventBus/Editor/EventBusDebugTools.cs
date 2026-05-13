@@ -1,6 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 
+using Systems.EventBus.Enums;
+
 namespace Systems.EventBus
 {
     public class EventBusDebugTools : EditorWindow

@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using Data;
 using Systems.Decoration.Components;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using Systems.Grid.Components;
 using UnityEngine;
 using Vanguard;

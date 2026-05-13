@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Data;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
+using Systems.EventBus.Events;
 using UnityEngine;
 using Zenject;
 

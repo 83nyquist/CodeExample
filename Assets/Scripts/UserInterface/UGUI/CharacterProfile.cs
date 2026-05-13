@@ -1,5 +1,5 @@
 using Character;
-using Systems.EventBus;
+using Systems.EventBus.BaseClasses;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
