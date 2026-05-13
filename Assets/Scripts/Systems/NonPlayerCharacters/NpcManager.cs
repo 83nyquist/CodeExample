@@ -29,6 +29,9 @@ namespace Systems.NonPlayerCharacters
         [SerializeField] private float maxMoveInterval = 3f;
         [SerializeField] private float visibilityUpdateInterval = 0.2f;
 
+        [Header("Debug")]
+        [SerializeField] private bool debugShowNpcsOutsideVision = false;
+
         [Header("Visual Settings")]
         [SerializeField] private GameObject npcVisualPrefab;
         [SerializeField] private float moveSpeed = 5f;
@@ -60,6 +63,7 @@ namespace Systems.NonPlayerCharacters
             InitializeComponents();
             Subscribe<WorldGenerationStartedEvent>(CleanupActiveSimulation);
             Subscribe<GridInitializationFinishedEvent>(InitializeNpcs);
+            Subscribe<VisionSetUpdatedEvent>(OnVisionSetUpdated);
         }
 
         /// <summary>
@@ -167,6 +171,33 @@ namespace Systems.NonPlayerCharacters
             _spawnCoroutine = null;
         }
         
+        private void OnVisionSetUpdated(VisionSetUpdatedEvent evt)
+        {
+            UpdateNpcVisibility(evt.VisionSet, debugShowNpcsOutsideVision);
+        }
+
+        public bool IsNpcVisibilityDebugEnabled
+        {
+            get => debugShowNpcsOutsideVision;
+            set
+            {
+                if (debugShowNpcsOutsideVision == value) return;
+                debugShowNpcsOutsideVision = value;
+                UpdateNpcVisibility(_currentVisionSet, debugShowNpcsOutsideVision);
+            }
+        }
+
+        private void OnValidate()
+        {
+            if (!Application.isPlaying) return;
+            if (debugShowNpcsOutsideVision != _isVisibilityForced)
+            {
+                _isVisibilityForced = debugShowNpcsOutsideVision;
+                if (IsInitialized && _visuals != null)
+                    _visuals.UpdateVisibilityStates(_simulation.Data, _currentVisionSet, debugShowNpcsOutsideVision);
+            }
+        }
+
         /// <summary>
         /// Updates the visibility of all NPC GameObjects based on the player's vision.
         /// </summary>

@@ -29,14 +29,10 @@ namespace Vanguard
         public void TraversePath(List<TileData> path)
         {
             if (path == null || path.Count == 0)
-            {
                 return;
-            }
 
             if (_moveCoroutine != null)
-            {
                 StopCoroutine(_moveCoroutine);
-            }
 
             _moveCoroutine = StartCoroutine(TraversePathRoutine(path));
         }
@@ -58,10 +54,7 @@ namespace Vanguard
 
             foreach (TileData tile in path)
             {
-                if (tile == null)
-                {
-                    continue;
-                }
+                if (tile == null) continue;
 
                 yield return MoveToTile(tile);
                 _currentTile = tile;
@@ -78,13 +71,9 @@ namespace Vanguard
             Vector3 direction = destination - transform.position;
             direction.y = 0f;
 
-            if (direction.sqrMagnitude <= 0.001f)
-            {
-                return;
-            }
+            if (direction.sqrMagnitude <= 0.001f) return;
 
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 targetRotation,
@@ -113,19 +102,8 @@ namespace Vanguard
 
         private void SetIsMoving(bool isMoving)
         {
-            if (isMoving)
-            {
-                Publish(new InputLockRequest(ToString()));
-            }
-            else
-            {
-                Publish(new InputUnlockRequest(ToString()));
-            }
-            
             if (Animator != null)
-            {
                 Animator.SetBool(IsMoving, isMoving);
-            }
         }
     }
 }

@@ -9,7 +9,6 @@ using Systems.Decoration.Interfaces;
 using Systems.EventBus.BaseClasses;
 using Systems.EventBus.Interfaces;
 using Systems.EventBus.Events;
-using Systems.NonPlayerCharacters;
 using Vanguard;
 using Zenject;
 
@@ -27,7 +26,6 @@ namespace Systems.Decoration
         [Inject] private AxialHexGrid _axialHexGrid;
         [Inject] private DecoratorFactory _decoratorFactory;
         [Inject] private VanguardMover _vanguardMover;
-        [Inject] private NpcManager _npcManager;
         [Inject] private PlayerSettings _playerSettings;
         [Inject] private IEventBus _eventBus;
 
@@ -35,8 +33,6 @@ namespace Systems.Decoration
 
         [SerializeField] private ShroudMode shroudMode = ShroudMode.DiscoveryBased;
         [SerializeField] private int secondaryShroudRadius = 8;
-
-        [SerializeField] private bool debugShowNpcsOutsideVision = false;
 
         private IDecorationScheduler _scheduler;
         private IVisionStrategy _visionStrategy;
@@ -70,23 +66,12 @@ namespace Systems.Decoration
             base.OnDestroy();
         }
 
-        private void OnValidate()
-        {
-            if (Application.isPlaying && _lastOrigin != null)
-            {
-                UpdateNpcVisibility();
-            }
-        }
-
         private void OnGenerationStarted(WorldGenerationStartedEvent obj)
         {
             _activeDecorators.Clear();
             _currentVisionSet.Clear();
             _isInitialDecoration = true;
             _decoratorFactory.CleanupActiveDecorators();
-            
-            if (_npcManager != null)
-                _npcManager.CleanupNpcs();
         }
 
         private void OnGenerationComplete(GridInitializationFinishedEvent obj)
@@ -110,11 +95,12 @@ namespace Systems.Decoration
 
             var (toShow, toHide) = TileVisibilityProcessor.IdentifyChanges(context, _activeDecorators);
 
-            UpdateNpcVisibility();
             if (toShow.Count > 0 || toHide.Count > 0)
             {
                 ExecuteStateTransition(context.ActiveSet, toShow, toHide);
             }
+
+            Publish(new VisionSetUpdatedEvent(_currentVisionSet));
         }
 
         private void ExecuteStateTransition(HashSet<TileData> nextActiveSet, List<TileData> toShow, List<TileData> toHide)
@@ -123,12 +109,6 @@ namespace Systems.Decoration
             _activeDecorators = nextActiveSet;
             StartCoroutine(_scheduler.ProcessQueues(toShow, toHide, _isInitialDecoration));
             _isInitialDecoration = false;
-        }
-
-        private void UpdateNpcVisibility()
-        {
-            if (_npcManager == null) return;
-            _npcManager.UpdateNpcVisibility(_currentVisionSet, debugShowNpcsOutsideVision);
         }
 
         private void ReleaseInputLock()
@@ -151,16 +131,5 @@ namespace Systems.Decoration
         public HashSet<TileData> GetVisibleTiles() => _activeDecorators;
         
         public HashSet<TileData> GetTilesInVision() => _currentVisionSet;
-        
-        public bool IsNpcVisibilityDebugEnabled
-        {
-            get => debugShowNpcsOutsideVision;
-            set
-            {
-                if (debugShowNpcsOutsideVision == value) return;
-                debugShowNpcsOutsideVision = value;
-                UpdateNpcVisibility();
-            }
-        }
     }
 }

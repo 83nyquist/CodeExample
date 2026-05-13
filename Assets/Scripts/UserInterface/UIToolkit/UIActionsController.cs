@@ -1,8 +1,8 @@
 using UnityEngine; // KEEP IN FOR THE UNITY CONDITION IN OnExitClicked()
 using Coordinators;
-using Systems.Decoration;
 using Systems.EventBus.BaseClasses;
 using Systems.EventBus.Events;
+using Systems.NonPlayerCharacters;
 using UnityEngine.UIElements;
 using Vanguard;
 using Zenject;
@@ -15,7 +15,7 @@ namespace UserInterface.UIToolkit
         [Inject] private UiManager _uiManager;
         [Inject] private VanguardController _vanguardController;
         [Inject] private WorldGeneratorCoordinator _worldGenerator;
-        [Inject] private WorldDecorator _worldDecorator;
+        [Inject] private NpcManager _npcManager;
 
         private bool _isProcessing;
 
@@ -51,7 +51,7 @@ namespace UserInterface.UIToolkit
         /// <summary> Toggles NPC debug visibility. </summary>
         private void OnToggleAgentsClicked()
         {
-            _worldDecorator.IsNpcVisibilityDebugEnabled = !_worldDecorator.IsNpcVisibilityDebugEnabled;
+            _npcManager.IsNpcVisibilityDebugEnabled = !_npcManager.IsNpcVisibilityDebugEnabled;
         }
     }
 }

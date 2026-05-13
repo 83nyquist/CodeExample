@@ -11,4 +11,10 @@ namespace Systems.EventBus.Events
         public int VisibleCount { get; }
         public NpcVisibleAgentsCountChangedEvent(int visibleCount) => VisibleCount = visibleCount;
     }
+
+    public class VisionSetUpdatedEvent : GameEvent
+    {
+        public System.Collections.Generic.HashSet<Systems.Grid.Components.TileData> VisionSet { get; }
+        public VisionSetUpdatedEvent(System.Collections.Generic.HashSet<Systems.Grid.Components.TileData> visionSet) => VisionSet = visionSet;
+    }
 }

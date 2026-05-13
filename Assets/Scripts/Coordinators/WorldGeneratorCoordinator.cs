@@ -27,6 +27,9 @@ namespace Coordinators
         [Inject] private WorldDecorator _worldDecorator;
         [Inject] private IEventBus _eventBus;
 
+        [Header("Pass Pipeline")]
+        [SerializeField] private PassPipeline pipeline = new();
+
         [Header("Generation Progress Tracker")]
         [SerializeField] private GenerationProgressTracker progressTracker;
         
@@ -37,9 +40,6 @@ namespace Coordinators
         [Header("Seed Settings")]
         [SerializeField] private bool useRandomSeed = true;
         [SerializeField] private int customSeed = 42;
-
-        [SerializeField] private List<GenerationPassWrapper> generationPasses = new();
-        [SerializeField] private List<AlterationPassWrapper> alterationPasses = new();
 
         private GridGenerator _internalGenerator;
         
@@ -95,14 +95,7 @@ namespace Coordinators
             _tilesInGrid = CalculateTotalTiles(radius);
             _currentSeed = useRandomSeed ? UnityEngine.Random.Range(1, 999999) : customSeed;
             
-            int totalTileWorkEstimate = 0;
-            totalTileWorkEstimate += _tilesInGrid * 2;
-            
-            foreach (var pass in generationPasses)
-                if (pass.pass != null) totalTileWorkEstimate += pass.pass.EstimateWorkUnits(_tilesInGrid);
-            
-            foreach (var pass in alterationPasses)
-                if (pass.pass != null) totalTileWorkEstimate += pass.pass.EstimateWorkUnits(_tilesInGrid);
+            int totalTileWorkEstimate = _tilesInGrid * 2 + pipeline.EstimateTotalWork(_tilesInGrid);
             
             Publish(new GenerationProgressInitializedEvent(
                 totalTileWorkEstimate + _worldDecorator.GetInitialWorkEstimate(), 
@@ -125,14 +118,14 @@ namespace Coordinators
 
         private IEnumerator RunGenerationPassesRoutine() =>
             ProcessPassesRoutine(
-                generationPasses.Select(w => w.pass).Where(p => p != null),
+                pipeline.generationPasses.Select(w => w.pass).Where(p => p != null),
                 pass => pass.Execute(_grid, _currentSeed),
                 pass => pass.EstimateWorkUnits(_tilesInGrid)
             );
 
         private IEnumerator RunAlterationPassesRoutine() =>
             ProcessPassesRoutine(
-                alterationPasses.Select(w => w.pass).Where(p => p != null),
+                pipeline.alterationPasses.Select(w => w.pass).Where(p => p != null),
                 pass => pass.Execute(_grid, _currentSeed),
                 pass => pass.EstimateWorkUnits(_tilesInGrid)
             );
@@ -192,44 +185,13 @@ namespace Coordinators
             return 3 * radius * radius + 3 * radius + 1;
         }
         
-        public void AddGenerationPass(IGridGenerationPass pass)
-        {
-            generationPasses.Add(new GenerationPassWrapper { pass = pass });
-        }
-        
-        public void RemoveGenerationPass(Type type)
-        {
-            generationPasses.RemoveAll(w => w.pass?.GetType() == type);
-        }
-        
-        public void AddAlterationPass(IGridAlterationPass pass)
-        {
-            alterationPasses.Add(new AlterationPassWrapper { pass = pass });
-        }
-        
-        public void RemoveAlterationPass(Type type)
-        {
-            alterationPasses.RemoveAll(w => w.pass?.GetType() == type);
-        }
-        
-        public bool HasGenerationPass(Type type)
-        {
-            return generationPasses.Any(w => w.pass?.GetType() == type);
-        }
-
-        public bool HasAlterationPass(Type type)
-        {
-            return alterationPasses.Any(w => w.pass?.GetType() == type);
-        }
-        
-        public void ClearGenerationPasses()
-        {
-            generationPasses.Clear();
-        }
-
-        public void ClearAlterationPasses()
-        {
-            alterationPasses.Clear();
-        }
+        public void AddGenerationPass(IGridGenerationPass pass) => pipeline.AddGenerationPass(pass);
+        public void RemoveGenerationPass(Type type) => pipeline.RemoveGenerationPass(type);
+        public void AddAlterationPass(IGridAlterationPass pass) => pipeline.AddAlterationPass(pass);
+        public void RemoveAlterationPass(Type type) => pipeline.RemoveAlterationPass(type);
+        public bool HasGenerationPass(Type type) => pipeline.HasGenerationPass(type);
+        public bool HasAlterationPass(Type type) => pipeline.HasAlterationPass(type);
+        public void ClearGenerationPasses() => pipeline.ClearGenerationPasses();
+        public void ClearAlterationPasses() => pipeline.ClearAlterationPasses();
     }
 }
